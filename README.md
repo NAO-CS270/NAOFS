@@ -17,12 +17,9 @@ read
 ```
 
 ### Running
-Compile the project - `make`
+Compile the project - `make nao`
 Mount in random local directory - `./nao tempdir`
 Go into the directory and test commands.
 
 ### Clean
 `make clean`
-
-### Run it using the below command
-gcc -o nao temp.c pkg-config fuse --cflags --libs
