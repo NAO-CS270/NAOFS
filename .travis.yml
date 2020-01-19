@@ -1,0 +1,10 @@
+language: c
+compiler: gcc
+sudo: false # only for faster builds
+dist: bionic
+addons:
+  apt:
+    packages:
+    - libfuse-dev
+    - pkg-config
+script: make nao
