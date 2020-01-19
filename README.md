@@ -23,3 +23,6 @@ Go into the directory and test commands.
 
 ### Clean
 `make clean`
+
+### Run it using the below command
+gcc -o nao temp.c pkg-config fuse --cflags --libs
