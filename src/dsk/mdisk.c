@@ -1,19 +1,20 @@
 #include "mdisk.h"
+#include <stdlib.h>
 
-#define BLOCK_SIZE 1024
 #define DISK_SIZE 1024
 
-struct disk_block {
-	unsigned char data[BLOCK_SIZE];
-};
+static disk_block mem_disk[DISK_SIZE];
 
-static struct disk_block mem_disk[DISK_SIZE];
-
-struct disk_block fetchMemoryDiskBlock(int blockNumber) {
+disk_block* fetchMemoryDiskBlock(int blockNumber) {
+	disk_block* retBlock = (disk_block*)malloc(sizeof(disk_block));
+	
 	if (blockNumber > DISK_SIZE) {
 		// Throw appropriate exception
-		return mem_disk[0];
+		*retBlock = mem_disk[0];
+	}
+	else {
+		*retBlock = mem_disk[blockNumber - 1];
 	}
 
-	return mem_disk[blockNumber - 1];
+	return retBlock;
 }

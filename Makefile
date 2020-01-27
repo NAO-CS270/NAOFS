@@ -17,8 +17,11 @@ blkbld = build/dsk/
 nao:
 	gcc -o nao temp.c `pkg-config fuse --cflags --libs`
 
-blockFetch: $(blkbld)mdisk.o | $(blkbld)
+blockFetch: $(blkbld)mdisk.o $(blkbld)fetcher.o | $(blkbld)
 	$(CC) $(CFLAGS) -c $< -o $(blkbld)$@
+
+$(blkbld)fetcher.o: $(blksrc)blkfetch.c $(blksrc)blkfetch.h $(blksrc)mdisk.h | $(blkbld)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(blkbld)mdisk.o: $(blksrc)mdisk.c $(blksrc)mdisk.h | $(blkbld)
 	$(CC) $(CFLAGS) -c $< -o $@
