@@ -1,5 +1,6 @@
 #include<time.h>
 #include<stdio.h>
+#include <stdint.h>
 
 #include "../dsk/mdisk.h"
 
