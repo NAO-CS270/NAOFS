@@ -3,56 +3,7 @@
 
 #include "../dsk/mdisk.h"
 
-#define BLOCK_PTRS_PER_INODE_STRUCT 16
-
-typedef int inode_addr_t;
-typedef int inode_type_t;
-
-typedef int disk_addr_t;
-
-typedef struct INode {
-    // assuming there are more than 1 file systems
-    uint32_t device_number;
-
-    // unique to each filesystem
-    uint32_t inode_number;
-
-    // file/directory/symlink
-    inode_type_t type;
-
-    // number of hard links to the file
-    uint32_t nlink;
-
-    uint32_t owner_uid;
-
-    // ID of the group owner of the file
-    uint32_t gid;
-
-    // size of the file in bytes
-    uint32_t size;
-
-    // number of blocks allocated to the file
-    uint32_t num_blocks;
-
-    // inode allocated/needs to be written
-    uint16_t status;
-
-    // pointers to disk blocks containing data
-    disk_addr_t disk_block[BLOCK_PTRS_PER_INODE_STRUCT];
-
-    // file's last access timestamp
-    time_t access_time;
-
-    // file creation time(not returned in the inode stat struct)
-    time_t birth_time;
-
-    // file's last modified timestamp(timestamp of a directory is changed by the creation
-    // or deletion of files in that directory)
-    time_t modified_time;
-
-    // permissions for the file
-    inode_mode_t mode;
-};
+#define BLOCK_PTRS_PER_INODE_STRUCT 13
 
 /**
  * Bit masks for the type of file whose data is stored in the inode.
@@ -75,7 +26,7 @@ typedef enum INodeType {
     S_IFDIR = 0040000,  // directory
     S_IFCHR = 0020000,  // character device
     S_IFIFO = 0010000,  // FIFO
-} inode_type_t;
+} INodeType;
 
 
 // for more details, refer - http://man7.org/linux/man-pages/man7/inode.7.html
@@ -98,5 +49,50 @@ typedef enum INodeMode {
     S_IROTH = 00004,  // others have read permission
     S_IWOTH = 00002,  // others have write permission
     S_IXOTH = 00001,  // others have execute permission
+} INodeMode;
 
-} inode_mode_t;
+
+typedef struct INode {
+    // assuming there are more than 1 file systems
+    uint32_t device_number;
+
+    // unique to each filesystem
+    uint32_t inode_number;
+
+    // file/directory/symlink
+    INodeType type;
+
+    // number of hard links to the file
+    uint32_t nlink;
+
+    uint32_t owner_uid;
+
+    // ID of the group owner of the file
+    uint32_t gid;
+
+    // size of the file in bytes
+    uint32_t size;
+
+    // number of blocks allocated to the file
+    uint32_t num_blocks;
+
+    // inode allocated/needs to be written
+    uint16_t status;
+
+    // pointers to disk blocks containing data
+    disk_block data_blocks[BLOCK_PTRS_PER_INODE_STRUCT];
+
+    // file's last access timestamp
+    time_t access_time;
+
+    // file creation time(not returned in the inode stat struct)
+    time_t birth_time;
+
+    // file's last modified timestamp(timestamp of a directory is changed by the creation
+    // or deletion of files in that directory)
+    time_t modified_time;
+
+    // permissions for the file
+    INodeMode mode;
+} INode;
+
