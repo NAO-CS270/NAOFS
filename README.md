@@ -1,4 +1,6 @@
-# NAOFS [![Build Status](https://travis-ci.org/NAO-CS270/NAOFS.svg?branch=master)](https://travis-ci.org/NAO-CS270/NAOFS) [![Coverage Status](https://coveralls.io/repos/github/NAO-CS270/NAOFS/badge.svg?branch=master)](https://coveralls.io/github/NAO-CS270/NAOFS?branch=master)
+# NAOFS [![Build Status](https://travis-ci.org/NAO-CS270/NAOFS.svg?branch=master)](https://travis-ci.org/NAO-CS270/NAOFS) [![codecov](https://codecov.io/gh/NAO-CS270/NAOFS/branch/master/graph/badge.svg)](https://codecov.io/gh/NAO-CS270/NAOFS)
+
+
 Not Any Other File System - Graduate Operating Systems Class Project. Building a linux file system using FUSE
 
 ### Requirements
