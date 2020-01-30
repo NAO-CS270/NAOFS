@@ -12,8 +12,7 @@
 		printf("%s\n", parts[i]);
 	}
  */
-int
-string_split(char* path, char *tokens[], const char *delimiter) {
+int string_split(char* path, char *tokens[], const char *delimiter) {
     int i = 0;
     char *copy = NULL;
     char *token = NULL;

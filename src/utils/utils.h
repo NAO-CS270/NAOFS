@@ -7,8 +7,7 @@
                                 __LINE__, __func__, __VA_ARGS__); } while (0)
 
 
-int
-string_split(char*, char *[], const char *);
+int string_split(char*, char *[], const char *);
 
 
 #endif
