@@ -7,6 +7,7 @@ env:
     - DEPS_DIR=${TRAVIS_BUILD_DIR}/deps
     # Global build options and C++ flags
     - CXX_FLAGS="-Wall -pedantic -Werror -Wno-variadic-macros -Wno-long-long -Wno-shadow"
+    - CXX="c++"
     # Misc
     - RUN_TESTS=true
     - COVERAGE=false
