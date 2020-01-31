@@ -18,3 +18,13 @@ disk_block* fetchMemoryDiskBlock(int blockNumber) {
 
 	return retBlock;
 }
+
+void writeMemoryDiskBlock(int blockNumber, disk_block* blockData) {
+	if (blockNumber >= DISK_SIZE) {
+		// Throw appropriate exception
+	}
+	else {
+		mem_disk[blockNumber] = *blockData;
+	}
+	free(blockData);
+}
