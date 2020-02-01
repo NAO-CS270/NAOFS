@@ -18,13 +18,13 @@ disk_block* makeOneBlock(disk_block *blockPtr, size_t startNode) {
 	size_t nodeCounter = startNode;
 
 	while (ptrIntoBlock < blockSize && nodeCounter < numOfBlocks) {
-		memcpy(ptrIntoBlock, &nodeCounter, addressLength);
+		memcpy(ptrIntoBlock, &nodeCounter, blockAddressSize);
 		
 		ptrIntoBlock += blockAddressSize;
 		nodeCounter++;
 	}
 	if (nodeCounter < numOfBlocks) {
-		memcpy(endOfBlock - BLOCK_SIZE, &nodeCounter, addressLength);
+		memcpy(endOfBlock - BLOCK_SIZE, &nodeCounter, blockAddressSize);
 	}
 
 	return blockPtr;

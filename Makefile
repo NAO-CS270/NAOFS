@@ -3,12 +3,21 @@
 # *********************************************************
 # Parameters to control Makefile operation
 CC = gcc
-CFLAGS = -Wall -pedantic
+
+INC_DIR = src/
+CFLAGS = -Wall -pedantic -I $(INC_DIR)
 
 # Path and file variables
 blksrc = src/dsk/
 blkbld = build/dsk/
 
+mkfssrc = src/mkfs/
+mkfsbld = build/mkfs/
+
+paramssrc = src/mandsk/
+
+inodesrc = src/inode/
+inodebld = build/inode/
 # *********************************************************
 # Phony Targets
 .PHONY: clean
@@ -17,14 +26,26 @@ blkbld = build/dsk/
 nao:
 	gcc -o nao temp.c `pkg-config fuse --cflags --libs`
 
-blockFetch: $(blkbld)mdisk.o $(blkbld)fetcher.o | $(blkbld)
-	$(CC) $(CFLAGS) -c $< -o $(blkbld)$@
+mkfs: $(mkfssrc)mkfs.c $(inodesrc)iNode.h $(mkfssrc)freeBlockList.h $(blksrc)blkfetch.h $(paramssrc)params.h freeBlockList inode| $(blkbld)
+	$(CC) $(CFLAGS) -c $< -o $(blkbld)mkfs
 
-$(blkbld)fetcher.o: $(blksrc)blkfetch.c $(blksrc)blkfetch.h $(blksrc)mdisk.h | $(blkbld)
-	$(CC) $(CFLAGS) -c $< -o $@
+freeBlockList: $(mkfssrc)freeBlockList.c $(mkfssrc)freeBlockList.h $(blksrc)mdisk.h $(paramssrc)params.h | $(mkfsbld)
+	$(CC) $(CFLAGS) -c $< -o $(mkfsbld)freeBlockList.o
 
-$(blkbld)mdisk.o: $(blksrc)mdisk.c $(blksrc)mdisk.h | $(blkbld)
-	$(CC) $(CFLAGS) -c $< -o $@
+inode: $(inodesrc)iNode.c $(inodesrc)iNode.h | $(inodebld)
+	$(CC) $(CFLAGS) -c $< -o $(inodebld)inode.o
+
+fetcher: $(blksrc)blkfetch.c $(blksrc)blkfetch.h $(blksrc)mdisk.h mdisk | $(blkbld)
+	$(CC) $(CFLAGS) -c $< -o $(blkbld)fetcher.o
+
+mdisk: $(blksrc)mdisk.c $(blksrc)mdisk.h | $(blkbld)
+	$(CC) $(CFLAGS) -c $< -o $(blkbld)mdisk.o
+
+$(mkfsbld):
+	mkdir -p $@
+
+$(inodebld):
+	mkdir -p $@
 
 $(blkbld):
 	mkdir -p $@
