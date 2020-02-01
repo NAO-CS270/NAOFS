@@ -1,6 +1,10 @@
+#ifndef _INODE_H
+#define _INODE_H
+
 #include<time.h>
 #include<stdio.h>
 #include <stdint.h>
+#include <stddef.h>
 
 #include "../dsk/mdisk.h"
 
@@ -52,6 +56,16 @@ typedef enum INodeMode {
     S_IXOTH = 00001,  // others have execute permission
 } INodeMode;
 
+// Using this struct in the project. Keeping the old for for reference.
+typedef struct iNode iNode;
+
+struct iNode {
+	size_t inode_number; 
+};
+
+extern void initializeINode(iNode *iNodePtr, size_t iNodeNum);
+extern size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum);
+extern size_t makeINodeListBlock(disk_block * blockPtr, size_t *iNodeList, size_t iNodeAddressesPerBlock);
 
 typedef struct INode {
     // assuming there are more than 1 file systems
@@ -97,3 +111,5 @@ typedef struct INode {
     INodeMode mode;
 } INode;
 
+
+#endif
