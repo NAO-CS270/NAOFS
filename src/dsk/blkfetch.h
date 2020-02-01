@@ -5,4 +5,5 @@
 
 extern disk_block* getDiskBlock(int blockNumber);
 
+extern void writeDiskBlock(int blockNumber, disk_block* blockData);
 #endif
