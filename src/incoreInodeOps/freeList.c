@@ -1,6 +1,5 @@
 #include <stdlib.h>
-#include "inodecache/freeList.h"
-#include "incoreInodeOps/node.h"
+#include "incoreInodeOps/freeList.h"
 
 void freeListInsert(Node* head, Node* node) {
     node->next = head;

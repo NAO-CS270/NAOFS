@@ -1,6 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
-#include "incoreInodeOps/node.h"
+#include "inode/inCoreiNode.h"
 
 struct Node {
     inCoreiNode* inode;

@@ -18,6 +18,9 @@ paramssrc = src/mandsk/
 
 inodesrc = src/inode/
 inodebld = build/inode/
+
+incoreInodeOpssrc = src/incoreInodeOps/
+incoreInodeOpsbld = build/incoreInodeOps/
 # *********************************************************
 # Phony Targets
 .PHONY: clean
@@ -41,6 +44,18 @@ fetcher: $(blksrc)blkfetch.c $(blksrc)blkfetch.h $(blksrc)mdisk.h mdisk | $(blkb
 mdisk: $(blksrc)mdisk.c $(blksrc)mdisk.h | $(blkbld)
 	$(CC) $(CFLAGS) -c $< -o $(blkbld)mdisk.o
 
+freeList: $(incoreInodeOpssrc)freeList.c $(incoreInodeOpssrc)freeList.h $(incoreInodeOpssrc)node.h | $(incoreInodeOpsbld)
+	$(CC) $(CFLAGS) -c $< -o $(incoreInodeOpsbld)freeList.o
+
+hashQ: $(incoreInodeOpssrc)hashQ.c $(incoreInodeOpssrc)hashQ.h $(incoreInodeOpssrc)node.h $(paramssrc)params.h | $(incoreInodeOpsbld)
+	$(CC) $(CFLAGS) -c $< -o $(incoreInodeOpsbld)hashQ.o
+
+iget: $(incoreInodeOpssrc)iget.c $(incoreInodeOpssrc)iget.h $(blksrc)blkfetch.h $(blksrc)mdisk.h $(incoreInodeOpssrc)hashQ.h $(incoreInodeOpssrc)freeList.h $(incoreInodeOpssrc)node.h $(inodesrc)inCoreiNode.h $(inodesrc)iNode.h $(paramssrc)params.h  | $(incoreInodeOpsbld)
+	$(CC) $(CFLAGS) -c $< -o $(incoreInodeOpsbld)iget.o
+
+iput: $(incoreInodeOpssrc)iput.c $(incoreInodeOpssrc)iput.h $(blksrc)blkfetch.h $(blksrc)mdisk.h $(incoreInodeOpssrc)hashQ.h $(incoreInodeOpssrc)freeList.h $(incoreInodeOpssrc)node.h $(inodesrc)inCoreiNode.h $(paramssrc)params.h | $(incoreInodeOpsbld)
+	$(CC) $(CFLAGS) -c $< -o $(incoreInodeOpsbld)iput.o
+
 $(mkfsbld):
 	mkdir -p $@
 
@@ -48,6 +63,9 @@ $(inodebld):
 	mkdir -p $@
 
 $(blkbld):
+	mkdir -p $@
+
+$(incoreInodeOpsbld):
 	mkdir -p $@
 
 clean:

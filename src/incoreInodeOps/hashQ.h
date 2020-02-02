@@ -2,13 +2,12 @@
 #define HASHQ_H
 
 #include <stdio.h>
-#include "incoreInodeOps/list.h"
 #include "incoreInodeOps/node.h"
 #include "mandsk/params.h"
 
 
 // (device number + inode number) % INODE_HASH_SIZE
-extern size_t getHash(size_t device_number, size_t inode_number);
+extern size_t getHash(size_t deviceNumber, size_t inodeNumber);
 
 // insert into the hash table
 extern void insertInHash(Node* node, Node** hashQ);

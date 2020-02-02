@@ -1,9 +1,9 @@
-#include <stdbool.h>
+#include "incoreInodeOps/iput.h"
 
-#include "dsk/blkfetch.h"
-#include "inCoreInodeOps/iput.h"
-#include "mandsk/params.h"
+const size_t num_of_inodes = NUM_OF_INODES;
+const size_t inode_size = INODE_SIZE;
 
+const int ILIST_START_BLOCK = 3;
 
 void iput(inCoreiNode* inode, Node** hashQ, Node* freelist) {
     if(inode->lock == false) {
@@ -22,11 +22,11 @@ void iput(inCoreiNode* inode, Node** hashQ, Node* freelist) {
         // TODO: take care of when file_data_changed is TRUE
         // TODO: Take a global lock
         if (inode->inode_changed && !inode->file_data_changed) {
-            int inodeBlockNumber = inode->inode_number / NUM_OF_INODES + ILIST_START_BLOCK;
+            int inodeBlockNumber = inode->inode_number / num_of_inodes + ILIST_START_BLOCK;
             disk_block *metaBlock = getDiskBlock(inodeBlockNumber);
 
-            size_t offset = (inode->inode_number % NUM_OF_INODES) * INODE_SIZE;
-            memcpy(metaBlock + offset, inode->disk_iNode, INODE_SIZE);
+            size_t offset = (inode->inode_number % num_of_inodes) * inode_size;
+            memcpy(metaBlock + offset, inode->disk_iNode, inode_size);
             writeDiskBlock(inodeBlockNumber, metaBlock);
         }
         Node* node = hashLookup(inode->device_number, inode->inode_number, hashQ);

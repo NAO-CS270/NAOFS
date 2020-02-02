@@ -1,5 +1,9 @@
+#include "incoreInodeOps/iget.h"
+
 const int SLEEP_TIME_IN_SECONDS = 3;
 const int ILIST_START_BLOCK = 3;
+const size_t num_of_inodes = NUM_OF_INODES;
+const size_t inode_size = INODE_SIZE;
 
 inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber, Node** hashQ, Node* freeList) {
     Node* node;
@@ -32,12 +36,12 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber, Node** hashQ, Node* f
         // TODO:  call bread here(implemented below for now). Should return void*
         // TODO: Take a lock while reading
         // since the inode numbers start from 0, we don't do iNodeNumber-1.
-        int inodeBlockNumber = iNodeNumber / NUM_OF_INODES + ILIST_START_BLOCK;
+        int inodeBlockNumber = iNodeNumber / num_of_inodes + ILIST_START_BLOCK;
         disk_block* metaBlock = getDiskBlock(inodeBlockNumber);
 
-        size_t offset = (iNodeNumber % NUM_OF_INODES) * INODE_SIZE;
-        iNode* inode = (iNode*)malloc(INODE_SIZE);
-        memcpy(inode, metaBlock+offset, INODE_SIZE);
+        size_t offset = (iNodeNumber % num_of_inodes) * inode_size;
+        iNode* inode = (iNode*)malloc(inode_size);
+        memcpy(inode, metaBlock+offset, inode_size);
         // end of bread
 
         node->inode->disk_iNode = inode;

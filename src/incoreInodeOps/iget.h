@@ -2,9 +2,12 @@
 #define IGET_H
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
-#include "disk/mdisk.h"
+#include "dsk/blkfetch.h"
+#include "dsk/mdisk.h"
 #include "incoreInodeOps/hashQ.h"
 #include "incoreInodeOps/freeList.h"
 #include "incoreInodeOps/node.h"
