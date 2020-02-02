@@ -1,14 +1,3 @@
-#include <stdbool.h>
-#include <unistd.h>
-
-#include "disk/mdisk.h"
-#include "incoreInodeOps/hashQ.h"
-#include "incoreInodeOps/freeList.h"
-#include "incoreInodeOps/node.h"
-#include "inode/inCoreiNode.h"
-#include "inode/iNode.h"
-#include "mandsk/params.h"
-
 const int SLEEP_TIME_IN_SECONDS = 3;
 const int ILIST_START_BLOCK = 3;
 

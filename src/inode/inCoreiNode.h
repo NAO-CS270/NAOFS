@@ -1,5 +1,5 @@
-#ifndef NAOFS_INCOREINODE_H
-#define NAOFS_INCOREINODE_H
+#ifndef INCOREINODE_H
+#define INCOREINODE_H
 
 #include <stdbool.h>
 #include "inode/iNode.h"
@@ -31,4 +31,4 @@ extern void decrement_reference_count(inCoreiNode* iNode);
 
 extern size_t get_reference_count(inCoreiNode* iNode);
 
-#endif //NAOFS_INCOREINODE_H
+#endif //INCOREINODE_H

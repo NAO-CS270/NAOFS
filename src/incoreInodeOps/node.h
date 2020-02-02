@@ -1,5 +1,5 @@
-#ifndef PROJECT1_NODE_H
-#define PROJECT1_NODE_H
+#ifndef NODE_H
+#define NODE_H
 #include "incoreInodeOps/node.h"
 
 struct Node {
@@ -14,4 +14,4 @@ struct Node {
 
 typedef struct Node Node;
 
-#endif //PROJECT1_NODE_H
+#endif //NODE_H
