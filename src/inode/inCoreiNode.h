@@ -28,12 +28,4 @@ struct inCoreiNode {
 
 };
 
-extern void get_lock(inCoreiNode* iNode);
-extern void release_lock(inCoreiNode* iNode);
-
-extern void increment_reference_count(inCoreiNode* iNode);
-extern void decrement_reference_count(inCoreiNode* iNode);
-
-extern size_t get_reference_count(inCoreiNode* iNode);
-
 #endif //INCOREINODE_H
