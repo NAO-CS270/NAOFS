@@ -19,7 +19,12 @@ struct inCoreiNode {
     size_t inode_number;
 
     iNode* disk_iNode;
-    // TODO: Add inode status?
+
+    // dirty bits for this inode
+    bool inode_changed;
+    bool file_data_changed;
+    // TODO: handle file mount point
+    // TODO: A process is (or many processes are) waiting for it to be unlocked.
 
 };
 

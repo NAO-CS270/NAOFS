@@ -8,12 +8,12 @@
 
 
 // (device number + inode number) % INODE_HASH_SIZE
-extern size_t get_hash(size_t device_number, size_t inode_number);
+extern size_t getHash(size_t device_number, size_t inode_number);
 
 // insert into the hash table
-extern void insert(Node* node, Node** hashQ);
+extern void insertInHash(Node* node, Node** hashQ);
 // search for the inode in the hashQ
-extern Node* hash_lookup(size_t deviceNumber, size_t inodeNumber, Node** hashQ);
+extern Node* hashLookup(size_t deviceNumber, size_t inodeNumber, Node** hashQ);
 
 
 #endif //HASHQ_H
