@@ -1,0 +1,5 @@
+#ifndef PROJECT1_IGET_H
+#define PROJECT1_IGET_H
+
+
+#endif //PROJECT1_IGET_H
