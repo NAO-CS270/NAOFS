@@ -1,5 +1,5 @@
-#ifndef _INODE_H
-#define _INODE_H
+#ifndef INODE_H
+#define INODE_H
 
 #include<time.h>
 #include<stdio.h>
@@ -112,4 +112,4 @@ typedef struct INode {
 } INode;
 
 
-#endif
+#endif // INODE_H
