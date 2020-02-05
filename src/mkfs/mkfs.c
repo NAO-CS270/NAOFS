@@ -88,7 +88,7 @@ void initializeDiskBlocks(size_t freeBlockNum, size_t startPos) {
 
 /* Only this method must be exposed to be called as MKFS API. */
 void makeFileSystem() {
-	size_t iNodeToRemember = initializeINodeData(I_NODE_LIST_BLOCK, I_NODE_BLOCKS_HEAD);
+	size_t iNodeToRemember = initializeINodeData(INODE_LIST_BLOCK, INODE_BLOCKS_HEAD);
 	// `numOfINodeBlocks` is global static, and is expected to be set appropriately before this.
 	initializeDiskBlocks(FREE_LIST_BLOCK, 4 + numOfINodeBlocks);
 }
