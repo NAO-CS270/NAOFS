@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "dsk/mdisk.h"
 #include "mandsk/params.h"
