@@ -61,6 +61,7 @@ typedef struct iNode iNode;
 
 struct iNode {
 	size_t inode_number; 
+	
 };
 
 extern void initializeINode(iNode *iNodePtr, size_t iNodeNum);

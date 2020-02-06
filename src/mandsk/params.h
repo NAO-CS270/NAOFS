@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
-#define BLOCK_ADDRESS_SIZE 32
-#define INODE_ADDRESS_SIZE 32
+#define BLOCK_ADDRESS_SIZE 4
+#define INODE_ADDRESS_SIZE 4
 
 #define BLOCK_SIZE 1024
 #define NUM_OF_BLOCKS (1<<BLOCK_ADDRESS_SIZE)

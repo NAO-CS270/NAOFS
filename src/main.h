@@ -1,5 +1,13 @@
-#ifndef NAOFS_MAIN_H
-#define NAOFS_MAIN_H
+#ifndef MAIN_H
+#define MAIN_H
 
+#include <stdio.h>
+#include <fuse.h>
+#include <string.h>
+#include <errno.h>
+#include <stdbool.h>
+#include <fcntl.h>
+#include "fileTables.h"
+#include "inode/inCoreiNode.h"
 
-#endif //NAOFS_MAIN_H
+#endif //MAIN_H

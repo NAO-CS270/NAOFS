@@ -1,17 +1,6 @@
 #define FUSE_USE_VERSION 29
 
-#include <stdio.h>
-#include <fuse.h>
-#include <string.h>
-#include <errno.h>
-#include <stdbool.h>
-#include <fcntl.h>
-#include "fileTables.h"
-#include "inode/inCoreiNode.h"
-
-//static const char *filepath = "/file";
-//static const char *filename = "file";
-//static const char *filecontent = "It might be depressing but, I am all the content here.\n";
+#include "main.h"
 
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
