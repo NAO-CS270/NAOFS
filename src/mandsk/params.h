@@ -14,4 +14,6 @@
 #define INODE_BUFFER_SIZE 32
 #define INODE_HASH_SIZE 8
 
+#define MAX_FD 40
+
 #endif
