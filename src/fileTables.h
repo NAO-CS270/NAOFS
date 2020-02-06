@@ -1,6 +1,7 @@
 #ifndef FILETABLES_H
 #define FILETABLES_H
 
+#include <stdlib.h>
 #include "inode/inCoreiNode.h"
 #include "mandsk/params.h"
 

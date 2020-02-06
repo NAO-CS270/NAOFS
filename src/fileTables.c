@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include "fileTables.h"
 
 // putFileDescriptorEntry adds an entry to the file_descriptor_table. If
 // the table is full, an error is returned. Else, the file descriptor table
