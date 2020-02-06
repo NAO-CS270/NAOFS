@@ -42,7 +42,8 @@ void rememberIfNeeded(size_t iNodeNum, iNodeListBlock *iNodeList) {
 		return ;
 	}
 	
-	disk_block *superBlockData = getDiskBlock(SUPER_BLOCK);
+	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
+	getDiskBlock(SUPER_BLOCK, superBLockData);
 
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
 	makeSuperBlock(superBlockData, theSuperBlock);
@@ -60,7 +61,8 @@ void freeINode(size_t iNodeNum) {
 	
 	pthread_mutex_lock(&iNodeListMutex);
 
-	disk_block *iNodeListData = getDiskBlock(INODE_LIST_BLOCK);
+	disk_block *iNodeListData = (disk_block *)malloc(BLOCK_SIZE);
+	getDiskBlock(INODE_LIST_BLOCK, iNodeListData);
 
 	iNodeListBlock *iNodeList = (iNodeListBlock *)malloc(sizeof(iNodeListBlock));
 	makeINodeListBlock(iNodeListData, iNodeList);
@@ -74,6 +76,7 @@ void freeINode(size_t iNodeNum) {
 		writeINodeListBlock(iNodeList, iNodeListData);
 		writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
 	}
+	free(iNodeListData);
 	free(iNodeListBlock);
 
 	pthread_mutex_unlock(&iNodeListMutex);

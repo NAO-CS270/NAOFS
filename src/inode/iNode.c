@@ -42,7 +42,7 @@ size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum) {
 	return iNodeCounter;
 }
 
-size_t makeINodeListBlock(disk_block * blockPtr, size_t *iNodeList, size_t listSize) {
+size_t initINodeListBlock(disk_block * blockPtr, size_t *iNodeList, size_t listSize) {
 	memcpy(blockPtr, 0, BLOCK_SIZE);
 	size_t counter = 0;
 
