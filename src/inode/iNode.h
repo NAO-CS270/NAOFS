@@ -1,8 +1,9 @@
 #ifndef INODE_H
 #define INODE_H
 
-#include<time.h>
-#include<stdio.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -61,7 +62,7 @@ typedef struct iNode iNode;
 
 struct iNode {
 	size_t inode_number; 
-	
+	bool isFree;
 };
 
 extern void initializeINode(iNode *iNodePtr, size_t iNodeNum);

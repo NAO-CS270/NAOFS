@@ -16,6 +16,7 @@ void initializeINode(iNode *iNodePtr, size_t iNodeNum) {
 	}
 
 	iNodePtr->inode_number = iNodeNum;
+	iNodePtr->isFree = false;
 	return ;
 }
 
