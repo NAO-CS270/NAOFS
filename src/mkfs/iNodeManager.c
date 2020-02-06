@@ -68,8 +68,8 @@ size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums) {
 	return getReturnValue(iNodeNums, freeINodeCounter);
 }
 
-/* Modifies iNode with iNode number `iNodeNum` as the boolean `markedAs` and writes it to disk. */
-void markINodeUsed(size_t iNodeNum, bool markedAs) {
+/* Modifies iNode with iNode number `iNodeNum` as the boolean `isFree` and writes it to disk. */
+void markINodeFree(size_t iNodeNum, bool isFree) {
 	if (iNodeNum >= NUM_OF_INODES) {
 		// TODO - Throw an error
 		return ;
@@ -85,7 +85,7 @@ void markINodeUsed(size_t iNodeNum, bool markedAs) {
 
 	while (iNodeIterator < iNodesInABlock) {
 		if ((theINode->inode_number) == iNodeNum) {
-			(theINode->isFree) = markedAs;
+			(theINode->isFree) = isFree;
 			break;
 		}
 		theINode++;

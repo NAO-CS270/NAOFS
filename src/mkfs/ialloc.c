@@ -61,7 +61,7 @@ size_t getNewINode() {
 		freeINode = checkAndGetFreeINode(iNodeList);
 	}
 
-	markINodeUsed(freeINode, false);
+	markINodeFree(freeINode, false);
 	writeINodeListBlock(iNodeList, iNodeListData);
 	writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
 	free(iNodeListBlock);
