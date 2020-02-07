@@ -65,16 +65,47 @@ static int open_callback(const char *path, struct fuse_file_info *fi) {
         // TODO: Free all blocks. (Algorithm: free)
     }
     inode->lock = false;
-    // TODO: Uncomment this when the new fd is allocated to this file
+    // set the file handle in file_info
+    fi->fh = fd;
     return fd;
 }
 
+static int read_callback(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
+    char* dataRead;
+    char* ptrIntoBuf = buf;
+    if(fi->fh < 0) {
+        return -1;
+    }
+    fuse_context = fuse_get_context();
+    // TODO: perform access permission checks
+    inCoreiNode *inode = file_descriptor_table[fi->fh];
+    inode->lock = true;
+    int count = 0;
+    while(count < size) {
+        bmapResponse *bmapResp  = bmap(inode, offset);
+        // trying to read end of the file
+        if(bmapResp->ioBytesInBlock == 0) {
+            break;
+        }
+        char* dataFromFile = readDiskBlock(blockNumber, bmapResp->ioBytesInBlock);
+        count += bmapResp->ioBytesInBlock;
+        memcpy(ptrIntoBuf, dataFromFile, bmapResp->ioBytesInBlock);
+        ptrIntoBuf += bmapResp->ioBytesInBlock;
+    }
+    inode->lock = false;
+    return count;
+}
+
+static int write_callback(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi) {
+
+}
 
 static struct fuse_operations OPERATIONS = {
         .getattr = getattr_callback,
         .readdir = readdir_callback,
         .read = read_callback,
         .open = open_callback,
+        .write = write_callback,
 };
 
 int main(int argc, char *argv[]) {

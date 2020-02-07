@@ -6,10 +6,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <mandsk/params.h>
 
 #include "../dsk/mdisk.h"
-
-#define BLOCK_PTRS_PER_INODE_STRUCT 13
 
 /**
  * Bit masks for the type of file whose data is stored in the inode.
