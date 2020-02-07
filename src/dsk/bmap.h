@@ -2,7 +2,7 @@
 #define BMAP_H
 
 #include "stdlib.h"
-#include "inode/inCoreiNode.h"
+#include "../inode/inCoreiNode.h"
 
 struct bmapResponse {
     size_t blockNumber;
@@ -12,6 +12,12 @@ struct bmapResponse {
 };
 
 typedef struct bmapResponse bmapResponse;
+
+struct indirectBlock {
+    uint32_t blocks[BLOCK_SIZE/BLOCK_ADDRESS_SIZE];
+};
+
+typedef struct indirectBlock indirectBlock;
 
 extern bmapResponse* bmap(inCoreiNode *inode, size_t offset);
 #endif //BMAP_H

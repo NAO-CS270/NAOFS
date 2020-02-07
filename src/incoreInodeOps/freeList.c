@@ -33,5 +33,3 @@ void freeListRemove(Node* head, Node* node) {
         head = head->next;
     }
 }
-
-

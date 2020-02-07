@@ -3,8 +3,6 @@
 
 #include <stdlib.h>
 #include "inode/inCoreiNode.h"
-#include "mandsk/params.h"
-#include "dsk/mdisk.h"
 
 typedef  struct fileTable {
     size_t fd;
@@ -18,5 +16,5 @@ FileTable file_descriptor_table[MAX_FD];
 extern size_t putFileDescriptorEntry(inCoreiNode *inode, size_t mode);
 extern void initFileTableEntries();
 
-typedef fileTable fileTable;
+typedef struct fileTable fileTable;
 #endif //FILETABLES_H

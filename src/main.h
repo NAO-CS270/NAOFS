@@ -8,7 +8,6 @@
 #include <stdbool.h>
 #include <fcntl.h>
 #include "fileTables.h"
-#include "inode/inCoreiNode.h"
 #include "dsk/bmap.h"
 
 #endif //MAIN_H
