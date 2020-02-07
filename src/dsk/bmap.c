@@ -8,11 +8,11 @@ bmapResponse* bmap(inCoreiNode* inode, size_t offset) {
     } else {
         // indirect pointers
     }
-    bmapResp = (bmapResponse*)malloc(sizeof(bmapResponse));
+    bmapResponse *bmapResp = (bmapResponse*)malloc(sizeof(bmapResponse));
     bmapResp->blockNumber = blockNum;
     bmapResp->byteOffsetInBlock = blockOffset;
 
-    numBytesToRead = BLOCK_SIZE - byteOffsetInBlock;
+    numBytesToRead = BLOCK_SIZE - bmapResp->byteOffsetInBlock;
     bmapResp->ioBytesInBlock = numBytesToRead;
     //TODO: see if we need read ahead block number
     return bmapResp;

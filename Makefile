@@ -56,6 +56,9 @@ iget: $(incoreInodeOpssrc)iget.c $(incoreInodeOpssrc)iget.h $(blksrc)blkfetch.h 
 iput: $(incoreInodeOpssrc)iput.c $(incoreInodeOpssrc)iput.h $(blksrc)blkfetch.h $(blksrc)mdisk.h $(incoreInodeOpssrc)hashQ.h $(incoreInodeOpssrc)freeList.h $(incoreInodeOpssrc)node.h $(inodesrc)inCoreiNode.h $(paramssrc)params.h | $(incoreInodeOpsbld)
 	$(CC) $(CFLAGS) -c $< -o $(incoreInodeOpsbld)iput.o
 
+bmap: $(blksrc)bmap.c $(blksrc)bmap.h $(blksrc)mdisk.h $(incoreInodeOpssrc)node.h | $(blkbld)
+	$(CC) $(CFLAGS) -c $< -o $(blkbld)bmap.o
+
 $(mkfsbld):
 	mkdir -p $@
 
