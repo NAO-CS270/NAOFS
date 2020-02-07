@@ -29,7 +29,7 @@ incoreInodeOpsbld = build/incoreInodeOps/
 nao:
 	gcc -o nao temp.c `pkg-config fuse --cflags --libs`
 
-mkfs: $(mkfssrc)mkfs.c $(inodesrc)iNode.h $(mkfssrc)freeBlockList.h $(blksrc)blkfetch.h $(paramssrc)params.h freeBlockList inode| $(blkbld)
+mkfs: $(mkfssrc)mkfs.c $(inodesrc)iNode.h $(mkfssrc)freeBlockList.h $(mkfssrc)metaBlocks.h $(blksrc)blkfetch.h $(paramssrc)params.h freeBlockList inode| $(blkbld)
 	$(CC) $(CFLAGS) -c $< -o $(blkbld)mkfs
 
 freeBlockList: $(mkfssrc)freeBlockList.c $(mkfssrc)freeBlockList.h $(blksrc)mdisk.h $(paramssrc)params.h | $(mkfsbld)

@@ -6,6 +6,7 @@
 #include "dsk/blkfetch.h"
 #include "mandsk/params.h"
 #include "freeBlockList.h"
+#include "metaBlocks.h"
 
 static size_t numOfINodeBlocks = 0;
 
@@ -17,10 +18,11 @@ size_t writeINodeListToDisk(size_t freeBlockNum, size_t *iNodeList, size_t iNode
 	}
 
 	disk_block *metaBlock = (disk_block *)malloc(BLOCK_SIZE);
-	size_t rememberedINode = makeINodeListBlock(metaBlock, iNodeList, iNodeListSize);
+	size_t rememberedINode = initINodeListBlock(metaBlock, iNodeList, iNodeListSize);
 	writeDiskBlock(freeBlockNum, metaBlock);
+	free(metaBlock);
 
-	return numOfINodeBlocks;
+	return rememberedINode;
 }
 
 size_t getINodeListSize() {
@@ -33,7 +35,8 @@ size_t getINodeListSize() {
 
 /* Initializes `NUM_OF_INODES` empty iNodes and saves them to disk. */
 void createINodes(size_t startPos) {
-	disk_block *metaBlock;
+	disk_block *metaBlock = (disk_block *)malloc(BLOCK_SIZE);
+
 	size_t iNodeCounter = 0;
 
 	numOfINodeBlocks = (NUM_OF_INODES * INODE_SIZE) / BLOCK_SIZE;
@@ -41,12 +44,12 @@ void createINodes(size_t startPos) {
 	size_t endOfINodeBlocks = blockCounter + numOfINodeBlocks;
 
 	while (blockCounter < endOfINodeBlocks) {
-		metaBlock = (disk_block *)malloc(BLOCK_SIZE);
 		iNodeCounter = populateINodesIn(metaBlock, iNodeCounter);
 
 		writeDiskBlock(blockCounter, metaBlock);
 		blockCounter++;
 	}
+	free(metaBlock);
 }
 
 /* Initializes `NUM_OF_INODES` empty iNodes and saves them to disk. Then, it forms
@@ -64,9 +67,7 @@ size_t initializeINodeData(size_t freeBlockNum, size_t startPos) {
 }
 
 /* Sets up the free block list structure, assuming that the free data blocks start
- * at `startPos`, and the super block free list block is at `freeBlockNum`. A block
- * is allocated here, which is passed to `writeDiskBlock` method, which takes care
- * of freeing the pointer. This method should not free the memory again.
+ * at `startPos`, and the super block free list block is at `freeBlockNum`.
  *
  * TODO - Consider zero-ing all the blocks
  */
@@ -74,16 +75,16 @@ void initializeDiskBlocks(size_t freeBlockNum, size_t startPos) {
 	size_t blockMemSize = sizeof(disk_block);
 	size_t freeBlocksPerBlock = BLOCK_SIZE / BLOCK_ADDRESS_SIZE;
 
-	disk_block *metaBlock;
+	disk_block *metaBlock = (disk_block *)malloc(blockMemSize);
 	size_t pointerBlockNumber = freeBlockNum;
 
 	while (pointerBlockNumber < NUM_OF_BLOCKS) {
-		metaBlock = (disk_block *)malloc(blockMemSize);
 		metaBlock = makeOneBlock(metaBlock, pointerBlockNumber);
 		
 		writeDiskBlock(pointerBlockNumber, metaBlock);
 		pointerBlockNumber += freeBlocksPerBlock;
 	}
+	free(metaBlock);
 }
 
 /* Only this method must be exposed to be called as MKFS API. */
@@ -91,5 +92,15 @@ void makeFileSystem() {
 	size_t iNodeToRemember = initializeINodeData(INODE_LIST_BLOCK, INODE_BLOCKS_HEAD);
 	// `numOfINodeBlocks` is global static, and is expected to be set appropriately before this.
 	initializeDiskBlocks(FREE_LIST_BLOCK, 4 + numOfINodeBlocks);
+
+	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
+	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
+
+	(theSuperBlock->rememberedINodeNum) = iNodeToRemember;
+	writeSuperBlock(theSuperBlock, superBlockData);
+	writeDiskBlock(SUPER_BLOCK, superBlockData);
+
+	free(superBlockData);
+	free(theSuperBlock);
 }
 
