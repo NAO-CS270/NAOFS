@@ -6,8 +6,8 @@ struct disk_block {
 };
 typedef struct disk_block disk_block;
 
-extern disk_block* fetchMemoryDiskBlock(int blockNumber);
+extern disk_block* fetchMemoryDiskBlock(int blockNumber, disk_block* blockData);
 
-extern void writeMemoryDiskBlock(int blockNumber, disk_block* diskData);
+extern void writeMemoryDiskBlock(int blockNumber, disk_block* blockData);
 
 #endif

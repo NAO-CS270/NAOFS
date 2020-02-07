@@ -1,36 +1,33 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "iNode.h"
 #include "mandsk/params.h"
 #include "dsk/mdisk.h"
 
-static const size_t iNodeAddressSize = INODE_ADDRESS_SIZE;
-
-static const size_t blockSize = BLOCK_SIZE;
-static const size_t numOfBlocks = NUM_OF_BLOCKS;
 static const size_t iNodeSize = INODE_SIZE;			// TODO - Update
-static const size_t numOfINodes = NUM_OF_INODES;
 
 void initializeINode(iNode *iNodePtr, size_t iNodeNum) {
 	memset(iNodePtr, 0, iNodeSize);
 
-	if (iNodeNum >= numOfINodes) {
+	if (iNodeNum >= NUM_OF_INODES) {
 		// throw appropriate error
 		return ;
 	}
 
 	iNodePtr->inode_number = iNodeNum;
+	iNodePtr->isFree = false;
 	return ;
 }
 
 size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum) {
-	memset(blockPtr, 0, blockSize);
+	memset(blockPtr, 0, BLOCK_SIZE);
 
 	iNode * iNodePtr;
 	size_t iNodeCounter = iNodeNum;
 
 	unsigned char *ptrIntoBlock = (blockPtr->data);
-	unsigned char *endOfBlock = ptrIntoBlock + blockSize;
+	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
 
 	while (ptrIntoBlock < endOfBlock) {
 		iNodePtr = (iNode *)malloc(iNodeSize);
@@ -45,18 +42,18 @@ size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum) {
 	return iNodeCounter;
 }
 
-size_t makeINodeListBlock(disk_block * blockPtr, size_t *iNodeList, size_t listSize) {
-	memcpy(blockPtr, 0, blockSize);
+size_t initINodeListBlock(disk_block * blockPtr, size_t *iNodeList, size_t listSize) {
+	memcpy(blockPtr, 0, BLOCK_SIZE);
 	size_t counter = 0;
 
 	unsigned char *ptrIntoBlock = (blockPtr->data);
-	unsigned char *endOfBlock = ptrIntoBlock + blockSize;
+	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
 
 	while (counter < listSize) {
-		memcpy(ptrIntoBlock, iNodeList + counter, iNodeAddressSize);
+		memcpy(ptrIntoBlock, iNodeList + counter, INODE_ADDRESS_SIZE);
 
 		counter++;
-		ptrIntoBlock += iNodeAddressSize;
+		ptrIntoBlock += INODE_ADDRESS_SIZE;
 	}
 
 	size_t nextINode = 0;

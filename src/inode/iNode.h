@@ -1,8 +1,9 @@
-#ifndef _INODE_H
-#define _INODE_H
+#ifndef INODE_H
+#define INODE_H
 
-#include<time.h>
-#include<stdio.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -61,11 +62,12 @@ typedef struct iNode iNode;
 
 struct iNode {
 	size_t inode_number; 
+	bool isFree;
 };
 
 extern void initializeINode(iNode *iNodePtr, size_t iNodeNum);
 extern size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum);
-extern size_t makeINodeListBlock(disk_block * blockPtr, size_t *iNodeList, size_t iNodeAddressesPerBlock);
+extern size_t initINodeListBlock(disk_block * blockPtr, size_t *iNodeList, size_t iNodeAddressesPerBlock);
 
 typedef struct INode {
     // assuming there are more than 1 file systems
@@ -112,4 +114,4 @@ typedef struct INode {
 } INode;
 
 
-#endif
+#endif // INODE_H
