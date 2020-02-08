@@ -23,11 +23,14 @@ void iput(inCoreiNode* inode, Node** hashQ, Node* freelist) {
         // TODO: Take a global lock
         if (inode->inode_changed && !inode->file_data_changed) {
             int inodeBlockNumber = inode->inode_number / num_of_inodes + ILIST_START_BLOCK;
-            disk_block *metaBlock = getDiskBlock(inodeBlockNumber);
+            disk_block *metaBlock = (disk_block*)malloc(sizeof(disk_block));
+            metaBlock = getDiskBlock(inodeBlockNumber, metaBlock);
 
             size_t offset = (inode->inode_number % num_of_inodes) * inode_size;
             memcpy(metaBlock + offset, inode->disk_iNode, inode_size);
-            writeDiskBlock(inodeBlockNumber, metaBlock);
+            metaBlock = writeDiskBlock(inodeBlockNumber, metaBlock);
+
+            free(metaBlock);
         }
         Node* node = hashLookup(inode->device_number, inode->inode_number, hashQ);
         if(NULL == node) {

@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include "incoreInodeOps/freeList.h"
 
-
 static Node* freeList;
 
 void initFreeInCoreINodeList() {
