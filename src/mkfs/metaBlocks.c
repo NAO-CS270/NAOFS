@@ -29,6 +29,39 @@ disk_block *writeSuperBlock(superBlock *theBlock, disk_block *blockPtr) {
 	return blockPtr;
 }
 
+extern freeDiskListBlock* makeFreeDiskListBlock(disk_block *blockPtr, freeDiskListBlock *theBlock) {
+	unsigned char *ptrIntoBlock = blockPtr->data;
+	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
+
+	size_t blkNum = 0;
+	size_t counter = 0;
+	while (ptrIntoBlock < endOfBlock) {
+		memcpy(&blkNum, ptrIntoBlock, BLOCK_ADDRESS_SIZE);
+
+		theBlock->blkNos[counter] = blkNum;
+		counter++;
+		ptrIntoBlock += BLOCK_ADDRESS_SIZE;
+	}
+
+	return theBlock;
+}
+
+extern disk_block* writeFreeDiskListBlock(freeDiskListBlock* theBlock, disk_block* blockPtr) {
+	unsigned char* ptrIntoBlock = blockPtr->data;
+	unsigned char* endOfBlock = ptrIntoBlock + BLOCK_SIZE;
+
+	size_t blkNum = 0;
+	size_t counter = 0;
+	while (ptrIntoBlock < endOfBlock) {
+		memcpy(ptrIntoBlock, &(theBlock->blkNos[counter]), BLOCK_ADDRESS_SIZE);
+
+		counter++;
+		ptrIntoBlock += BLOCK_ADDRESS_SIZE;
+	}
+
+	return blockPtr;
+}
+
 iNodeListBlock *makeINodeListBlock(disk_block *blockPtr, iNodeListBlock *theBlock) {
 	unsigned char *ptrIntoBlock = blockPtr->data;
 	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
