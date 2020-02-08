@@ -6,7 +6,7 @@ static Node* hashQ[inodeHashSize];
 
 // returns the index of the inode in hashQ
 size_t getHash(size_t deviceNumber, size_t inodeNumber) {
-    return (deviceNumber + inodeNumber) % inodeHashSize;
+    return (deviceNumber + inodeNumber << 6 + inodeNumber << 16 - inodeNumber) % inodeHashSize;
 }
 
 // insert into the hash table
@@ -19,6 +19,7 @@ void insertInHash(Node* node) {
     node->hash_prev = NULL;
     node->hash_next = head;
     head->hash_prev = node;
+    hashQ[index] = node;
 }
 
 // returns the inode cached in the hash queue, NULL if not found
