@@ -9,7 +9,7 @@
 
 #include "../dsk/mdisk.h"
 
-#define BLOCK_PTRS_PER_INODE_STRUCT 13
+#define BLOCKS_IN_INODE 13
 
 enum iNodeType {
 	T_FREE		= 0,
@@ -52,6 +52,8 @@ struct iNode {
 	size_t owner_uid;			// TODO - Have to figure out how to initialize this.
 
 	size_t group_uid;			// TODO - Have to figure out how to initialize this.
+
+	size_t dataBlockNums[BLOCKS_IN_INODE];
 };
 typedef struct iNode iNode;
 
@@ -67,7 +69,7 @@ typedef struct INode {
     uint32_t inode_number;
 
     // file/directory/symlink
-    INodeType type;
+    iNodeType type;
 
     // number of hard links to the file
     uint32_t nlink;
@@ -87,7 +89,7 @@ typedef struct INode {
     uint16_t status;
 
     // pointers to disk blocks containing data
-    disk_block data_blocks[BLOCK_PTRS_PER_INODE_STRUCT];
+    disk_block data_blocks[BLOCKS_IN_INODE];
 
     // file's last access timestamp
     time_t access_time;
@@ -100,7 +102,7 @@ typedef struct INode {
     time_t modified_time;
 
     // permissions for the file
-    INodeMode mode;
+    iNodeMode mode;
 } INode;
 
 
