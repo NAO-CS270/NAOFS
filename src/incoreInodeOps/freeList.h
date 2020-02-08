@@ -4,6 +4,8 @@
 #include "incoreInodeOps/node.h"
 #include "inode/inCoreiNode.h"
 
+extern void initFreeInCoreINodeList();
+
 // insert in front of the list
 extern void freeListInsert(Node* head, Node* node);
 // remove node from the freelist

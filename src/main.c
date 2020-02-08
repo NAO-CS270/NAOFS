@@ -135,6 +135,8 @@ static struct fuse_operations OPERATIONS = {
 };
 
 int main(int argc, char *argv[]) {
+    initFreeInCoreINodeList();
+
     // initialize the file table entries here
     initFileTableEntries();
     return fuse_main(argc, argv, &OPERATIONS, NULL);
