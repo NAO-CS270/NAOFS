@@ -57,7 +57,7 @@ void rememberIfNeeded(size_t iNodeNum, iNodeListBlock *iNodeList) {
 }
 
 void freeINode(size_t iNodeNum) {
-	markINodeFree(freeINode, true);
+	markINodeFree(freeINode, T_FREE);
 	
 	pthread_mutex_lock(&iNodeListMutex);
 
