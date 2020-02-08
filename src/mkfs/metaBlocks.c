@@ -29,9 +29,9 @@ disk_block *writeSuperBlock(superBlock *theBlock, disk_block *blockPtr) {
 	return blockPtr;
 }
 
-extern freeDiskListBlock* makeFreeDiskListBlock(disk_block *blockPtr, freeDiskListBlock *theBlock) {
-	unsigned char *ptrIntoBlock = blockPtr->data;
-	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
+freeDiskListBlock* makeFreeDiskListBlock(disk_block *blockPtr, freeDiskListBlock *theBlock) {
+	unsigned char* ptrIntoBlock = blockPtr->data;
+	unsigned char* endOfBlock = ptrIntoBlock + BLOCK_SIZE;
 
 	size_t blkNum = 0;
 	size_t counter = 0;
@@ -46,7 +46,7 @@ extern freeDiskListBlock* makeFreeDiskListBlock(disk_block *blockPtr, freeDiskLi
 	return theBlock;
 }
 
-extern disk_block* writeFreeDiskListBlock(freeDiskListBlock* theBlock, disk_block* blockPtr) {
+disk_block* writeFreeDiskListBlock(freeDiskListBlock* theBlock, disk_block* blockPtr) {
 	unsigned char* ptrIntoBlock = blockPtr->data;
 	unsigned char* endOfBlock = ptrIntoBlock + BLOCK_SIZE;
 
