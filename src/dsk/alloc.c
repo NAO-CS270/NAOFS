@@ -1,34 +1,37 @@
 #include "alloc.h"
 #include "mdisk.h"
 #include "../mkfs/metaBlocks.h"
+#include "../mkfs/diskParams.h"
+#include "blkfetch.h"
 
 static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
-const int SLEEP_TIME_IN_SECONDS = 3;
 
-size_t alloc(superBlock* superBlock) {
-    while (superBlock -> free_blklst_lock)
-        sleep(SLEEP_TIME_IN_SECONDS);
+size_t alloc() {
     pthread_mutex_lock(&iNodeListMutex);
-    if (superBlock -> free_blklst_lock) {
-        pthread_mutex_unlock(&iNodeListMutex);
-        return alloc(superBlock);
+
+    disk_block* freeListBlock = (disk_block*)malloc(sizeof(disk_block));
+    freeListBlock = getDiskBlock(FREE_LIST_BLOCK, freeListBlock);
+    freeDiskListBlock* diskBlock = (freeDiskListBlock*)malloc(sizeof(freeDiskListBlock));
+    diskBlock = makeFreeDiskListBlock (freeListBlock, diskBlock);
+
+    size_t new_block = 0;
+    int i;
+    for (i = BLOCK_ADDRESSES_PER_BLOCK - 1; i > -1; --i) {
+        if (diskBlock -> blkNos[i]) {
+            new_block = diskBlock[i] -> blkNos;
+            diskBlock -> blkNos[i] = 0;
+            break;
+        }
+    }
+    if (i == 0) {
+        disk_block* newFreeListBlock = (disk_block*)malloc(sizeof(disk_block));
+        newFreeListBlock = getDiskBlock(new_block, newFreeListBlock);
+        memcpy(freeListBlock, newFreeListBlock, sizeof(disk_block));
+        freeListBlock(newFreeListBlock);
     }
 
-    superBlock -> free_blklst_lock = true;
-    superBlock -> num_free_blocks --;
-    size_t new_block = *(superBlock -> free_block_list);
-    superBlock -> free_block_list ++;
-
-    if (superBlock -> num_free_blocks == 0) {
-        superBlock -> free_block_list -= BLOCK_SIZE // is it correct?
-        superBlock -> num_free_blocks = BLOCK_SIZE;
-        disk_block *new_list = (disk_block *)malloc(BLOCK_SIZE);
-        fetchMemoryDiskBlock(new_block, new_list);
-        memcpy(superBlock -> free_block_list, new_list, BLOCK_SIZE);
-    }
-
-    superBlock -> dirty_bit = true;
-    superBlock -> free_blklst_lock = false;
+    free(freeListBlock);
+    free(diskBlock);
     pthread_mutex_unlock(&iNodeListMutex);
     return new_block;
 }
