@@ -1,6 +1,6 @@
 #define FUSE_USE_VERSION 29
 
-#include "main.h"
+#include "./main.h"
 
 
 static int getattr_callback(const char *path, struct stat *stbuf) {

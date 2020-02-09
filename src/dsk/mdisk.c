@@ -1,4 +1,4 @@
-#include "mdisk.h"
+#include "./mdisk.h"
 
 #define DISK_SIZE 1024
 
