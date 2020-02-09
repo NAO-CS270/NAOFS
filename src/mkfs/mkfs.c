@@ -1,12 +1,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include "diskParams.h"
+#include "./diskParams.h"
 #include "../inode/iNode.h"
 #include "../dsk/blkfetch.h"
 #include "../mandsk/params.h"
-#include "freeBlockList.h"
-#include "metaBlocks.h"
+#include "./freeBlockList.h"
+#include "./metaBlocks.h"
 
 static size_t numOfINodeBlocks = 0;
 

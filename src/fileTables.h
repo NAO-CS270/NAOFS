@@ -2,7 +2,7 @@
 #define FILETABLES_H
 
 #include <stdlib.h>
-#include "inode/inCoreiNode.h"
+#include "./inode/inCoreiNode.h"
 
 typedef  struct fileTable {
     size_t fd;
