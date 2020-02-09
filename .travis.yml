@@ -14,9 +14,9 @@ before_install:
   - pip install --user cpp-coveralls
 
 script:
-  - make nao
-  - mkdir build
-  - cd build
+  - make fuse
+  - mkdir CI-build
+  - cd CI-build
   - cmake ..
   - cmake --build .
   - ctest

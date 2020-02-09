@@ -1,7 +1,7 @@
 #include "metaBlocks.h"
-#include "dsk/mdisk.h"
-#include "mandsk/params.h"
-#include "inode/iNode.h"
+#include "../dsk/mdisk.h"
+#include "../mandsk/params.h"
+#include "../inode/iNode.h"
 
 #include <stdlib.h>
 #include <string.h>

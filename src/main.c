@@ -1,6 +1,6 @@
 #define FUSE_USE_VERSION 29
 
-#include "main.h"
+#include "./main.h"
 
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
@@ -114,7 +114,6 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
         free(metaBlock);
         bytesWritten += bytesWritten + bmapResp->ioBytesInBlock;
         tempOffset = tempOffset + bmapResp->ioBytesInBlock + 1;
-        }
     }
     return bytesWritten;
 }
