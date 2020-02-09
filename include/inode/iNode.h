@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "../dsk/mdisk.h"
+#include "dsk/mdisk.h"
 
 #define BLOCKS_IN_INODE 13
 

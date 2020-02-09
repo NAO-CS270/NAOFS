@@ -3,7 +3,7 @@
 
 #include <pthread.h>
 #include <stdbool.h>
-#include "./iNode.h"
+#include "inode/iNode.h"
 
 struct inCoreiNode {
     // mutex for this inode
