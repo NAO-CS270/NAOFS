@@ -21,36 +21,6 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
     return -ENOENT;
 }
 
-//static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
-//    (void) offset;
-//    (void) fi;
-//
-//    filler(buf, ".", NULL, 0);
-//    filler(buf, "..", NULL, 0);
-//    filler(buf, filename, NULL, 0);
-//
-//    return 0;
-//}
-
-//static int read_callback(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
-//    printf("Given path - %s\n", path);
-//    printf("Here's what I'm giving you\n");
-//
-//    size_t len = strlen(filecontent);
-//    if (offset >= len) {
-//        return 0;
-//    }
-//
-//    if (offset + size > len) {
-//        memcpy(buf, filecontent + offset, len - offset);
-//        return len - offset;
-//    }
-//
-//    memcpy(buf, filecontent + offset, size);
-//    return size;
-//}
-
-
 static int open_callback(const char *path, struct fuse_file_info *fi) {
     inCoreiNode *inode;
     // TODO: Uncomment when namei is implemented
@@ -72,8 +42,12 @@ static int open_callback(const char *path, struct fuse_file_info *fi) {
 }
 
 static int read_callback(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
+
     char* dataRead;
     char* ptrIntoBuf = buf;
+    int blockBytesRead = 0;
+    int tempOffset = offset;
+    char* ptrIntoBuffer = buf;
     if(fi->fh < 0) {
         return -1;
     }
@@ -81,23 +55,74 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     // TODO: perform access permission checks
     inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
     inode->lock = true;
-    int count = 0;
-    while(count < size) {
-        bmapResponse *bmapResp  = bmap(inode, offset);
+    while(blockBytesRead < size) {
+        bmapResponse *bmapResp  = bmap(inode, tempOffset);
         // trying to read end of the file
         if(bmapResp->ioBytesInBlock == 0) {
             break;
         }
-        char* dataFromFile = readDiskBlock(bmapResp->blockNumber, bmapResp->ioBytesInBlock);
-        count += bmapResp->ioBytesInBlock;
-        memcpy(ptrIntoBuf, dataFromFile, bmapResp->ioBytesInBlock);
-        ptrIntoBuf += bmapResp->ioBytesInBlock;
+        // fetch the block from the disk and copy the data in the buffer
+        disk_block* metaBlock = (disk_block*)malloc(sizeof(disk_block));
+        metaBlock = getDiskBlock(bmapResp->blockNumber, metaBlock);
+        memcpy(ptrIntoBuf, metaBlock->data, bmapResp->ioBytesInBlock);
+        ptrIntoBuf += bmapResp->ioBytesInBlock + 1;
+
+        blockBytesRead += bmapResp->ioBytesInBlock;
+        tempOffset = tempOffset + blockBytesRead + 1;
+        free(metaBlock);
     }
     inode->lock = false;
-    return count;
+    return blockBytesRead;
 }
 
 static int write_callback(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi) {
+    if(fi->fh < 0) {
+        return -1;
+    }
+    int bytesWritten = 0;
+    bool fullBlockWrite = false;
+    int tempOffset = offset;
+    char* ptrIntoBuffer = buf;
+
+    struct fuse_context* fuse_context = fuse_get_context();
+    inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
+
+    inode->lock = true;
+    while(bytesWritten < size) {
+        bmapResponse *bmapResp = bmap(inode, tempOffset);
+        if(bmapResp == NULL) {
+            // TODO: Call alloc here
+            fullBlockWrite = true;
+        } else {
+            if (bmapResp->byteOffsetInBlock == 0 && bmapResp->ioBytesInBlock == BLOCK_SIZE) {
+                // no need to read the block from the disk. This is cause the entire block has to
+                // be overwritten anyway.
+                fullBlockWrite = true;
+            }
+        }
+        disk_block *metaBlock = (disk_block *) malloc(sizeof(disk_block));
+        if(fullBlockWrite) {
+            memcpy(metaBlock->data, buf, bmapResp->ioBytesInBlock);
+            writeMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
+        } else {
+            metaBlock = fetchMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
+            unsigned char* ptrIntoBlock = metaBlock->data;
+            ptrIntoBlock += bmapResp->ioBytesInBlock;
+            memcpy(ptrIntoBlock, buf, bmapResp->ioBytesInBlock);
+            writeMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
+        }
+        free(metaBlock);
+        bytesWritten += bytesWritten + bmapResp->ioBytesInBlock;
+        tempOffset = tempOffset + bmapResp->ioBytesInBlock + 1;
+        }
+    }
+    return bytesWritten;
+}
+
+static int mkdir_callback(const char* path, mode_t mode) {
+    // if new node  not named pipe and user not super user
+    // return error
+    // get inode of parent node (using namei)
 
 }
 
@@ -105,10 +130,13 @@ static struct fuse_operations OPERATIONS = {
         .getattr = getattr_callback,
         .read = read_callback,
         .open = open_callback,
-        .write = write_callback,
+        .write = write_callback
+        //.mkdir = mkdir_callback,
 };
 
 int main(int argc, char *argv[]) {
+    initFreeInCoreINodeList();
+
     // initialize the file table entries here
     initFileTableEntries();
     return fuse_main(argc, argv, &OPERATIONS, NULL);

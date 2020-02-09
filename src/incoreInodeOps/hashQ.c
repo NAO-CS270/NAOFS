@@ -3,6 +3,8 @@
 
 static const size_t inodeHashSize = INODE_HASH_SIZE;
 
+static Node** hashQ[INODE_HASH_SIZE];
+
 // returns the index of the inode in hashQ
 size_t getHash(size_t deviceNumber, size_t inodeNumber) {
     return (deviceNumber + inodeNumber) % inodeHashSize;
