@@ -2,7 +2,7 @@
 #define INCOREINODE_H
 
 #include <stdbool.h>
-#include "inode/iNode.h"
+#include "iNode.h"
 
 // Using this struct in the project. Keeping the old for for reference.
 typedef struct inCoreiNode inCoreiNode;
