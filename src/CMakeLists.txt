@@ -13,10 +13,8 @@ execute_process (
 target_sources(
     NAOFS
     PRIVATE
-        example.cpp
         ${SOURCES}
     PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}/example.h
         ${HEADERS}
     )
 

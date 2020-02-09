@@ -1,7 +1,11 @@
+execute_process (
+        COMMAND bash -c "find . -regex '.*.c$'"
+        SOURCES outVar
+)
+
 add_executable(
     unit_tests
-    example_add.cpp
-    example_subtract.cpp
+    ${SOURCES}
     )
 
 target_link_libraries(
