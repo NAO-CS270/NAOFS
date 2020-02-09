@@ -15,30 +15,37 @@ void initializeINode(iNode *iNodePtr, size_t iNodeNum) {
 		return ;
 	}
 
+	iNodePtr->device_number = 0;
 	iNodePtr->inode_number = iNodeNum;
-	iNodePtr->isFree = false;
+	iNodePtr->linksCount = 0;
+	iNodePtr->type = T_REGULAR;
+	iNodePtr->mode = P_RUSR | P_WUSR | P_RGRP;
+	iNodePtr->owner_uid = 0;
+	iNodePtr->group_uid = 0;
 	return ;
 }
 
+/* Initializes and populates iNodes in the disk block at `blockPtr`. The created iNodes
+ * start at iNode number `iNodeNum`. Move this function to `mkfs/metaBlocks.c` maybe.
+ */
 size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum) {
 	memset(blockPtr, 0, BLOCK_SIZE);
 
-	iNode * iNodePtr;
+	iNode * iNodePtr = (iNode *)malloc(iNodeSize);
 	size_t iNodeCounter = iNodeNum;
 
 	unsigned char *ptrIntoBlock = (blockPtr->data);
 	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
 
 	while (ptrIntoBlock < endOfBlock) {
-		iNodePtr = (iNode *)malloc(iNodeSize);
 		initializeINode(iNodePtr, iNodeCounter);
-
 		memcpy(ptrIntoBlock, iNodePtr, iNodeSize);
-		free(iNodePtr);
 
 		ptrIntoBlock += iNodeSize;
 		iNodeCounter++;
 	}
+
+	free(iNodePtr);
 	return iNodeCounter;
 }
 

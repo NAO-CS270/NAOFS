@@ -9,61 +9,41 @@
 
 #include "../dsk/mdisk.h"
 
-/**
- * Bit masks for the type of file whose data is stored in the inode.
- * To test for a regular file:
- *  stat(pathname, &sb);
- *      if ((sb.st_mode & S_IFMT) == S_IFREG) {
- *             // Handle regular file
- * }
- * POSIX refers to the stat.st_mode bits corresponding to the mask
- * S_IFMT (see below) as the file type, the 12 bits corresponding to the
- * mask 07777 as the file mode bits and the least significant 9 bits
- * (0777) as the file permission bits.
- */
-//typedef enum INodeType {
-//    S_IFMT = 0170000,   // file type
-//    S_IFSOCK = 0140000, // socket
-//    S_IFLNK = 0120000,  // symbolic link
-//    S_IFREG = 0100000,  // regular file
-//    S_IFBLK = 0060000,  // block device
-//    S_IFDIR = 0040000,  // directory
-//    S_IFCHR = 0020000,  // character device
-//    S_IFIFO = 0010000,  // FIFO
-//} INodeType;
+#define BLOCKS_IN_INODE 13
 
+enum iNodeType {
+	T_FREE		= 0,
+	T_REGULAR	= 1,
+	T_DIRECTORY	= 2
+};
+typedef enum iNodeType iNodeType;
 
-//// for more details, refer - http://man7.org/linux/man-pages/man7/inode.7.html
-//typedef enum INodeMode {
-//    S_ISUID = 04000,  // set-user-ID bit (see execve(2))
-//    S_ISGID = 02000,  // set-group-ID bit
-//    S_ISVTX = 01000,  // sticky bit
-//
-//    S_IRWXU = 00700,  // owner has read, write, and execute permission
-//    S_IRUSR = 00400,  // owner has read permission
-//    S_IWUSR = 00200,  // owner has write permission
-//    S_IXUSR = 00100,  // owner has execute permission
-//
-//    S_IRWXG = 00070,  // group has read, write, and execute permission
-//    S_IRGRP = 00040,  // group has read permission
-//    S_IWGRP = 00020,  // group has write permission
-//    S_IXGRP = 00010,  // group has execute permission
-//
-//    S_IRWXO = 00007,  // others (not in group) have read, write, and execute permission
-//    S_IROTH = 00004,  // others have read permission
-//    S_IWOTH = 00002,  // others have write permission
-//    S_IXOTH = 00001,  // others have execute permission
-//} INodeMode;
+enum iNodeMode {
+    P_SUID = 04000,  // set-user-ID bit (see execve(2))
+    P_SGID = 02000,  // set-group-ID bit
+    P_SVTX = 01000,  // sticky bit
+
+    P_RUSR = 00400,  // owner has read permission
+    P_WUSR = 00200,  // owner has write permission
+    P_XUSR = 00100,  // owner has execute permission
+
+    P_RGRP = 00040,  // group has read permission
+    P_WGRP = 00020,  // group has write permission
+    P_XGRP = 00010,  // group has execute permission
+
+    P_ROTH = 00004,  // others have read permission
+    P_WOTH = 00002,  // others have write permission
+    P_XOTH = 00001,  // others have execute permission
+};
+typedef enum iNodeMode iNodeMode;
 
 // Using this struct in the project. Keeping the old for for reference.
-typedef struct iNode iNode;
-
 struct iNode {
+	size_t device_number;
+
 	size_t inode_number; 
+
 	bool isFree;
-	size_t link_count;
-	size_t uid;
-	size_t gid;
 	size_t permissions;
 
 	size_t direct_blocks[DIRECT_BLOCKS];
@@ -74,55 +54,67 @@ struct iNode {
 	time_t access_time;
 	time_t creation_time;
 
+	size_t linksCount;
+
+	iNodeType type;
+
+	iNodeMode mode;
+
+	size_t owner_uid;			// TODO - Have to figure out how to initialize this.
+
+	size_t group_uid;			// TODO - Have to figure out how to initialize this.
+
+	size_t dataBlockNums[BLOCKS_IN_INODE];
 };
+typedef struct iNode iNode;
 
 extern void initializeINode(iNode *iNodePtr, size_t iNodeNum);
 extern size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum);
 extern size_t initINodeListBlock(disk_block * blockPtr, size_t *iNodeList, size_t iNodeAddressesPerBlock);
 
-//typedef struct INode {
-//    // assuming there are more than 1 file systems
-//    uint32_t device_number;
-//
-//    // unique to each filesystem
-//    uint32_t inode_number;
-//
-//    // file/directory/symlink
-//    INodeType type;
-//
-//    // number of hard links to the file
-//    uint32_t nlink;
-//
-//    uint32_t owner_uid;
-//
-//    // ID of the group owner of the file
-//    uint32_t gid;
-//
-//    // size of the file in bytes
-//    uint32_t size;
-//
-//    // number of blocks allocated to the file
-//    uint32_t num_blocks;
-//
-//    // inode allocated/needs to be written
-//    uint16_t status;
-//
-//    // pointers to disk blocks containing data
-//    disk_block data_blocks[BLOCK_PTRS_PER_INODE_STRUCT];
-//
-//    // file's last access timestamp
-//    time_t access_time;
-//
-//    // file creation time(not returned in the inode stat struct)
-//    time_t birth_time;
-//
-//    // file's last modified timestamp(timestamp of a directory is changed by the creation
-//    // or deletion of files in that directory)
-//    time_t modified_time;
-//
-//    // permissions for the file
-//    INodeMode mode;
-//} INode;
+typedef struct INode {
+    // assuming there are more than 1 file systems
+    uint32_t device_number;
+
+    // unique to each filesystem
+    uint32_t inode_number;
+
+    // file/directory/symlink
+    iNodeType type;
+
+    // number of hard links to the file
+    uint32_t nlink;
+
+    uint32_t owner_uid;
+
+    // ID of the group owner of the file
+    uint32_t gid;
+
+    // size of the file in bytes
+    uint32_t size;
+
+    // number of blocks allocated to the file
+    uint32_t num_blocks;
+
+    // inode allocated/needs to be written
+    uint16_t status;
+
+    // pointers to disk blocks containing data
+    disk_block data_blocks[BLOCKS_IN_INODE];
+
+    // file's last access timestamp
+    time_t access_time;
+
+    // file creation time(not returned in the inode stat struct)
+    time_t birth_time;
+
+    // file's last modified timestamp(timestamp of a directory is changed by the creation
+    // or deletion of files in that directory)
+    time_t modified_time;
+
+    // permissions for the file
+    iNodeMode mode;
+} INode;
 
 
 #endif // INODE_H

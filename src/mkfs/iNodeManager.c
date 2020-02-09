@@ -27,7 +27,7 @@ size_t getFromBlock(iNodesBlock *blockOfINodes, size_t *nextAddrAt) {
 	size_t iNodeIterator = 0;
 
 	while (iNodeIterator < iNodesInABlock) {
-		if (theINode->isFree) {
+		if (theINode->type == T_FREE) {
 			*nextAddrAt = theINode->inode_number;
 			nextAddrAt++;
 			collectedCount++;
@@ -69,8 +69,8 @@ size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums) {
 	return getReturnValue(iNodeNums, freeINodeCounter);
 }
 
-/* Modifies iNode with iNode number `iNodeNum` as the boolean `isFree` and writes it to disk. */
-void markINodeFree(size_t iNodeNum, bool isFree) {
+/* Modifies iNode with iNode number `iNodeNum` as the boolean `toSetType` and writes it to disk. */
+void markINodeFree(size_t iNodeNum, bool toSetType) {
 	if (iNodeNum >= NUM_OF_INODES) {
 		// TODO - Throw an error
 		return ;
@@ -87,7 +87,7 @@ void markINodeFree(size_t iNodeNum, bool isFree) {
 
 	while (iNodeIterator < iNodesInABlock) {
 		if ((theINode->inode_number) == iNodeNum) {
-			(theINode->isFree) = isFree;
+			(theINode->type) = toSetType;
 			break;
 		}
 		theINode++;
