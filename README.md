@@ -23,5 +23,14 @@ Compile the project - `make nao`
 Mount in random local directory - `./nao tempdir`
 Go into the directory and test commands.
 
+### Test
+```
+mkdir CI-build
+cd CI-build
+cmake ..
+cmake --build .
+ctest  // or ./bin/unit_tests
+```
+
 ### Clean
 `make clean`
