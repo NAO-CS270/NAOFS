@@ -1,6 +1,7 @@
 #ifndef IPUT_H
 #define IPUT_H
 
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,5 +14,5 @@
 #include "inode/inCoreiNode.h"
 #include "mandsk/params.h"
 
-extern void iput(inCoreiNode* inode, Node** hashQ, Node* freelist);
+extern void iput(inCoreiNode* inode);
 #endif //IPUT_H

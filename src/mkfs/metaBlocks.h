@@ -5,6 +5,7 @@
 #include "mandsk/params.h"
 #include "inode/iNode.h"
 
+#define BLOCK_ADDRESSES_PER_BLOCK (BLOCK_SIZE/BLOCK_ADDRESS_SIZE)
 #define INODE_NOS_PER_BLOCK (BLOCK_SIZE/INODE_ADDRESS_SIZE)
 #define INODES_PER_BLOCK (BLOCK_SIZE/INODE_SIZE)
 
@@ -13,7 +14,9 @@ struct superBlock {
 };
 typedef struct superBlock superBlock;
 
+// use same struct for indirect block
 struct freeDiskListBlock {
+	size_t blkNos[BLOCK_ADDRESSES_PER_BLOCK]
 };
 typedef struct freeDiskListBlock freeDiskListBlock;
 
@@ -30,12 +33,16 @@ typedef struct iNodesBlock iNodesBlock;
 extern superBlock *makeSuperBlock(disk_block *blockPtr, superBlock *theBlock);
 extern disk_block *writeSuperBlock(superBlock *theBlock, disk_block *blockPtr);
 
+extern freeDiskListBlock* makeFreeDiskListBlock(disk_block* blockPtr, freeDiskListBlock* theBlock);
+extern disk_block* writeFreeDiskListBlock(freeDiskListBlock* theBlock, disk_block* blockPtr);
+
 extern iNodeListBlock *makeINodeListBlock(disk_block *blockPtr, iNodeListBlock *theBlock);
 extern disk_block *writeINodeListBlock(iNodeListBlock *theBlock, disk_block *blockPtr);
 
 extern iNodesBlock *makeINodesBlock(disk_block *blockPtr, iNodesBlock *theBlock);
 extern disk_block *writeINodesBlock(iNodesBlock *theBlock, disk_block *blockPtr);
 
+#undef BLOCK_ADDRESSES_PER_BLOCK
 #undef INODE_NOS_PER_BLOCK
 #undef INODES_PER_BLOCK
 

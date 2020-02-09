@@ -1,14 +1,13 @@
 #ifndef INCOREINODE_H
 #define INCOREINODE_H
 
+#include <pthread.h>
 #include <stdbool.h>
 #include "iNode.h"
 
-// Using this struct in the project. Keeping the old for for reference.
-typedef struct inCoreiNode inCoreiNode;
-
 struct inCoreiNode {
-    bool lock;
+    // mutex for this inode
+    pthread_mutex_t iNodeMutex;
 
     // when this is 0, inode has to be put back into the inode free list.
     size_t reference_count;
@@ -27,5 +26,8 @@ struct inCoreiNode {
     // TODO: A process is (or many processes are) waiting for it to be unlocked.
 
 };
+
+// Using this struct in the project. Keeping the old for for reference.
+typedef struct inCoreiNode inCoreiNode;
 
 #endif //INCOREINODE_H

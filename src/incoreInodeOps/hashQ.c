@@ -1,7 +1,8 @@
-#include "mandsk/params.h"
 #include "incoreInodeOps/hashQ.h"
 
 static const size_t inodeHashSize = INODE_HASH_SIZE;
+
+static Node* hashQ[inodeHashSize];
 
 // returns the index of the inode in hashQ
 size_t getHash(size_t deviceNumber, size_t inodeNumber) {
@@ -9,7 +10,7 @@ size_t getHash(size_t deviceNumber, size_t inodeNumber) {
 }
 
 // insert into the hash table
-void insertInHash(Node* node, Node** hashQ) {
+void insertInHash(Node* node) {
     inCoreiNode* inode = node->inode;
     size_t index = getHash(inode->device_number, inode->inode_number);
     Node* head = hashQ[index];
@@ -21,7 +22,7 @@ void insertInHash(Node* node, Node** hashQ) {
 }
 
 // returns the inode cached in the hash queue, NULL if not found
-Node* hashLookup(size_t deviceNumber, size_t inodeNumber, Node** hashQ) {
+Node* hashLookup(size_t deviceNumber, size_t inodeNumber) {
     size_t hash_number = getHash(deviceNumber, inodeNumber);
     Node* head = hashQ[hash_number];
     if(NULL == head) {

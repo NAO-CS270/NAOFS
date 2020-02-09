@@ -10,9 +10,9 @@
 extern size_t getHash(size_t deviceNumber, size_t inodeNumber);
 
 // insert into the hash table
-extern void insertInHash(Node* node, Node** hashQ);
+extern void insertInHash(Node* node);
 // search for the inode in the hashQ
-extern Node* hashLookup(size_t deviceNumber, size_t inodeNumber, Node** hashQ);
+extern Node* hashLookup(size_t deviceNumber, size_t inodeNumber);
 
 
 #endif //HASHQ_H
