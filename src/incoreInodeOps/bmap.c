@@ -1,4 +1,4 @@
-#include "./bmap.h"
+#include "incoreInodeOps/bmap.h"
 
 // num of block addresses in indirect block
 const size_t blkAddrNos = BLOCK_SIZE / BLOCK_ADDRESS_SIZE;

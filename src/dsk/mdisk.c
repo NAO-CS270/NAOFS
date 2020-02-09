@@ -1,6 +1,5 @@
-#include "./mdisk.h"
-
-#define DISK_SIZE 1024
+#include "dsk/mdisk.h"
+#include "mandsk/params.h"
 
 static disk_block mem_disk[DISK_SIZE];
 
@@ -24,3 +23,4 @@ void writeMemoryDiskBlock(int blockNumber, disk_block* blockData) {
 		mem_disk[blockNumber] = *blockData;
 	}
 }
+
