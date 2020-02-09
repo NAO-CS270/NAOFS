@@ -2,8 +2,8 @@
 #include <string.h>
 
 #include "iNode.h"
-#include "mandsk/params.h"
-#include "dsk/mdisk.h"
+#include "../mandsk/params.h"
+#include "../dsk/mdisk.h"
 
 static const size_t iNodeSize = INODE_SIZE;			// TODO - Update
 

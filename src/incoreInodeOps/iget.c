@@ -1,4 +1,4 @@
-#include "incoreInodeOps/iget.h"
+#include "../incoreInodeOps/iget.h"
 
 inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
     // looking for the inode in the hash Q
