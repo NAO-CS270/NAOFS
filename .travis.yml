@@ -15,8 +15,8 @@ before_install:
 
 script:
   - make fuse
-  - mkdir build
-  - cd build
+  - mkdir CI-build
+  - cd CI-build
   - cmake ..
   - cmake --build .
   - ctest
