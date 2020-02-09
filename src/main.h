@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <fcntl.h>
 #include "fileTables.h"
-#include "dsk/bmap.h"
+#include "mkfs/bmap.h"
 #include "incoreInodeOps/freeList.h"
 
 #endif //MAIN_H
