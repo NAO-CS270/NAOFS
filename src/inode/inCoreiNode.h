@@ -3,7 +3,10 @@
 
 #include <pthread.h>
 #include <stdbool.h>
-#include "./iNode.h"
+#include "iNode.h"
+
+// Using this struct in the project. Keeping the old for for reference.
+typedef struct inCoreiNode inCoreiNode;
 
 struct inCoreiNode {
     // mutex for this inode
