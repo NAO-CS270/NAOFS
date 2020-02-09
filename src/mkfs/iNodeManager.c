@@ -121,7 +121,7 @@ void getDiskInode(inCoreiNode* inode) {
 	*(inode->disk_inode) = *(iNodesList[index]);
 
 	free(iNodeBlk);
-	free(disk_block);
+	free(metaBlock);
 }
 
 void writeDiskInode(inCoreiNode* inode) {
@@ -149,6 +149,6 @@ void writeDiskInode(inCoreiNode* inode) {
 	writeDiskBlock(blockNum, metaBlock);
 
 	free(iNodeBlk);
-	free(disk_block);
+	free(metaBlock);
 }
 

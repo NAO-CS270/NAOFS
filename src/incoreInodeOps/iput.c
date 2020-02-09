@@ -14,7 +14,7 @@ void iput(inCoreiNode* inode) {
          } */
 
         // writes inode data to disk
-        if (inode->inode_changed && !inode->file_data_changed) {
+        if (inode->inode_changed && inode->file_data_changed) {
             writeDiskInode(inode);
         }
         // get hash Q node
