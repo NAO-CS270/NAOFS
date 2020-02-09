@@ -2,9 +2,9 @@
 #include <stdlib.h>
 
 #include "diskParams.h"
-#include "inode/iNode.h"
-#include "dsk/blkfetch.h"
-#include "mandsk/params.h"
+#include "../inode/iNode.h"
+#include "../dsk/blkfetch.h"
+#include "../mandsk/params.h"
 #include "freeBlockList.h"
 #include "metaBlocks.h"
 

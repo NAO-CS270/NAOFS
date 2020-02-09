@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "incoreInodeOps/freeList.h"
+#include "../incoreInodeOps/freeList.h"
 
 static Node* freeList;
 

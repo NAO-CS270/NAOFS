@@ -2,8 +2,8 @@
 #define HASHQ_H
 
 #include <stdio.h>
-#include "incoreInodeOps/node.h"
-#include "mandsk/params.h"
+#include "../incoreInodeOps/node.h"
+#include "../mandsk/params.h"
 
 
 // (device number + inode number) % INODE_HASH_SIZE

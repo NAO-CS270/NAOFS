@@ -1,8 +1,8 @@
 #include "ialloc.h"
 #include "diskParams.h"
 #include "metaBlocks.h"
-#include "dsk/blkfetch.h"
-#include "mandsk/params.h"
+#include "../dsk/blkfetch.h"
+#include "../mandsk/params.h"
 #include "iNodeManager.h"
 
 #include <pthread.h>

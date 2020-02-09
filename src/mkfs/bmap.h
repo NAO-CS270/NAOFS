@@ -2,8 +2,8 @@
 #define BMAP_H
 
 #include <stdlib.h>
-#include "inode/inCoreiNode.h"
-#include "mkfs/metablocks.h"
+#include "../inode/inCoreiNode.h"
+#include "metablocks.h"
 
 /** blockNumber: the block number in which the offset resides
  *  byteOffsetInBlock: offset inside the block

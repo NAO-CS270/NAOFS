@@ -1,9 +1,9 @@
 #ifndef _SPEC_BLOCKS_H
 #define _SPEC_BLOCKS_H
 
-#include "dsk/mdisk.h"
-#include "mandsk/params.h"
-#include "inode/iNode.h"
+#include "../dsk/mdisk.h"
+#include "../mandsk/params.h"
+#include "../inode/iNode.h"
 
 #define BLOCK_ADDRESSES_PER_BLOCK (BLOCK_SIZE/BLOCK_ADDRESS_SIZE)
 #define INODE_NOS_PER_BLOCK (BLOCK_SIZE/INODE_ADDRESS_SIZE)
@@ -16,7 +16,7 @@ typedef struct superBlock superBlock;
 
 // use same struct for indirect block
 struct freeDiskListBlock {
-	size_t blkNos[BLOCK_ADDRESSES_PER_BLOCK]
+	size_t blkNos[BLOCK_ADDRESSES_PER_BLOCK];
 };
 typedef struct freeDiskListBlock freeDiskListBlock;
 
