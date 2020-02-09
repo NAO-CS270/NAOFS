@@ -4,20 +4,27 @@
 static Node* freeList;
 
 void initFreeInCoreINodeList() {
+    freeList = NULL;
     for(int i = 0; i < INODE_BUFFER_SIZE; i++) {
         Node* node = (Node*)malloc(sizeof(struct Node));
-        freeListInsert(freeList, node);
+        node->inode = (inCoreiNode*)malloc(sizeof(inCoreiNode));
+        node->inode->disk_iNode = (iNode*)malloc(sizeof(iNode));
+        freeListInsert(node);
     }
 }
 
-void freeListInsert(Node* head, Node* node) {
+void freeListInsert(Node* node) {
+    Node* head = freeList;
+    if (head = NULL)
+        head = node;
     node->next = head;
     head->prev = node;
     node->prev = NULL;
     head = node;
 }
 
-void freeListRemove(Node* head, Node* node) {
+void freeListRemove(Node* node) {
+    Node* head = freeList;
     while(NULL != head) {
         if(head->inode->inode_number == node->inode->inode_number) {
             // if tail node has to be removed
@@ -41,4 +48,9 @@ void freeListRemove(Node* head, Node* node) {
         }
         head = head->next;
     }
+}
+
+extern Node* getFreeINodeFromList() {
+    Node* head = freeList;
+    return head;
 }

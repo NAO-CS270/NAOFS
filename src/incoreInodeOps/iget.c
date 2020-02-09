@@ -1,57 +1,44 @@
 #include "incoreInodeOps/iget.h"
 
-const int SLEEP_TIME_IN_SECONDS = 3;
-const int ILIST_START_BLOCK = 3;
-const size_t num_of_inodes = NUM_OF_INODES;
-const size_t inode_size = INODE_SIZE;
+inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
+    // looking for the inode in the hash Q
+    Node* node = hashLookup(deviceNumber, iNodeNumber);
+    if(NULL != node) {
+        inCoreiNode* inode = node->inode;
+        // get a lock on the inode, wait until another process releases it
+        pthread_mutex_lock(&(inode->iNodeMutex));
+        // TODO: special processing for mount points.
 
-inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber, Node** hashQ, Node* freeList) {
-    Node* node;
-    while(true) {
-        node = hashLookup(deviceNumber, iNodeNumber, hashQ);
-        if(NULL != node) {
-            inCoreiNode* inode = node->inode;
-            if(inode->lock) {
-                sleep(SLEEP_TIME_IN_SECONDS);
-                continue;
-            }
-            // TODO: special processing for mount points.
-            if(inode->reference_count == 0) {
-                freeListRemove(freeList, node);
-            }
-            inode->reference_count++;
-            inode->lock = true;
-            return inode;
+        // if also in free in list, remove it
+        if(inode->reference_count == 0) {
+            freeListRemove(node);
         }
-        if(NULL == freeList) {
-            // TODO: Error handling
-            return NULL;
-        }
-        freeListRemove(freeList, node);
-        node->inode->inode_number = iNodeNumber;
-        node->inode->device_number = deviceNumber;
-
-        // updating the hash Q entry with new inode
-        insertInHash(node, hashQ);
-        // TODO:  call bread here(implemented below for now). Should return void*
-        // TODO: Take a lock while reading
-        // since the inode numbers start from 0, we don't do iNodeNumber-1.
-        int inodeBlockNumber = iNodeNumber / num_of_inodes + ILIST_START_BLOCK;
-        disk_block* metaBlock = (disk_block*)malloc(sizeof(disk_block));
-        metaBlock = getDiskBlock(inodeBlockNumber, metaBlock);
-
-        size_t offset = (iNodeNumber % num_of_inodes) * inode_size;
-        iNode* inode = (iNode*)malloc(inode_size);
-        memcpy(inode, metaBlock+offset, inode_size);
-        free(metaBlock);
-        // end of bread
-
-        node->inode->disk_iNode = inode;
-        // TODO: This has to be released by the process using iget.
-        node->inode->lock = true;
-        node->inode->reference_count++;
-
-        // TODO: Update inode status?
-        return node->inode;
+        inode->reference_count++;
+        // returning locked inode
+        return inode;
     }
+    if(NULL == freeList) {
+        // TODO: Error handling
+        return NULL;
+    }
+    // getting free inode from free list and removing it
+    node = getFreeINodeFromList();
+    node->inode->inode_number = iNodeNumber;
+    node->inode->device_number = deviceNumber;
+    freeListRemove(node);
+
+    // updating the hash Q entry with new inode
+    insertInHash(node);
+
+    // TODO: Take a lock while reading
+    // getting the disk inode
+    getDiskInode(node->inode);
+    // TODO: handle error if getDiskInode returns an error
+
+    // this lock has to be released by the process using iget
+    pthread_mutex_lock(&(inode->iNodeMutex));
+    node->inode->reference_count++;
+
+    // TODO: Update inode status?
+    return node->inode;
 }

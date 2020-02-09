@@ -3,6 +3,7 @@
 #include "dsk/blkfetch.h"
 #include "dsk/mdisk.h"
 #include "inode/iNode.h"
+#include "inode/inCoreiNode.h"
 
 static const size_t iNodesInABlock = BLOCK_SIZE/INODE_SIZE;
 static const size_t iNodeNumsInABlock = BLOCK_SIZE/INODE_ADDRESS_SIZE;
@@ -97,5 +98,57 @@ void markINodeFree(size_t iNodeNum, bool toSetType) {
 	writeDiskBlock(iNodesData);
 
 	free(iNodesList);
+}
+
+void getDiskInode(inCoreiNode* inode) {
+	size_t iNodeNum = inode->inode_number;
+	if (iNodeNum >= NUM_OF_INODES) {
+		// TODO - Throw an error
+		return ;
+	}
+
+	size_t blockNum = (iNodeNum/iNodesInABlock) + INODE_BLOCKS_HEAD;
+	disk_block* metaBlock = (disk_block*)malloc(BLOCK_SIZE);
+	metaBlock = getDiskBlock(blockNum, metaBlock);
+
+	iNodesBlock* iNodeBlk = (iNodesBlock*)malloc(sizeof(iNodesBlock));
+	iNodeBlk = makeINodesBlock(metaBlock, iNodeBlk);
+
+	iNode* iNodesList = iNodeBlk->iNodesList;
+	size_t index = iNodeNum % iNodesInABlock;
+
+	// the doubtful part, this or memcpy
+	*(inode->disk_inode) = *(iNodesList[index]);
+
+	free(iNodeBlk);
+	free(disk_block);
+}
+
+void writeDiskInode(inCoreiNode* inode) {
+	// TODO: get a lock before reading and release after writing
+	size_t iNodeNum = inode->inode_number;
+	if (iNodeNum >= NUM_OF_INODES) {
+		// TODO - Throw an error
+		return ;
+	}
+
+	size_t blockNum = (iNodeNum/iNodesInABlock) + INODE_BLOCKS_HEAD;
+	disk_block* metaBlock = (disk_block*)malloc(BLOCK_SIZE);
+	metaBlock = getDiskBlock(blockNum, metaBlock);
+
+	iNodesBlock* iNodeBlk = (iNodesBlock*)malloc(sizeof(iNodesBlock));
+	iNodeBlk = makeINodesBlock(metaBlock, iNodeBlk);
+
+	iNode* iNodesList = iNodeBlk->iNodesList;
+	size_t index = iNodeNum % iNodesInABlock;
+
+	// the doubtful part, this or memcpy
+	*(iNodesList[index]) = *(inode->disk_inode);
+
+	writeINodesBlock(iNodeBlk, metaBlock);
+	writeDiskBlock(blockNum, metaBlock);
+
+	free(iNodeBlk);
+	free(disk_block);
 }
 
