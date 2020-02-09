@@ -48,21 +48,22 @@ size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums) {
 		return 0;
 	}
 
-	disk_block *iNodesData;
 	iNodesBlock *iNodesList = (iNodesBlock *)malloc(sizeof(iNodesBlock));
 
 	size_t blockCounter = (startINodeNum/iNodesInABlock) + INODE_BLOCKS_HEAD;
 	size_t freeINodeCounter = 0;
 
 	while (freeINodeCounter < iNodeNumsInABlock) {
+        disk_block *iNodesData = (disk_block*)malloc(sizeof(disk_block));
 		if (blockCounter >= endOfINodeBlocks) {
 			break;
 		}
-		iNodesData = getDiskBlock(blockCounter);
+		iNodesData = getDiskBlock(blockCounter, iNodesData);
 		makeINodesBlock(iNodesData, iNodesList);
 
 		freeINodeCounter += getFromBlock(iNodesList, (iNodeNums->iNodeNos) + freeINodeCounter);
 		blockCounter++;
+		// TODO: free iNodesData?
 	}
 	free(iNodesList);
 	return getReturnValue(iNodeNums, freeINodeCounter);
@@ -76,10 +77,11 @@ void markINodeFree(size_t iNodeNum, bool toSetType) {
 	}
 	size_t blockNum = (iNodeNum/iNodesInABlock) + INODE_BLOCKS_HEAD;
 
-	disk_block *iNodesData = getDiskBlock(blockNum);
+	disk_block *iNodesData = (disk_block*)malloc(sizeof(disk_block));
+	iNodesData = getDiskBlock(blockNum, iNodesData);
 	iNodesBlock *iNodesList = (iNodesBlock *)malloc(sizeof(iNodesBlock));
 	makeINodesBlock(iNodesData, iNodesList);
-	
+	//TODO: Free iNotesData?
 	iNode *theINode = blockOfINodes->iNodesList;
 	size_t iNodeIterator = 0;
 

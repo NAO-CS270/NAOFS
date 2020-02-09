@@ -21,13 +21,18 @@ inodebld = build/inode/
 
 incoreInodeOpssrc = src/incoreInodeOps/
 incoreInodeOpsbld = build/incoreInodeOps/
+
+fuseBld = build/fuse/
 # *********************************************************
 # Phony Targets
 .PHONY: clean
 
 # Project Targets
 nao:
-	gcc -o nao temp.c `pkg-config fuse --cflags --libs`
+	gcc -o nao src/main.c `pkg-config fuse --cflags --libs`
+
+fuse: $(INC_DIR)main.c $(INC_DIR)main.h $(inodesrc)iNode.h $(incoreInodeOpssrc)node.h $(INC_DIR)fileTables.h $(paramssrc)params.h | $(fuseBld)
+	$(CC) -c $< -o $(fuseBld)fuse `pkg-config fuse --cflags --libs`
 
 mkfs: $(mkfssrc)mkfs.c $(inodesrc)iNode.h $(mkfssrc)freeBlockList.h $(mkfssrc)metaBlocks.h $(blksrc)blkfetch.h $(paramssrc)params.h freeBlockList inode| $(blkbld)
 	$(CC) $(CFLAGS) -c $< -o $(blkbld)mkfs
@@ -56,6 +61,9 @@ iget: $(incoreInodeOpssrc)iget.c $(incoreInodeOpssrc)iget.h $(blksrc)blkfetch.h 
 iput: $(incoreInodeOpssrc)iput.c $(incoreInodeOpssrc)iput.h $(blksrc)blkfetch.h $(blksrc)mdisk.h $(incoreInodeOpssrc)hashQ.h $(incoreInodeOpssrc)freeList.h $(incoreInodeOpssrc)node.h $(inodesrc)inCoreiNode.h $(paramssrc)params.h | $(incoreInodeOpsbld)
 	$(CC) $(CFLAGS) -c $< -o $(incoreInodeOpsbld)iput.o
 
+bmap: $(blksrc)bmap.c $(blksrc)bmap.h $(blksrc)mdisk.h $(incoreInodeOpssrc)node.h | $(blkbld)
+	$(CC) $(CFLAGS) -c $< -o $(blkbld)bmap.o
+
 $(mkfsbld):
 	mkdir -p $@
 
@@ -66,6 +74,9 @@ $(blkbld):
 	mkdir -p $@
 
 $(incoreInodeOpsbld):
+	mkdir -p $@
+
+$(fuseBld):
 	mkdir -p $@
 
 clean:

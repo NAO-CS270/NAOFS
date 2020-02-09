@@ -1,6 +1,15 @@
 #include <stdlib.h>
 #include "incoreInodeOps/freeList.h"
 
+static Node* freeList;
+
+void initFreeInCoreINodeList() {
+    for(int i = 0; i < INODE_BUFFER_SIZE; i++) {
+        Node* node = (Node*)malloc(sizeof(struct Node));
+        freeListInsert(freeList, node);
+    }
+}
+
 void freeListInsert(Node* head, Node* node) {
     node->next = head;
     head->prev = node;
@@ -33,5 +42,3 @@ void freeListRemove(Node* head, Node* node) {
         head = head->next;
     }
 }
-
-

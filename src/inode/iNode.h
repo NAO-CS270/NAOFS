@@ -43,6 +43,17 @@ struct iNode {
 
 	size_t inode_number; 
 
+	bool isFree;
+	size_t permissions;
+
+	size_t direct_blocks[DIRECT_BLOCKS];
+	size_t single_indirect_blocks[SINGLE_INDIRECT_BLOCKS];
+	size_t double_indirect_blocks[DOUBLE_INDIRECT_BLOCKS];
+
+	time_t modified_time;
+	time_t access_time;
+	time_t creation_time;
+
 	size_t linksCount;
 
 	iNodeType type;

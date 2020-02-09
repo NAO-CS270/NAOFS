@@ -1,8 +1,10 @@
 #ifndef _MEMORY_DISK_H
 #define _MEMORY_DISK_H
 
+#include "../mandsk/params.h"
+
 struct disk_block {
-	unsigned char data[1024];
+	unsigned char data[BLOCK_SIZE];
 };
 typedef struct disk_block disk_block;
 

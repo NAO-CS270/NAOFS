@@ -37,11 +37,13 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber, Node** hashQ, Node* f
         // TODO: Take a lock while reading
         // since the inode numbers start from 0, we don't do iNodeNumber-1.
         int inodeBlockNumber = iNodeNumber / num_of_inodes + ILIST_START_BLOCK;
-        disk_block* metaBlock = getDiskBlock(inodeBlockNumber);
+        disk_block* metaBlock = (disk_block*)malloc(sizeof(disk_block));
+        metaBlock = getDiskBlock(inodeBlockNumber, metaBlock);
 
         size_t offset = (iNodeNumber % num_of_inodes) * inode_size;
         iNode* inode = (iNode*)malloc(inode_size);
         memcpy(inode, metaBlock+offset, inode_size);
+        free(metaBlock);
         // end of bread
 
         node->inode->disk_iNode = inode;
