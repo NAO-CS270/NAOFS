@@ -30,8 +30,10 @@ bmapResponse* bmap(inCoreiNode* inode, size_t offset) {
         indirectionLevel = 1;
     else if (offset >= singleIndirectBlkMaxSize && offset < doubleIndirectBlkMaxSize)
         indirectionLevel = 2;
-    else
+    else {
+        // TODO:handle block not found error
         return NULL;
+    }
 
     size_t newOffset = offset;
     int i = indirectionLevel;
