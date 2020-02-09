@@ -1,9 +1,9 @@
 #include "diskParams.h"
-#include "mandsk/params.h"
-#include "dsk/blkfetch.h"
-#include "dsk/mdisk.h"
-#include "inode/iNode.h"
-#include "inode/inCoreiNode.h"
+#include "../mandsk/params.h"
+#include "../dsk/blkfetch.h"
+#include "../dsk/mdisk.h"
+#include "../inode/iNode.h"
+#include "../inode/inCoreiNode.h"
 
 static const size_t iNodesInABlock = BLOCK_SIZE/INODE_SIZE;
 static const size_t iNodeNumsInABlock = BLOCK_SIZE/INODE_ADDRESS_SIZE;

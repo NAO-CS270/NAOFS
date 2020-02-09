@@ -114,7 +114,6 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
         free(metaBlock);
         bytesWritten += bytesWritten + bmapResp->ioBytesInBlock;
         tempOffset = tempOffset + bmapResp->ioBytesInBlock + 1;
-        }
     }
     return bytesWritten;
 }

@@ -1,7 +1,7 @@
 #include "directory.h"
-#include "mandsk/params.h"
-#include "inode/iNode.h"
-#include "dsk/blkfetch.h"
+#include "../mandsk/params.h"
+#include "../inode/iNode.h"
+#include "../dsk/blkfetch.h"
 
 #include <stdlib.h>
 #include <string.h>
