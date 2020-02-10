@@ -1,16 +1,23 @@
 #ifndef _SPEC_BLOCKS_H
 #define _SPEC_BLOCKS_H
 
-#include "../dsk/mdisk.h"
-#include "../mandsk/params.h"
-#include "../inode/iNode.h"
+#include "dsk/mdisk.h"
+#include "mandsk/params.h"
+#include "inode/iNode.h"
 
-#define BLOCK_ADDRESSES_PER_BLOCK (BLOCK_SIZE/BLOCK_ADDRESS_SIZE)
-#define INODE_NOS_PER_BLOCK (BLOCK_SIZE/INODE_ADDRESS_SIZE)
-#define INODES_PER_BLOCK (BLOCK_SIZE/INODE_SIZE)
+#include "dsk/mdisk.h"
+#include "inode/inCoreiNode.h"
 
+// TODO: initialize the superblock as part of mkfs.
 struct superBlock {
-	size_t rememberedINodeNum;
+    size_t file_system_size;
+
+    size_t num_free_inodes;
+    size_t* free_inode_list;
+    size_t next_free_inode;
+    size_t remembered_inode;
+
+    bool dirty_bit;
 };
 typedef struct superBlock superBlock;
 
@@ -41,9 +48,5 @@ extern disk_block *writeINodeListBlock(iNodeListBlock *theBlock, disk_block *blo
 
 extern iNodesBlock *makeINodesBlock(disk_block *blockPtr, iNodesBlock *theBlock);
 extern disk_block *writeINodesBlock(iNodesBlock *theBlock, disk_block *blockPtr);
-
-#undef BLOCK_ADDRESSES_PER_BLOCK
-#undef INODE_NOS_PER_BLOCK
-#undef INODES_PER_BLOCK
 
 #endif
