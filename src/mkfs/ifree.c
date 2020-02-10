@@ -48,7 +48,7 @@ void rememberIfNeeded(size_t iNodeNum, iNodeListBlock *iNodeList) {
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
 	makeSuperBlock(superBlockData, theSuperBlock);
 
-	(theSuperBlock->rememberedINodeNum) = iNodeNum;
+	(theSuperBlock->remembered_inode) = iNodeNum;
 
 	writeSuperBlock(theSuperBlock, superBlockData);
 	writeDiskBlock(SUPER_BLOCK, superBlockData);
