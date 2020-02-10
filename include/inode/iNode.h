@@ -39,30 +39,31 @@ typedef enum iNodeMode iNodeMode;
 
 // Using this struct in the project. Keeping the old for for reference.
 struct iNode {
+    // device number
 	size_t device_number;
 
+    // inode number
 	size_t inode_number; 
 
-	bool isFree;        // will be removed as part of type
-	size_t permissions; // Duplicate from fuse_binding
-
-	size_t direct_blocks[DIRECT_BLOCKS];
-	size_t single_indirect_blocks[SINGLE_INDIRECT_BLOCKS];
-	size_t double_indirect_blocks[DOUBLE_INDIRECT_BLOCKS];
-
+    // different times access, modified and created
 	time_t modified_time;
 	time_t access_time;
 	time_t creation_time;
 
+    // link count
 	size_t linksCount;
 
+    // type of the file
 	iNodeType type;
 
-	iNodeMode mode; // Same as permission will remove one of them
+    // file permissions
+	iNodeMode mode;
 
-	size_t owner_uid;			// TODO - Have to figure out how to initialize this.
+    // id of the owner
+	size_t owner_uid;
 
-	size_t group_uid;			// TODO - Have to figure out how to initialize this.
+    // if of the group
+	size_t group_uid;
 
 	size_t dataBlockNums[BLOCKS_IN_INODE]; // same as the data block defined above, must remove one of them
 

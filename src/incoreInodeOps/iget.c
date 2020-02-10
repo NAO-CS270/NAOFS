@@ -17,7 +17,7 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
         // returning locked inode
         return inode;
     }
-    if(NULL == freeList) {
+    if(checkFreeListEmpty()) {
         // TODO: Error handling
         return NULL;
     }
@@ -25,6 +25,7 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
     node = getFreeINodeFromList();
     node->inode->inode_number = iNodeNumber;
     node->inode->device_number = deviceNumber;
+    inode->iNodeMutex = PTHREAD_MUTEX_INITIALIZER;
     freeListRemove(node);
 
     // updating the hash Q entry with new inode
@@ -32,7 +33,7 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
 
     // TODO: Take a lock while reading
     // getting the disk inode
-    getDiskInode(node->inode);
+    getDiskInode(node->inode->inode_number, node->inode->disk_inode);
     // TODO: handle error if getDiskInode returns an error
 
     // this lock has to be released by the process using iget
