@@ -1,18 +1,16 @@
-execute_process (
-        COMMAND bash -c "find . -regex '.*.c$'"
-        SOURCES outVar
-)
+FILE(GLOB SOURCES *.c)
 
 add_executable(
     unit_tests
     ${SOURCES}
-    )
+    main.c
+)
 
 target_link_libraries(
     unit_tests
     gtest_main
     NAOFS
-    )
+)
 
 add_test(
   NAME

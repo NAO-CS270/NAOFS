@@ -25,7 +25,7 @@ incoreInodeOpsbld = build/incoreInodeOps/
 fuseBld = build/fuse/
 # *********************************************************
 # Phony Targets
-.PHONY: clean
+.PHONY: clean, test
 
 # Project Targets
 nao:
@@ -79,5 +79,8 @@ $(incoreInodeOpsbld):
 $(fuseBld):
 	mkdir -p $@
 
+test:
+	make clean
+	mkdir CI-build && cd CI-build && cmake .. && cmake --build . && ctest
 clean:
-	rm -rf build nao
+	rm -rf build nao CI-build

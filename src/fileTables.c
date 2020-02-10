@@ -6,7 +6,7 @@
 size_t putFileDescriptorEntry(inCoreiNode *inode, size_t mode) {
     int i;
     for(i = 0; i < MAX_FD; i++) {
-        if(file_descriptor_table[i] == -1) {
+        if(file_descriptor_table[i].fd == -1) {
             break;
         }
     }

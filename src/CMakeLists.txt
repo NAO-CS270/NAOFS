@@ -1,14 +1,8 @@
 add_library(NAOFS "")
 
-execute_process (
-    COMMAND bash -c "find . -regex '.*.c$'"
-    SOURCES outVar
-)
+FILE(GLOB SOURCES *.c)
 
-execute_process (
-        COMMAND bash -c "find . -regex '.*.c$'"
-        HEADERS outVar
-)
+FILE(GLOB HEADERS *.h)
 
 target_sources(
     NAOFS

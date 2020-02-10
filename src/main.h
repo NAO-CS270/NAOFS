@@ -2,6 +2,7 @@
 #define MAIN_H
 
 #include <stdio.h>
+#define FUSE_USE_VERSION 29
 #include <fuse.h>
 #include <string.h>
 #include <errno.h>
