@@ -60,7 +60,7 @@ bmapResponse* bmap(inCoreiNode* inode, size_t offset) {
             diskBlock = makeFreeDiskListBlock (metaBlock, diskBlock);
 
             // read the block number
-            blockNum = diskBlock->blockNos[index];
+//            blockNum = diskBlock->blockNos[index]; TODO: fix this line
 
             free(diskBlock);
             free(metaBlock);

@@ -1,4 +1,5 @@
-#include "../incoreInodeOps/iget.h"
+#include "./freeList.h"
+#include "./iget.h"
 
 inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
     // looking for the inode in the hash Q
@@ -36,7 +37,7 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
     // TODO: handle error if getDiskInode returns an error
 
     // this lock has to be released by the process using iget
-    pthread_mutex_lock(&(inode->iNodeMutex));
+//    pthread_mutex_lock(&(inode->iNodeMutex)); TODO: fix this line
     node->inode->reference_count++;
 
     // TODO: Update inode status?

@@ -4,6 +4,7 @@
 #include "../incoreInodeOps/node.h"
 // #include "inode/inCoreiNode.h"
 
+static Node* freeList;
 // initialize free in core inodes list
 extern void initFreeInCoreINodeList();
 // insert in front of the list

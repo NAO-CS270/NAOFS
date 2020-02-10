@@ -1,7 +1,5 @@
 #include <stdlib.h>
-#include "../incoreInodeOps/freeList.h"
-
-static Node* freeList;
+#include "./freeList.h"
 
 void initFreeInCoreINodeList() {
     freeList = NULL;

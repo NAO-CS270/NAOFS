@@ -1,9 +1,9 @@
-FILE(GLOB SOURCES *.c)
+FILE(GLOB_RECURSE SOURCES *.c)
 
 add_executable(
     unit_tests
     ${SOURCES}
-    main.c
+        runner.c
 )
 
 #find_package(FUSE REQUIRED)
@@ -12,7 +12,7 @@ target_link_libraries(
     gtest_main
     NAOFS
 #    ${FUSE_LIBRARIES}
-    -lulockmgr
+#    -lulockmgr
 )
 
 add_test(

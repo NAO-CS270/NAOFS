@@ -1,4 +1,4 @@
-#include "../blkfetch.h"
+#include "./blkfetch.h"
 
 disk_block* getDiskBlock(int blockNumber, disk_block *blockData) {
 	return fetchMemoryDiskBlock(blockNumber, blockData);
