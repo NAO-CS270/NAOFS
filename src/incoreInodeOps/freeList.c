@@ -8,7 +8,8 @@ void initFreeInCoreINodeList() {
     for(int i = 0; i < INODE_BUFFER_SIZE; i++) {
         Node* node = (Node*)malloc(sizeof(struct Node));
         node->inode = (inCoreiNode*)malloc(sizeof(inCoreiNode));
-        node->inode->disk_iNode = (iNode*)malloc(sizeof(iNode));
+        iNode* disk_inode = (iNode*)malloc(sizeof(iNode));
+        insertDiskInodeData(disk_inode, node->inode);
         freeListInsert(node);
     }
 }

@@ -1,4 +1,6 @@
+#include "dsk/blkfetch.h"
 #include "incoreInodeOps/bmap.h"
+
 
 // num of block addresses in indirect block
 const size_t blkAddrNos = BLOCK_SIZE / BLOCK_ADDRESS_SIZE;
@@ -46,11 +48,11 @@ bmapResponse* bmap(inCoreiNode* inode, size_t offset) {
         // fetching block number from inode
         if (inodeBlkFlg) {
             if (indirectionLevel == 0)
-                blockNum = inode->disk_iNode->direct_blocks[index];
+                blockNum = inode->dataBlockNums[index];
             else if (indirectionLevel == 1)
-                blockNum = inode->disk_iNode->single_indirect_blocks[0];
+                blockNum = inode->dataBlockNums[11];
             else if (indirectionLevel == 2)
-                blockNum = inode->disk_iNode->double_indirect_blocks[0];
+                blockNum = inode->dataBlockNums[12];
             inodeBlkFlg = 0;
         } else if (indirectionLevel != 0) {
             // fetch the indirect block

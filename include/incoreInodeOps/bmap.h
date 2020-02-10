@@ -2,7 +2,7 @@
 #define BMAP_H
 
 #include <stdlib.h>
-#include "incoreInodeOps/inCoreiNode.h"
+#include "inode/inCoreiNode.h"
 #include "mkfs/metaBlocks.h"
 
 /** blockNumber: the block number in which the offset resides
