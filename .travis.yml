@@ -10,6 +10,7 @@ addons:
       - libfuse-dev
       - linux-libc-dev
       - libc6-dev
+      - libgcc-8-dev
       - pkg-config
 
 before_install:
