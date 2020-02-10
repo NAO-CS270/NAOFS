@@ -1,16 +1,10 @@
 #include "free.h"
 #include "mdisk.h"
-#include "../mkfs/metaBlocks.h"
-#include "../mkfs/diskParams.h"
+#include "mkfs/metaBlocks.h"
+#include "mkfs/diskParams.h"
 #include "blkfetch.h"
 
 static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
-
-void free(size_t blockNumber) {
-    pthread_mutex_lock(&iNodeListMutex);
-    _freeInto(FREE_LIST_BLOCK, blockNumber);
-    pthread_mutex_unlock(&iNodeListMutex);
-}
 
 void _freeInto(int freeListBlockNumber, size_t blockNumber) {
     disk_block* freeListBlock = (disk_block*)malloc(sizeof(disk_block));
@@ -31,4 +25,10 @@ void _freeInto(int freeListBlockNumber, size_t blockNumber) {
 
     free(freeListBlock);
     free(diskBlock);
+}
+
+void blockFree(size_t blockNumber) {
+    pthread_mutex_lock(&iNodeListMutex);
+    _freeInto(FREE_LIST_BLOCK, blockNumber);
+    pthread_mutex_unlock(&iNodeListMutex);
 }
