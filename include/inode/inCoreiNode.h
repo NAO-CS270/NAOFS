@@ -44,6 +44,8 @@ struct inCoreiNode {
     // dirty bits for this inode
     bool inode_changed;
     bool file_data_changed;
+
+    size_t size;
     // TODO: handle file mount point
     // TODO: A process is (or many processes are) waiting for it to be unlocked.
 };

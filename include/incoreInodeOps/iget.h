@@ -15,7 +15,9 @@
 #include "inode/inCoreiNode.h"
 #include "inode/iNode.h"
 #include "mkfs/iNodeManager.h"
+#include "inode/inCoreiNode.h"
 
 extern inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber);
+extern void fetchInodeFromDisk(size_t iNodeNumber,inCoreiNode* inode);
 
 #endif //IGET_H

@@ -139,7 +139,7 @@ static int mkdir_callback(const char* path, mode_t mode) {
     size_t newInodeNumber = getNewINode();
 
     char *filename = getFilenameFromPath(path);
-    //getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
+    getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
     iput(parentInode);
 
     // TODO: use the right device number, using 0 for now
@@ -155,6 +155,7 @@ static struct fuse_operations OPERATIONS = {
         .open = open_callback,
         .write = write_callback
         .mkdir = mkdir_callback,
+
 };
 
 int main(int argc, char *argv[]) {
