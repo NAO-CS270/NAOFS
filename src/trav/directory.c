@@ -88,7 +88,7 @@ size_t findINodeInDirectory(iNode *iNodePtr, char *entryName) {
 	return foundINode;
 }
 
-void getAndUpdateDirectoryTable(inCoreiNode* inode, size_t newInodeNumber, char* filename) {
+void getAndUpdateDirectoryTable(inCoreiNode* parentInode, size_t newInodeNumber, char* filename) {
     // TODO: See what needs to be done when the validateSearch fails
     validateSearch(inode);
 
@@ -104,7 +104,7 @@ void getAndUpdateDirectoryTable(inCoreiNode* inode, size_t newInodeNumber, char*
     nameINodePair iNodeData;
 
     for(counter = 0; counter < ENTRIES_PER_BLOCK; counter++) {
-        iNodeData = dataPtr->entries[counter];
+        iNodeData = dirData->entries[counter];
         if(NULL == iNodeData) {
             break;
         }
@@ -117,12 +117,34 @@ void getAndUpdateDirectoryTable(inCoreiNode* inode, size_t newInodeNumber, char*
     iNodeData.iNodeNum = newInodeNumber;
     iNodeData.name = filename;
 
-    dataPtr->entries[counter] = iNodeData;
+    dirData->entries[counter] = iNodeData;
     // TODO: Is this correct?
-    *(blkPtr) = *(dataPtr);
+    *(blkPtr) = *(dirData);
     writeMemoryDiskBlock(bmapResp->blockNumber, blkPtr);
 
-    free(dataPtr);
+    free(dirData);
     free(blkPtr);
 }
 
+void updateNewDirMetaData(inCoreiNode* inode, size_t newInodeNumber, size_t parentInodeNumber) {
+    bmapResponse* bmapResp = bmap(inode, inode->disk_iNode->size);
+    directoryTable *dirData = (directoryTable*)malloc(sizeof(directoryTable));
+    disk_block *blkPtr = (disk_block*)malloc(sizeof(disk_block));
+
+    getDiskBlock(bmapResp->BlockNumber, blkPtr);
+    makeDirectoryTable(blkPtr, dirData);
+
+    size_t = counter;
+    // since this is called at the time of mkdir, the directory entry table will be empty.
+    dirData->entries[0].name = ".";
+    dirData->entries[0].iNodeNum = newInodeNumber;
+
+    dirData->entries[1].name = "..";
+    dirData->entries[1].iNodeNum = parentInodeNumber;
+
+    *(blkPtr) = *(dirData);
+    writeMemoryDiskBlock(bmapResp->BlockNumber, blkPtr);
+
+    free(dirData);
+    free(blkPtr);
+}
