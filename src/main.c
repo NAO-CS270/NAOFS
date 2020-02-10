@@ -25,19 +25,21 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
 static int open_callback(const char *path, struct fuse_file_info *fi) {
     inCoreiNode *inode;
     // TODO: Uncomment when namei is implemented
-    // inode = namei(path);
+    // size_t inodeNumber = namei(path);
 
+    // TODO: Sending the device number as 0 for now.
+    inode = iget(inode, 0);
     // TODO: Allocate file table entry for inode, initialize count, offset.
     size_t fd = putFileDescriptorEntry(inode, fi->flags);
     if(fd == -1) {
         return fd;
     }
-    // TODO: Allocate user file descriptor entry, set pointer to file table entry - no need to do this.
     if(fi->flags & O_TRUNC) {
         // TODO: Free all blocks. (Algorithm: free)
     }
     // set the file handle in file_info
     fi->fh = fd;
+    iput(inode);
     return fd;
 }
 
@@ -71,6 +73,8 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
         tempOffset = tempOffset + blockBytesRead + 1;
         free(metaBlock);
     }
+    inode->disk_iNode->size = size; //TODO: Do we need to call iput here?
+    iput(inode);
     return blockBytesRead;
 }
 
@@ -114,17 +118,14 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
         bytesWritten += bytesWritten + bmapResp->ioBytesInBlock;
         tempOffset = tempOffset + bmapResp->ioBytesInBlock + 1;
     }
+    inode->disk_iNode->size = bytesWritten;
+    iput(inode);
     return bytesWritten;
 }
 
 // creates a new special file(dir, pipe, link). Returns -1 on error
 static int mkdir_callback(const char* path, mode_t mode) {
     char* parentDirPath;
-    //struct fuse_context* fuse_context = fuse_get_context();
-
-//    if(0 != fuse_context->uid) {
-//        return -1;
-//    }
     parentDirPath = getParentDirectory(path);
 
     // TODO: There is going to be an error thrown by namei
