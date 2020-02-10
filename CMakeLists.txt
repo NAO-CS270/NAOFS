@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(NAOFS C)
+project(NAOFS CXX)
 
 # place binaries and libraries according to GNU standards
 include(GNUInstallDirs)
