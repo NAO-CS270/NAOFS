@@ -21,26 +21,29 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
     return -ENOENT;
 }
 
+// TODO: Update the size of the file
 static int open_callback(const char *path, struct fuse_file_info *fi) {
     inCoreiNode *inode;
     // TODO: Uncomment when namei is implemented
-    // inode = namei(path);
+    // size_t inodeNumber = namei(path);
 
+    // TODO: Sending the device number as 0 for now.
+    inode = iget(inode, 0);
     // TODO: Allocate file table entry for inode, initialize count, offset.
     size_t fd = putFileDescriptorEntry(inode, fi->flags);
     if(fd == -1) {
         return fd;
     }
-    // TODO: Allocate user file descriptor entry, set pointer to file table entry - no need to do this.
     if(fi->flags & O_TRUNC) {
         // TODO: Free all blocks. (Algorithm: free)
     }
-    inode->lock = false;
     // set the file handle in file_info
     fi->fh = fd;
+    iput(inode);
     return fd;
 }
 
+// TODO: Update the size of the file
 static int read_callback(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
 
     char* dataRead;
@@ -54,7 +57,6 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     struct fuse_context* fuse_context = fuse_get_context();
     // TODO: perform access permission checks
     inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
-    inode->lock = true;
     while(blockBytesRead < size) {
         bmapResponse *bmapResp  = bmap(inode, tempOffset);
         // trying to read end of the file
@@ -71,10 +73,12 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
         tempOffset = tempOffset + blockBytesRead + 1;
         free(metaBlock);
     }
-    inode->lock = false;
+    inode->disk_iNode->size = size; //TODO: Do we need to call iput here?
+    iput(inode);
     return blockBytesRead;
 }
 
+// TODO: update the size of the file
 static int write_callback(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi) {
     if(fi->fh < 0) {
         return -1;
@@ -87,7 +91,6 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
     struct fuse_context* fuse_context = fuse_get_context();
     inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
 
-    inode->lock = true;
     while(bytesWritten < size) {
         bmapResponse *bmapResp = bmap(inode, tempOffset);
         if(bmapResp == NULL) {
@@ -105,7 +108,7 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
             memcpy(metaBlock->data, buf, bmapResp->ioBytesInBlock);
             writeMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
         } else {
-            metaBlock = fetchMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
+            metaBlock = getDiskBlock(bmapResp->blockNumber, metaBlock);
             unsigned char* ptrIntoBlock = metaBlock->data;
             ptrIntoBlock += bmapResp->ioBytesInBlock;
             memcpy(ptrIntoBlock, buf, bmapResp->ioBytesInBlock);
@@ -115,14 +118,35 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
         bytesWritten += bytesWritten + bmapResp->ioBytesInBlock;
         tempOffset = tempOffset + bmapResp->ioBytesInBlock + 1;
     }
+    inode->disk_iNode->size = bytesWritten;
+    iput(inode);
     return bytesWritten;
 }
 
+// creates a new special file(dir, pipe, link). Returns -1 on error
 static int mkdir_callback(const char* path, mode_t mode) {
-    // if new node  not named pipe and user not super user
-    // return error
-    // get inode of parent node (using namei)
+    char* parentDirPath;
+    parentDirPath = getParentDirectory(path);
 
+    // TODO: There is going to be an error thrown by namei
+    inCoreiNode *parentInode = namei(parentDirPath);
+    if (NULL != parentInode) {
+        iput(inode);
+        return -1;
+    }
+
+    // assign new inode from the file system
+    size_t newInodeNumber = getNewINode();
+
+    char *filename = getFilenameFromPath(path);
+    getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
+    iput(parentInode);
+
+    // TODO: use the right device number, using 0 for now
+    inCoreiNode *newInode = iget(newInodeNumber, 0);
+    // add "." and ".." in the newly created inode
+    updateNewDirMetaData(newInode, newInodeNumber, parentInode, parentInode->inode_number);
+    iput(newInode);
 }
 
 static struct fuse_operations OPERATIONS = {
@@ -130,7 +154,7 @@ static struct fuse_operations OPERATIONS = {
         .read = read_callback,
         .open = open_callback,
         .write = write_callback
-        //.mkdir = mkdir_callback,
+        .mkdir = mkdir_callback,
 };
 
 int main(int argc, char *argv[]) {

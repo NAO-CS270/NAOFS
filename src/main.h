@@ -7,8 +7,14 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <fcntl.h>
-#include "./fileTables.h"
-#include "./mkfs/bmap.h"
-#include "./incoreInodeOps/freeList.h"
+#include "fileTables.h"
+#include "dsk/bmap.h"
+#include "dsk/blkfetch.h"
+#include "incoreInodeOps/freeList.h"
+#include "utils/utils.h"
+#include "incoreInodeOps/iput.h"
+#include "incoreInodeOps/iget.h"
+#include "mkfs/ialloc.h"
+#include "trav/directory.h"
 
 #endif //MAIN_H
