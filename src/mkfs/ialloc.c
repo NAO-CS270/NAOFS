@@ -1,11 +1,4 @@
-#include "ialloc.h"
-#include "diskParams.h"
-#include "metaBlocks.h"
-#include "../dsk/blkfetch.h"
-#include "../mandsk/params.h"
-#include "./iNodeManager.h"
-
-#include <pthread.h>
+#include "mkfs/ialloc.h"
 
 static const size_t iNodeNumsPerBlock = BLOCK_SIZE/INODE_ADDRESS_SIZE;
 
@@ -68,7 +61,7 @@ size_t getNewINode() {
 	writeINodeListBlock(iNodeList, iNodeListData);
 	writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
 	free(iNodeListData);
-	free(iNodeListBlock);
+	free(iNodeList);
 
 	pthread_mutex_unlock(&iNodeListMutex);
 	return freeINode;

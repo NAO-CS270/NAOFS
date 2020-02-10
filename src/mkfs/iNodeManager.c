@@ -1,9 +1,4 @@
-#include "diskParams.h"
-#include "../mandsk/params.h"
-#include "../dsk/blkfetch.h"
-#include "../dsk/mdisk.h"
-#include "../inode/iNode.h"
-#include "../inode/inCoreiNode.h"
+#include "mkfs/iNodeManager.h"
 
 static const size_t iNodesInABlock = BLOCK_SIZE/INODE_SIZE;
 static const size_t iNodeNumsInABlock = BLOCK_SIZE/INODE_ADDRESS_SIZE;
@@ -19,7 +14,7 @@ size_t getReturnValue(iNodeListBlock *iNodeNums, size_t freeINodeCounter) {
 		return 0;
 	}
 
-	return *((iNodeNums->iNodesNos) + (freeINodeCounter - 1));
+	return *((iNodeNums->iNodeNos) + (freeINodeCounter - 1));
 }
 
 size_t getFromBlock(iNodesBlock *blockOfINodes, size_t *nextAddrAt) {
@@ -80,8 +75,8 @@ void markINodeFree(size_t iNodeNum, bool toSetType) {
 
 	disk_block *iNodesData = (disk_block*)malloc(sizeof(disk_block));
 	iNodesData = getDiskBlock(blockNum, iNodesData);
-	iNodesBlock *iNodesList = (iNodesBlock *)malloc(sizeof(iNodesBlock));
-	makeINodesBlock(iNodesData, iNodesList);
+	iNodesBlock *blockOfINodes = (iNodesBlock *)malloc(sizeof(iNodesBlock));
+	makeINodesBlock(iNodesData, blockOfINodes);
 	//TODO: Free iNotesData?
 	iNode *theINode = blockOfINodes->iNodesList;
 	size_t iNodeIterator = 0;
@@ -94,10 +89,10 @@ void markINodeFree(size_t iNodeNum, bool toSetType) {
 		theINode++;
 		iNodeIterator++;
 	}
-	writeINodesBlock(iNodesList, iNodesData);
-	writeDiskBlock(iNodesData);
+	writeINodesBlock(blockOfINodes, iNodesData);
+	writeDiskBlock(blockNum, iNodesData);
 
-	free(iNodesList);
+	free(blockOfINodes);
 }
 
 void getDiskInode(size_t iNodeNum, iNode* inode) {
@@ -117,6 +112,7 @@ void getDiskInode(size_t iNodeNum, iNode* inode) {
 	size_t index = iNodeNum % iNodesInABlock;
 
 	// the doubtful part, this or memcpy
+
 	*inode = *(iNodesList[index]);
 
 	free(iNodeBlk);
@@ -125,7 +121,6 @@ void getDiskInode(size_t iNodeNum, iNode* inode) {
 
 void writeDiskInode(size_t iNodeNum, iNode* inode) {
 	// TODO: get a lock before reading and release after writing
-	size_t iNodeNum = inode->inode_number;
 	if (iNodeNum >= NUM_OF_INODES) {
 		// TODO - Throw an error
 		return ;

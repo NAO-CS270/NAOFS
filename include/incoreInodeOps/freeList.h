@@ -1,7 +1,7 @@
 #ifndef FREE_LIST_H
 #define FREE_LIST_H
 
-#include "../incoreInodeOps/node.h"
+#include "incoreInodeOps/node.h"
 // #include "inode/inCoreiNode.h"
 
 // initialize free in core inodes list

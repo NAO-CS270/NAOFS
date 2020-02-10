@@ -1,8 +1,9 @@
 #ifndef _DIRECTORY_H
 #define _DIRECTORY_H
 
-#include "../mandsk/params.h"
-#include "../dsk/mdisk.h"
+#include "mandsk/params.h"
+#include "dsk/mdisk.h"
+#include "inode/iNode.h"
 
 #define ENTRIES_PER_BLOCK (BLOCK_SIZE/sizeof(nameINodePair))
 

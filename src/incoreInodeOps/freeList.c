@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "../incoreInodeOps/freeList.h"
+#include "incoreInodeOps/freeList.h"
 
 static Node* freeList;
 
@@ -15,7 +15,7 @@ void initFreeInCoreINodeList() {
 
 void freeListInsert(Node* node) {
     Node* head = freeList;
-    if (head = NULL)
+    if (head == NULL)
         head = node;
     node->next = head;
     head->prev = node;

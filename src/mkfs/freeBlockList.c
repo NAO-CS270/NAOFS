@@ -1,9 +1,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "../dsk/mdisk.h"
-#include "../mandsk/params.h"
+#include "mkfs/freeBlockList.h"
 
 static size_t blockSize = BLOCK_SIZE;
 static size_t blockAddressSize = BLOCK_ADDRESS_SIZE;

@@ -1,4 +1,4 @@
-#include "../incoreInodeOps/hashQ.h"
+#include "incoreInodeOps/hashQ.h"
 
 static const size_t inodeHashSize = INODE_HASH_SIZE;
 

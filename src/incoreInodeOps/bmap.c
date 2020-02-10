@@ -55,12 +55,12 @@ bmapResponse* bmap(inCoreiNode* inode, size_t offset) {
         } else if (indirectionLevel != 0) {
             // fetch the indirect block
             disk_block* metaBlock = (disk_block*)malloc(BLOCK_SIZE);
-            metaBlock = getDiskBlock (blockNum, metaBlock);
+            metaBlock = getDiskBlock(blockNum, metaBlock);
             indirectBlock* diskBlock = (indirectBlock*)malloc(sizeof(indirectBlock));
             diskBlock = makeFreeDiskListBlock (metaBlock, diskBlock);
 
             // read the block number
-            blockNum = diskBlock->blockNos[index];
+            blockNum = diskBlock->blkNos[index];
 
             free(diskBlock);
             free(metaBlock);
