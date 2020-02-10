@@ -54,3 +54,10 @@ extern Node* getFreeINodeFromList() {
     Node* head = freeList;
     return head;
 }
+
+extern bool checkFreeListEmpty() {
+    if (freeList == NULL)
+        return true;
+    return false;
+}
+
