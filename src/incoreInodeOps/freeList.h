@@ -12,5 +12,7 @@ extern void freeListInsert(Node* node);
 extern void freeListRemove(Node* node);
 // get first incore inode from freelist
 extern Node* getFreeINodeFromList();
+// check if freelist is empty
+extern bool checkFreeListEmpty();
 
 #endif //FREE_LIST_H
