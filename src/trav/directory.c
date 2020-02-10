@@ -121,5 +121,8 @@ void getAndUpdateDirectoryTable(inCoreiNode* inode, size_t newInodeNumber, char*
     // TODO: Is this correct?
     *(blkPtr) = *(dataPtr);
     writeMemoryDiskBlock(bmapResp->blockNumber, blkPtr);
+
+    free(dataPtr);
+    free(blkPtr);
 }
 
