@@ -88,3 +88,38 @@ size_t findINodeInDirectory(iNode *iNodePtr, char *entryName) {
 	return foundINode;
 }
 
+void getAndUpdateDirectoryTable(inCoreiNode* inode, size_t newInodeNumber, char* filename) {
+    // TODO: See what needs to be done when the validateSearch fails
+    validateSearch(inode);
+
+    // fetch the directory table from the disk
+    bmapResponse* bmapResp = bmap(parentInode, parentInode->disk_iNode->size);
+    directoryTable *dirData = (directoryTable*)malloc(sizeof(directoryTable));
+    disk_block *blkPtr = (disk_block*)malloc(sizeof(disk_block));
+    // fetch the directory table from the disk block
+    getDiskBlock(blockNum, blkPtr);
+    makeDirectoryTable(blkPtr, dirData);
+
+    size_t counter;
+    nameINodePair iNodeData;
+
+    for(counter = 0; counter < ENTRIES_PER_BLOCK; counter++) {
+        iNodeData = dataPtr->entries[counter];
+        if(NULL == iNodeData) {
+            break;
+        }
+    }
+    if (counter == ENTRIES_PER_BLOCK) {
+        // TODO: Throw an error in this case
+    }
+    // counter is the new index at which the entry has to be made
+    iNodeData = (nameINodePair*)malloc(sizeof(nameINodePair));
+    iNodeData.iNodeNum = newInodeNumber;
+    iNodeData.name = filename;
+
+    dataPtr->entries[counter] = iNodeData;
+    // TODO: Is this correct?
+    *(blkPtr) = *(dataPtr);
+    writeMemoryDiskBlock(bmapResp->blockNumber, blkPtr);
+}
+

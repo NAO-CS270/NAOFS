@@ -65,6 +65,8 @@ struct iNode {
 	size_t group_uid;			// TODO - Have to figure out how to initialize this.
 
 	size_t dataBlockNums[BLOCKS_IN_INODE]; // same as the data block defined above, must remove one of them
+
+	size_t size;
 };
 typedef struct iNode iNode;
 

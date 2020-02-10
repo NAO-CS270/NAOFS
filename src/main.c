@@ -21,6 +21,7 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
     return -ENOENT;
 }
 
+// TODO: Update the size of the file
 static int open_callback(const char *path, struct fuse_file_info *fi) {
     inCoreiNode *inode;
     // TODO: Uncomment when namei is implemented
@@ -41,6 +42,7 @@ static int open_callback(const char *path, struct fuse_file_info *fi) {
     return fd;
 }
 
+// TODO: Update the size of the file
 static int read_callback(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
 
     char* dataRead;
@@ -75,6 +77,7 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     return blockBytesRead;
 }
 
+// TODO: update the size of the file
 static int write_callback(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi) {
     if(fi->fh < 0) {
         return -1;
@@ -105,7 +108,7 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
             memcpy(metaBlock->data, buf, bmapResp->ioBytesInBlock);
             writeMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
         } else {
-            metaBlock = fetchMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
+            metaBlock = getDiskBlock(bmapResp->blockNumber, metaBlock);
             unsigned char* ptrIntoBlock = metaBlock->data;
             ptrIntoBlock += bmapResp->ioBytesInBlock;
             memcpy(ptrIntoBlock, buf, bmapResp->ioBytesInBlock);
@@ -118,11 +121,29 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
     return bytesWritten;
 }
 
+// creates a new special file(dir, pipe, link). Returns -1 on error
 static int mkdir_callback(const char* path, mode_t mode) {
-    // if new node  not named pipe and user not super user
-    // return error
-    // get inode of parent node (using namei)
+    char* parentDirPath;
+    //struct fuse_context* fuse_context = fuse_get_context();
 
+//    if(0 != fuse_context->uid) {
+//        return -1;
+//    }
+    parentDirPath = getParentDirectory(path);
+
+    // TODO: There is going to be an error thrown by namei
+    inCoreiNode *parentInode = namei(parentDirPath);
+    if (NULL != parentInode) {
+        iput(inode);
+        return -1;
+    }
+    // assign new inode from the file system
+    size_t newInodeNumber = getNewINode();
+
+    char *filename = getFilenameFromPath(path);
+    getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
+    iput(parentInode);
+    // TODO: release new node inode(:iput)??
 }
 
 static struct fuse_operations OPERATIONS = {
@@ -130,7 +151,7 @@ static struct fuse_operations OPERATIONS = {
         .read = read_callback,
         .open = open_callback,
         .write = write_callback
-        //.mkdir = mkdir_callback,
+        .mkdir = mkdir_callback,
 };
 
 int main(int argc, char *argv[]) {
