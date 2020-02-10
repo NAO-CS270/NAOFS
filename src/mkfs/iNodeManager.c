@@ -100,8 +100,7 @@ void markINodeFree(size_t iNodeNum, bool toSetType) {
 	free(iNodesList);
 }
 
-void getDiskInode(inCoreiNode* inode) {
-	size_t iNodeNum = inode->inode_number;
+void getDiskInode(size_t iNodeNum, iNode* inode) {
 	if (iNodeNum >= NUM_OF_INODES) {
 		// TODO - Throw an error
 		return ;
@@ -118,13 +117,13 @@ void getDiskInode(inCoreiNode* inode) {
 	size_t index = iNodeNum % iNodesInABlock;
 
 	// the doubtful part, this or memcpy
-	*(inode->disk_inode) = *(iNodesList[index]);
+	*inode = *(iNodesList[index]);
 
 	free(iNodeBlk);
 	free(metaBlock);
 }
 
-void writeDiskInode(inCoreiNode* inode) {
+void writeDiskInode(size_t iNodeNum, iNode* inode) {
 	// TODO: get a lock before reading and release after writing
 	size_t iNodeNum = inode->inode_number;
 	if (iNodeNum >= NUM_OF_INODES) {
@@ -143,7 +142,7 @@ void writeDiskInode(inCoreiNode* inode) {
 	size_t index = iNodeNum % iNodesInABlock;
 
 	// the doubtful part, this or memcpy
-	*(iNodesList[index]) = *(inode->disk_inode);
+	*(iNodesList[index]) = *inode;
 
 	writeINodesBlock(iNodeBlk, metaBlock);
 	writeDiskBlock(blockNum, metaBlock);
