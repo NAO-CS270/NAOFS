@@ -11,6 +11,7 @@ void insertDiskInodeData(iNode* disk_inode, inCoreiNode* in_core) {
 	in_core->mode = disk_inode->mode;
 	in_core->owner_uid = disk_inode->owner_uid;
 	in_core->group_uid = disk_inode->group_uid;
+	in_core->size = disk_inode->size;
 
 	int index = 0;
 	while (index < BLOCKS_IN_INODE) {
