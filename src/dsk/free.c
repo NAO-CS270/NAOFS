@@ -1,8 +1,8 @@
-#include "free.h"
-#include "mdisk.h"
+#include "dsk/free.h"
+#include "dsk/mdisk.h"
 #include "mkfs/metaBlocks.h"
 #include "mkfs/diskParams.h"
-#include "blkfetch.h"
+#include "dsk/blkfetch.h"
 
 static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
 
