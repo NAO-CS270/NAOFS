@@ -18,10 +18,10 @@ void _freeInto(int freeListBlockNumber, size_t blockNumber) {
     freeDiskListBlock* diskBlock = (freeDiskListBlock*)malloc(sizeof(freeDiskListBlock));
     diskBlock = makeFreeDiskListBlock (freeListBlock, diskBlock);
 
-    if (diskBlock -> blkNos[BLOCK_ADDRESSES_PER_BLOCK - 1]) {
+    if (diskBlock -> blkNos[0]) {
         _freeInto(diskBlock -> blkNos[BLOCK_ADDRESSES_PER_BLOCK - 1], blockNumber);
     } else {
-        for (int i = 0; i < BLOCK_ADDRESSES_PER_BLOCK; ++i) {
+        for (int i = BLOCK_ADDRESSES_PER_BLOCK - 1; i > -1; --i) {
             if (diskBlock -> blkNos[i] == 0) {
                 diskBlock -> blkNos[i] = blockNumber;
                 break;
