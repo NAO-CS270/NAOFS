@@ -17,7 +17,7 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
         // returning locked inode
         return inode;
     }
-    if(NULL == freeList) {
+    if(checkFreeListEmpty()) {
         // TODO: Error handling
         return NULL;
     }
