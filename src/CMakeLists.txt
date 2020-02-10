@@ -1,8 +1,10 @@
 add_library(NAOFS "")
 
 FILE(GLOB SOURCES *.c)
+list(REMOVE_ITEM SOURCES "main.c")
 
 FILE(GLOB HEADERS *.h)
+list(REMOVE_ITEM HEADERS "main.h")
 
 #find_package(FUSE REQUIRED)
 #target_link_libraries(homefs ${FUSE_LIBRARIES})
