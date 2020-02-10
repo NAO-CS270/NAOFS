@@ -8,6 +8,8 @@
 #include <stddef.h>
 
 #include "dsk/mdisk.h"
+#include "mandsk/params.h"
+
 
 #define BLOCKS_IN_INODE 13
 

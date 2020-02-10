@@ -6,13 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../dsk/blkfetch.h"
-#include "../dsk/mdisk.h"
-#include "../incoreInodeOps/freeList.h"
-#include "../incoreInodeOps/hashQ.h"
-#include "../incoreInodeOps/node.h"
-#include "../inode/inCoreiNode.h"
-#include "../mandsk/params.h"
+#include "dsk/blkfetch.h"
+#include "dsk/mdisk.h"
+#include "incoreInodeOps/freeList.h"
+#include "incoreInodeOps/hashQ.h"
+#include "incoreInodeOps/node.h"
+#include "incoreInodeOps/inCoreiNode.h"
+#include "mandsk/params.h"
 
 extern void iput(inCoreiNode* inode);
 #endif //IPUT_H

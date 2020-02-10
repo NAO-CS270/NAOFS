@@ -1,4 +1,4 @@
-#include "../incoreInodeOps/iput.h"
+#include "incoreInodeOps/iput.h"
 
 void iput(inCoreiNode* inode) {
     // take lock, the thread calling iput should release lock and call it
