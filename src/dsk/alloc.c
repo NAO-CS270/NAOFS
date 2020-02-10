@@ -16,18 +16,18 @@ size_t alloc() {
 
     size_t new_block = 0;
     int i;
-    for (i = BLOCK_ADDRESSES_PER_BLOCK - 1; i > -1; --i) {
+    for (i = 0; i < BLOCK_ADDRESSES_PER_BLOCK; ++i) {
         if (diskBlock -> blkNos[i]) {
             new_block = diskBlock[i] -> blkNos;
             diskBlock -> blkNos[i] = 0;
             break;
         }
     }
-    if (i == 0) {
+    if (i == BLOCK_ADDRESSES_PER_BLOCK - 1) {
         disk_block* newFreeListBlock = (disk_block*)malloc(sizeof(disk_block));
         newFreeListBlock = getDiskBlock(new_block, newFreeListBlock);
         memcpy(freeListBlock, newFreeListBlock, sizeof(disk_block));
-        freeListBlock(newFreeListBlock);
+        free(newFreeListBlock);
     }
 
     free(freeListBlock);
