@@ -4,6 +4,8 @@ FILE(GLOB SOURCES *.c)
 
 FILE(GLOB HEADERS *.h)
 
+find_package(FUSE REQUIRED)
+target_link_libraries(homefs ${FUSE_LIBRARIES})
 target_sources(
     NAOFS
     PRIVATE
@@ -16,4 +18,6 @@ target_include_directories(
     NAOFS
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}
+    PRIVATE
+        ${FUSE_INCLUDE_DIR}
     )

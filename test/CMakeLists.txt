@@ -6,10 +6,12 @@ add_executable(
     main.c
 )
 
+find_package(FUSE REQUIRED)
 target_link_libraries(
     unit_tests
     gtest_main
     NAOFS
+    ${FUSE_LIBRARIES}
 )
 
 add_test(
