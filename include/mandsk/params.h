@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 
+#define DISK_SIZE 1024
+
 #define BLOCK_ADDRESS_SIZE 4  // affects definition of indirect block in bmap.h
 #define INODE_ADDRESS_SIZE 4
 #define FILENAME_SIZE 64

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "../incoreInodeOps/freeList.h"
+#include "incoreInodeOps/freeList.h"
 
 static Node* freeList;
 
@@ -8,14 +8,15 @@ void initFreeInCoreINodeList() {
     for(int i = 0; i < INODE_BUFFER_SIZE; i++) {
         Node* node = (Node*)malloc(sizeof(struct Node));
         node->inode = (inCoreiNode*)malloc(sizeof(inCoreiNode));
-        node->inode->disk_iNode = (iNode*)malloc(sizeof(iNode));
+        iNode* disk_inode = (iNode*)malloc(sizeof(iNode));
+        insertDiskInodeData(disk_inode, node->inode);
         freeListInsert(node);
     }
 }
 
 void freeListInsert(Node* node) {
     Node* head = freeList;
-    if (head = NULL)
+    if (head == NULL)
         head = node;
     node->next = head;
     head->prev = node;

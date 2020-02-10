@@ -1,9 +1,7 @@
-#include "metaBlocks.h"
-#include "../dsk/mdisk.h"
-#include "../mandsk/params.h"
-#include "../inode/iNode.h"
+#include "mkfs/metaBlocks.h"
+#include "dsk/mdisk.h"
+#include "inode/iNode.h"
 
-#include <stdlib.h>
 #include <string.h>
 
 // For all functions, check that input pointers point to enough memory.
