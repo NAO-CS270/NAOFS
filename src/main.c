@@ -137,13 +137,19 @@ static int mkdir_callback(const char* path, mode_t mode) {
         iput(inode);
         return -1;
     }
+
     // assign new inode from the file system
     size_t newInodeNumber = getNewINode();
 
     char *filename = getFilenameFromPath(path);
     getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
     iput(parentInode);
-    // TODO: release new node inode(:iput)??
+
+    // TODO: use the right device number, using 0 for now
+    inCoreiNode *newInode = iget(newInodeNumber, 0);
+    // add "." and ".." in the newly created inode
+    updateNewDirMetaData(newInode, newInodeNumber, parentInode, parentInode->inode_number);
+    iput(newInode);
 }
 
 static struct fuse_operations OPERATIONS = {
