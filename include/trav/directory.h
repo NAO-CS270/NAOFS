@@ -4,6 +4,7 @@
 #include "mandsk/params.h"
 #include "dsk/mdisk.h"
 #include "inode/iNode.h"
+#include "inode/inCoreiNode.h"
 
 #define ENTRIES_PER_BLOCK (BLOCK_SIZE/sizeof(nameINodePair))
 

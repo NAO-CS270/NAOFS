@@ -15,6 +15,6 @@
 #include "incoreInodeOps/iput.h"
 #include "incoreInodeOps/iget.h"
 #include "mkfs/ialloc.h"
-#include "trav/directory.h"
+#include "../include/trav/directory.h"
 
 #endif //MAIN_H
