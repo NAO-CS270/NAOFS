@@ -13,6 +13,7 @@
 #include "incoreInodeOps/freeList.h"
 #include "utils/utils.h"
 #include "incoreInodeOps/iput.h"
+#include "incoreInodeOps/iget.h"
 #include "mkfs/ialloc.h"
 #include "trav/directory.h"
 
