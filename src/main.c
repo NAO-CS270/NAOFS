@@ -36,7 +36,6 @@ static int open_callback(const char *path, struct fuse_file_info *fi) {
     if(fi->flags & O_TRUNC) {
         // TODO: Free all blocks. (Algorithm: free)
     }
-    inode->lock = false;
     // set the file handle in file_info
     fi->fh = fd;
     return fd;
@@ -56,7 +55,6 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     struct fuse_context* fuse_context = fuse_get_context();
     // TODO: perform access permission checks
     inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
-    inode->lock = true;
     while(blockBytesRead < size) {
         bmapResponse *bmapResp  = bmap(inode, tempOffset);
         // trying to read end of the file
@@ -73,7 +71,6 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
         tempOffset = tempOffset + blockBytesRead + 1;
         free(metaBlock);
     }
-    inode->lock = false;
     return blockBytesRead;
 }
 
@@ -90,7 +87,6 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
     struct fuse_context* fuse_context = fuse_get_context();
     inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
 
-    inode->lock = true;
     while(bytesWritten < size) {
         bmapResponse *bmapResp = bmap(inode, tempOffset);
         if(bmapResp == NULL) {
