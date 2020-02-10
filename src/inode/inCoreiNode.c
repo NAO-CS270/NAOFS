@@ -1,4 +1,4 @@
-#include "inCoreiNode.h"
+#include "inode/inCoreiNode.h"
 
 void insertDiskInodeData(iNode* disk_inode, inCoreiNode* in_core) {
 	in_core->device_number = disk_inode->device_number;

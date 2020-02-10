@@ -12,7 +12,7 @@
 #include "incoreInodeOps/hashQ.h"
 #include "incoreInodeOps/freeList.h"
 #include "incoreInodeOps/node.h"
-#include "incoreInodeOps/inCoreiNode.h"
+#include "inode/inCoreiNode.h"
 #include "inode/iNode.h"
 #include "mkfs/iNodeManager.h"
 

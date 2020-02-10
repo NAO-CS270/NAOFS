@@ -113,7 +113,7 @@ void getDiskInode(size_t iNodeNum, iNode* inode) {
 
 	// the doubtful part, this or memcpy
 
-	*inode = *(iNodesList[index]);
+	*inode = (iNodesList[index]);
 
 	free(iNodeBlk);
 	free(metaBlock);
@@ -137,7 +137,7 @@ void writeDiskInode(size_t iNodeNum, iNode* inode) {
 	size_t index = iNodeNum % iNodesInABlock;
 
 	// the doubtful part, this or memcpy
-	*(iNodesList[index]) = *inode;
+	(iNodesList[index]) = *inode;
 
 	writeINodesBlock(iNodeBlk, metaBlock);
 	writeDiskBlock(blockNum, metaBlock);

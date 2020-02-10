@@ -9,7 +9,7 @@
 #include "dsk/blkfetch.h"
 #include "dsk/mdisk.h"
 #include "inode/iNode.h"
-#include "incoreInodeOps/inCoreiNode.h"
+#include "inode/inCoreiNode.h"
 #include "mkfs/diskParams.h"
 
 extern size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums);

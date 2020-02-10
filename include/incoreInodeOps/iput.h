@@ -11,7 +11,7 @@
 #include "incoreInodeOps/freeList.h"
 #include "incoreInodeOps/hashQ.h"
 #include "incoreInodeOps/node.h"
-#include "incoreInodeOps/inCoreiNode.h"
+#include "inode/inCoreiNode.h"
 #include "mandsk/params.h"
 
 extern void iput(inCoreiNode* inode);
