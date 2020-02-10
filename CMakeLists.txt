@@ -9,7 +9,7 @@ include_directories(include)
 
 file(GLOB SOURCES "src/*/*.c")
 
-add_executable(naofs ${PROJECT_SOURCE_DIR}/dummy.c ${SOURCES})
+add_executable(naofs test/test_block_fetch.c ${SOURCES})
 
 
 
