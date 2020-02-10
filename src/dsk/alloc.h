@@ -1,6 +1,8 @@
 #ifndef NAOFS_ALLOC_H
 #define NAOFS_ALLOC_H
 
-extern size_t alloc();
+#include <stdlib.h>
+
+extern size_t blockAlloc();
 
 #endif //NAOFS_ALLOC_H
