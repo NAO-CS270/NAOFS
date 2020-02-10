@@ -31,8 +31,8 @@ void fetchFreeINodes(iNodeListBlock *iNodeList) {
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
 	makeSuperBlock(superBlockData, theSuperBlock);
 
-	size_t rememberedINode = theSuperBlock->rememberedINodeNum;
-	(theSuperBlock->rememberedINodeNum) = searchINodes(rememberedINode, iNodeList);
+	size_t rememberedINode = theSuperBlock->remembered_inode;
+	(theSuperBlock->remembered_inode) = searchINodes(rememberedINode, iNodeList);
 
 	writeSuperBlock(theSuperBlock, superBlockData);
 	writeDiskBlock(SUPER_BLOCK, superBlockData);

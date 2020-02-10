@@ -96,7 +96,7 @@ void makeFileSystem() {
 	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
 
-	(theSuperBlock->rememberedINodeNum) = iNodeToRemember;
+	(theSuperBlock->remembered_inode) = iNodeToRemember;
 	writeSuperBlock(theSuperBlock, superBlockData);
 	writeDiskBlock(SUPER_BLOCK, superBlockData);
 

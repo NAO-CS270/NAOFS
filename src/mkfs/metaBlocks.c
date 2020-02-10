@@ -13,7 +13,7 @@ superBlock *makeSuperBlock(disk_block *blockPtr, superBlock *theBlock) {
 	size_t iNodeNum = 0;
 	memcpy(&iNodeNum, ptrIntoBlock, INODE_ADDRESS_SIZE);
 
-	theBlock->rememberedINodeNum = iNodeNum;
+	theBlock->remembered_inode = iNodeNum;
 
 	return theBlock;
 }
@@ -22,7 +22,7 @@ disk_block *writeSuperBlock(superBlock *theBlock, disk_block *blockPtr) {
 	unsigned char *ptrIntoBlock = blockPtr->data;
 	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
 
-	memcpy(ptrIntoBlock, theBlock->rememberedINodeNum, INODE_ADDRESS_SIZE);
+	memcpy(ptrIntoBlock, theBlock->remembered_inode, INODE_ADDRESS_SIZE);
 
 	return blockPtr;
 }
