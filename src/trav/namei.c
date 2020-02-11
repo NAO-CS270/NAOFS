@@ -9,7 +9,7 @@
 /* Ensures that path has only alphanumeric, `_`, `-` or `/` characters. Terminates the path
  * by null byte if it isn't. Returns final path length.
  */
-size_t checkAndGetLen(char *path, size_t bufLen) {
+size_t checkAndGetLen(const char *path, size_t bufLen) {
     size_t counter;
     for (counter = 0 ; counter<bufLen ; counter++) {
         if (isalnum(path[counter]) != 0) {
@@ -41,7 +41,7 @@ void operate(char *workingBuffer, inCoreiNode *workingINode) {
  * Assumes the string `path`, starting at `counter` is the name of a file in the directory of `workingINode`. Then
  * tries to find the file in the directory.
  */
-size_t processNextLevel(char *path, size_t counter, char *workingBuffer, inCoreiNode *workingINode) {
+size_t processNextLevel(const char *path, size_t counter, char *workingBuffer, inCoreiNode *workingINode) {
     for (; ; counter++) {
         if ((path[counter] == '/') || (path[counter] == '\0')) {
             operate(workingBuffer, workingINode);
