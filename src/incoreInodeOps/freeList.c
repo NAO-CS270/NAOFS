@@ -5,7 +5,8 @@ static Node* freeList;
 
 void initFreeInCoreINodeList() {
     freeList = NULL;
-    for(int i = 0; i < INODE_BUFFER_SIZE; i++) {
+    int i;
+    for(i = 0; i < INODE_BUFFER_SIZE; i++) {
         Node* node = (Node*)malloc(sizeof(struct Node));
         node->inode = (inCoreiNode*)malloc(sizeof(inCoreiNode));
         iNode* disk_inode = (iNode*)malloc(sizeof(iNode));
