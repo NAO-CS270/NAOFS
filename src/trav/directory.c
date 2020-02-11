@@ -101,11 +101,11 @@ void getAndUpdateDirectoryTable(inCoreiNode* parentInode, size_t newInodeNumber,
 
     fetchInodeFromDisk(parentInode->inode_number, parentInode);
     // fetch the directory table from the disk
-    bmapResponse* bmapResp = bmap(parentInode, parentInode->size);
-    directoryTable *dirData = (directoryTable*)malloc(sizeof(directoryTable));
-    disk_block *blkPtr = (disk_block*)malloc(sizeof(disk_block));
-    // fetch the directory table from the disk block
+    bmapResponse *bmapResp = bmap(parentInode, parentInode->size);
+    disk_block *blkPtr = (disk_block *) malloc(sizeof(disk_block));
     getDiskBlock(bmapResp->blockNumber, blkPtr);
+    // fetch the directory table from the disk block
+    directoryTable *dirData = (directoryTable *) malloc(sizeof(directoryTable));
     makeDirectoryTable(blkPtr, dirData);
 
     size_t counter;
@@ -123,6 +123,7 @@ void getAndUpdateDirectoryTable(inCoreiNode* parentInode, size_t newInodeNumber,
     // counter is the new index at which the entry has to be made
     iNodeData = (nameINodePair*)malloc(sizeof(nameINodePair));
     iNodeData->iNodeNum = newInodeNumber;
+    // TODO: strcpy
     memcpy(iNodeData->name, filename, FILENAME_SIZE);
     dirData->entries[counter] = *(iNodeData);
 
