@@ -13,9 +13,9 @@
 #define FILENAME_SIZE 64ll
 
 #define BLOCK_SIZE 1024ll
-#define NUM_OF_BLOCKS (1<<(BLOCK_ADDRESS_SIZE*8))
+#define NUM_OF_BLOCKS (1ll<<(BLOCK_ADDRESS_SIZE*8ll))
 #define INODE_SIZE (1ll<<7) // TODO: sizeof(iNode)?
-#define NUM_OF_INODES (1ll<<(INODE_ADDRESS_SIZE*8))
+#define NUM_OF_INODES (1ll<<(INODE_ADDRESS_SIZE*8ll))
 #define DIRECT_BLOCKS 10ll
 #define SINGLE_INDIRECT_BLOCKS 1ll
 #define DOUBLE_INDIRECT_BLOCKS 1ll
