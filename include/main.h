@@ -2,7 +2,7 @@
 #define MAIN_H
 
 #include "fileTables.h"
-#include "mkfs/bmap.h"
+#include "incoreInodeOps/bmap.h"
 #include "incoreInodeOps/freeList.h"
 #include "fileTables.h"
 #include "incoreInodeOps/bmap.h"
@@ -13,7 +13,7 @@
 #include "mkfs/ialloc.h"
 #include "trav/directory.h"
 #define FUSE_USE_VERSION 29
-#include <fuse.h>
+#include <fuse/fuse.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
