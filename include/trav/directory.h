@@ -25,6 +25,8 @@ extern size_t findINodeInDirectory(inCoreiNode *iNodePtr, char *entryName);
 extern void getAndUpdateDirectoryTable(inCoreiNode* inode, size_t newInodeNumber, char* filename);
 void updateNewDirMetaData(inCoreiNode* inode, size_t newInodeNumber, size_t parentInodeNumber);
 
+extern directoryTable* getDirectoryEntries(inCoreiNode* inode);
+
 /*
 union directoryData {
 	disk_block dataBlock;
