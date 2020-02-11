@@ -11,7 +11,7 @@ include_directories(include)
 
 pkg_check_modules(FUSE REQUIRED fuse)
 
-file(GLOB SOURCES "src/*.c")
+file(GLOB_RECURSE SOURCES "src/*.c")
 
 add_executable(naofs ${SOURCES})
 
