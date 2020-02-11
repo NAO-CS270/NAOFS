@@ -10,6 +10,9 @@ include(FindPkgConfig)
 include_directories(include)
 
 pkg_check_modules(FUSE REQUIRED fuse)
+find_package(FUSE REQUIRED)
+target_include_directories(homefs PRIVATE ${FUSE_INCLUDE_DIR})
+target_link_libraries(homefs ${FUSE_LIBRARIES})
 
 file(GLOB_RECURSE SOURCES "src/*.c")
 

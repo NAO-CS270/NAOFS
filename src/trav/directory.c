@@ -24,7 +24,7 @@ directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBloc
 		memcpy(fileData->name, ptrIntoBlock, FILENAME_SIZE);
 		ptrIntoBlock += FILENAME_SIZE;
 
-		memcpy(fileData->iNodeNum, ptrIntoBlock, INODE_ADDRESS_SIZE);
+		memcpy(&(fileData->iNodeNum), ptrIntoBlock, INODE_ADDRESS_SIZE);
 		ptrIntoBlock += INODE_ADDRESS_SIZE;
 
 		counter++;

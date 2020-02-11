@@ -1,8 +1,8 @@
 #include "mkfs/iNodeManager.h"
 
-static const size_t iNodesInABlock = BLOCK_SIZE/INODE_SIZE;
-static const size_t iNodeNumsInABlock = BLOCK_SIZE/INODE_ADDRESS_SIZE;
-static const size_t endOfINodeBlocks = INODE_BLOCKS_HEAD + ((INODE_SIZE * NUM_OF_INODES) / BLOCK_SIZE);
+#define iNodesInABlock (BLOCK_SIZE/INODE_SIZE)
+#define iNodeNumsInABlock (BLOCK_SIZE/INODE_ADDRESS_SIZE)
+#define endOfINodeBlocks (INODE_BLOCKS_HEAD + ((INODE_SIZE * NUM_OF_INODES) / BLOCK_SIZE))
 
 size_t getReturnValue(iNodeListBlock *iNodeNums, size_t freeINodeCounter) {
 	if (freeINodeCounter == 0) {

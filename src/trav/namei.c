@@ -28,8 +28,6 @@ size_t checkAndGetLen(char *path, size_t bufLen) {
 
 void operate(char *workingBuffer, inCoreiNode *workingINode) {
     size_t iNodeNum = findINodeInDirectory(workingINode, workingBuffer);
-    if (iNodeNum == 0)
-        return false;
     iput(workingINode);
 	if (iNodeNum == 0) {
 		workingINode = NULL;
