@@ -1,7 +1,5 @@
-#define FUSE_USE_VERSION 29
-
-#include "./main.h"
-
+#include "main.h"
+#include "trav/namei.h"
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
     memset(stbuf, 0, sizeof(struct stat));
@@ -21,23 +19,53 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
     return -ENOENT;
 }
 
-// TODO: Update the size of the file
-static int open_callback(const char *path, struct fuse_file_info *fi) {
-    inCoreiNode *inode;
-    // TODO: Uncomment when namei is implemented
-    // size_t inodeNumber = namei(path);
+static int truncateFile(inCoreiNode* inode) {
+    inodeBlocksFree(inode);
+    inode -> size = 0;
+}
 
-    // TODO: Sending the device number as 0 for now.
-    inode = iget(inode, 0);
-    // TODO: Allocate file table entry for inode, initialize count, offset.
-    size_t fd = putFileDescriptorEntry(inode, fi->flags);
+// TODO: keep a check for if a file already exists: it truncates.
+static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
+    inCoreiNode* newFilesiNode;
+    newFilesiNode = getFileINode(path, strlen(path));
+    if (newFilesiNode == NULL) {
+        char *parentDirPath;
+        parentDirPath = getParentDirectory(path);
+        inCoreiNode *parentInode = getFileINode(parentDirPath, strlen(parentDirPath));
+
+        // assign new inode from the file system
+        size_t newInodeNumber = getNewINode();
+
+        char *filename = getFilenameFromPath(path);
+        getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
+        iput(parentInode);
+
+        newFilesiNode = iget(inodeNumber, 0);
+        size_t fd = createFileDescriptorEntry(newFilesiNode, fi->flags);
+        iput(newFilesiNode);
+    }
+    return fd;
+}
+
+// TODO: Update the size of the file
+// TODO: Call create here
+static int open_callback(const char *path, struct fuse_file_info *fi) {
+    if(fi->flags & O_CREAT) {
+        return fi -> fd = create_callback(path, 0, fi);
+    }
+
+    inCoreiNode *inode;
+    inode = getFileINode(path, strlen(path));
+    size_t fd = createFileDescriptorEntry(inode, fi->flags);
+
     if(fd == -1) {
+        // print errors
         return fd;
     }
+
     if(fi->flags & O_TRUNC) {
-        // TODO: Free all blocks. (Algorithm: free)
+        truncateFile(inode);
     }
-    // set the file handle in file_info
     fi->fh = fd;
     iput(inode);
     return fd;
@@ -73,12 +101,12 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
         tempOffset = tempOffset + blockBytesRead + 1;
         free(metaBlock);
     }
-    inode->size = size; //TODO: Do we need to call iput here?
+    fetchInodeFromDisk(inode->inode_number, inode);
+    inode->size = size;
     iput(inode);
     return blockBytesRead;
 }
 
-// TODO: update the size of the file
 static int write_callback(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi) {
     if(fi->fh < 0) {
         return -1;
@@ -118,6 +146,7 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
         bytesWritten += bytesWritten + bmapResp->ioBytesInBlock;
         tempOffset = tempOffset + bmapResp->ioBytesInBlock + 1;
     }
+    fetchInodeFromDisk(inode->inode_number, inode);
     inode->size = bytesWritten;
     iput(inode);
     return bytesWritten;
@@ -140,7 +169,7 @@ static struct fuse_operations OPERATIONS = {
         .open = open_callback,
         .write = write_callback
         .mkdir = mkdir_callback,
-
+        .create = create_callback,
 };
 
 int main(int argc, char *argv[]) {
