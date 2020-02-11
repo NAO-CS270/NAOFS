@@ -23,7 +23,8 @@ size_t createFileDescriptorEntry(inCoreiNode *inode, size_t mode) {
 }
 
 void initFileTableEntries() {
-    for(int i = 0; i < MAX_FD; i++) {
+    int i;
+    for(i = 0; i < MAX_FD; i++) {
         file_descriptor_table[i].fd = -1;
     }
 }
