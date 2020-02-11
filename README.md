@@ -34,3 +34,9 @@ ctest  // or ./bin/unit_tests
 
 ### Clean
 `make clean`
+
+### Run fuse
+./naofs ../new_debug -d
+fusermount -u ../new_debug -o default_permissions
+
+ssh -i ~/pem_files/cs270-3.pem centos@169.231.235.52
