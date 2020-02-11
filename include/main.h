@@ -15,7 +15,7 @@
 #include "trav/directory.h"
 #include "trav/namei.h"
 #include "utils/utils.h"
-#define FUSE_USE_VERSION 39
+#define FUSE_USE_VERSION 29
 #include <fuse/fuse.h>
 #include <stdio.h>
 #include <string.h>

@@ -10,9 +10,7 @@ include(FindPkgConfig)
 include_directories(include)
 
 pkg_check_modules(FUSE REQUIRED fuse)
-find_package(FUSE REQUIRED)
-target_include_directories(homefs PRIVATE ${FUSE_INCLUDE_DIR})
-target_link_libraries(homefs ${FUSE_LIBRARIES})
+# find_package(FUSE REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.c")
 
@@ -20,7 +18,8 @@ add_executable(naofs ${SOURCES})
 
 target_compile_options(naofs PRIVATE -D_FILE_OFFSET_BITS=64)
 
-
+target_include_directories(naofs PRIVATE ${FUSE_INCLUDE_DIR})
+target_link_libraries(naofs ${FUSE_LIBRARIES})
 
 
 
