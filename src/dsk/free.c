@@ -36,8 +36,10 @@ void diskBlockFree(disk_block* diskBlockNumber, size_t leftSize) {
         leftSize -= BLOCK_SIZE;
     }
 
-    if (leftSize > 0)
-        diskBlockFree(blockToBeFreed -> data[BLOCK_SIZE - 1], leftSize);
+    if (leftSize > 0) {
+        diskBlockFree(blockToBeFreed->data[BLOCK_SIZE - 1], leftSize);
+        blockFree(blockToBeFreed->data[BLOCK_SIZE - 1]);
+    }
 }
 
 void inodeBlocksFree(inCoreiNode *inode) {
@@ -47,8 +49,10 @@ void inodeBlocksFree(inCoreiNode *inode) {
         leftSize -= BLOCK_SIZE;
     }
 
-    if (leftSize > 0)
+    if (leftSize > 0) {
         diskBlockFree(inode->dataBlockNums[BLOCKS_IN_INODE - 1], leftSize);
+        blockFree(inode->dataBlockNums[BLOCKS_IN_INODE - 1]);
+    }
 }
 
 void blockFree(size_t blockNumber) {
