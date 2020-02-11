@@ -1,6 +1,6 @@
 #include "incoreInodeOps/hashQ.h"
 
-static const size_t inodeHashSize = INODE_HASH_SIZE;
+#define inodeHashSize INODE_HASH_SIZE
 
 static Node* hashQ[inodeHashSize];
 

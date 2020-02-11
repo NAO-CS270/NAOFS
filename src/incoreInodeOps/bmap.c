@@ -3,13 +3,13 @@
 
 
 // num of block addresses in indirect block
-const size_t blkAddrNos = BLOCK_SIZE / BLOCK_ADDRESS_SIZE;
+#define blkAddrNos (BLOCK_SIZE / BLOCK_ADDRESS_SIZE)
 // max size mapped by all the direct blocks
-const size_t directBlkMaxSize = BLOCK_SIZE * DIRECT_BLOCKS;
+#define directBlkMaxSize  BLOCK_SIZE * DIRECT_BLOCKS)
 // max size mapped by all the single indirect blocks
-const size_t singleIndirectBlkMaxSize = BLOCK_SIZE * blkAddrNos;
+#define singleIndirectBlkMaxSize (BLOCK_SIZE * blkAddrNos)
 // max size mapped by all the double indirect blocks
-const size_t doubleIndirectBlkMaxSize = BLOCK_SIZE * blkAddrNos * blkAddrNos;
+#define doubleIndirectBlkMaxSize (BLOCK_SIZE * blkAddrNos * blkAddrNos)
 
 bmapResponse* bmap(inCoreiNode* inode, size_t offset) {
     // allocate size for bmap response
