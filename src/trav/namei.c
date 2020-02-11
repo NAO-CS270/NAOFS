@@ -26,31 +26,37 @@ size_t checkAndGetLen(char *path, size_t bufLen) {
     return bufLen;
 }
 
-
-bool operate(char *workingBuffer, inCoreiNode *workingINode) {
+void operate(char *workingBuffer, inCoreiNode *workingINode) {
     size_t iNodeNum = findINodeInDirectory(workingINode, workingBuffer);
     if (iNodeNum == 0)
         return false;
     iput(workingINode);
-    workingINode = iget(iNodeNum, 0);
-    return true;
+	if (iNodeNum == 0) {
+		workingINode = NULL;
+	}
+	else {
+		workingINode = iget(iNodeNum, 0);
+	}
 }
 
-
-bool processNextLevel(char *path, size_t* counter, char *workingBuffer, inCoreiNode *workingINode) {
-    for (int i = 0; ; ++i, ++(*counter)) {
-        if ((path[*counter] == '/') || (path[*counter] == '\0')) {
-            workingBuffer[i] = 0;
-            if (operate(workingBuffer, workingINode) == 0)
-                return false;
+/**
+ * Assumes the string `path`, starting at `counter` is the name of a file in the directory of `workingINode`. Then
+ * tries to find the file in the directory.
+ */
+size_t processNextLevel(char *path, size_t counter, char *workingBuffer, inCoreiNode *workingINode) {
+    for (; ; counter++) {
+        if ((path[counter] == '/') || (path[counter] == '\0')) {
+            operate(workingBuffer, workingINode);
             break;
         }
-        workingBuffer[i] = path[*counter];
+        workingBuffer[counter] = path[counter];
     }
-    return true;
+    return counter;
 }
 
-
+/* Takes in path string in `path` and the length of it in `bufLen`. Returns `NULL` if any of the directories in
+ * along the path doesn't exist.
+ */
 inCoreiNode* getFileINode(char *path, size_t bufLen) {
 	size_t pathLen = checkAndGetLen(path, bufLen);
 	char *workingBuffer = (char *)malloc((pathLen + 1)*sizeof(char));
@@ -59,12 +65,18 @@ inCoreiNode* getFileINode(char *path, size_t bufLen) {
 	inCoreiNode *workingINode = iget(0, 0);
 
 	size_t counter;
-	for (counter=0 ;path[counter] != '\0' ; counter++) {
-	    if (processNextLevel(path, &counter, workingBuffer, workingINode) == false) {
-            return NULL;
-	    }
+	for (counter=0 ; ; counter++) {
+		memset(workingBuffer, 0, pathLen + 1);
+		counter = processNextLevel(path, counter, workingBuffer, workingINode);
+
+		if (workingINode == NULL) {
+			return NULL;
+		}
+
+		if (path[counter] == '\0') {
+			break;
+		}
 	}
     return workingINode;
 }
-
 
