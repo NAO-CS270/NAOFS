@@ -1,10 +1,28 @@
 language: c
+sudo: false
 compiler: gcc
-sudo: false # only for faster builds
-dist: bionic
+
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
-    - libfuse-dev
-    - pkg-config
-script: make nao
+      - libfuse-dev
+      - pkg-config
+
+before_install:
+  - pip install --user cpp-coveralls
+
+script:
+  - make fuse
+  - mkdir CI-build
+  - cd CI-build
+  - cmake ..
+  - cmake --build .
+  - ctest
+
+after_success:
+  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
+
+notifications:
+  email: false

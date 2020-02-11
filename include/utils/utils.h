@@ -7,8 +7,8 @@
                                 __LINE__, __func__, __VA_ARGS__); } while (0)
 
 
-int
-string_split(char*, char *[], const char *);
-
+extern int string_split(char*, char *[], const char*);
+extern char* getParentDirectory(const char* path);
+extern char* getFilenameFromPath(const char* path);
 
 #endif

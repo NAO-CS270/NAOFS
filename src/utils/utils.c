@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "utils.h"
+#include "utils/utils.h"
 
 /**
  * Usage:
@@ -12,8 +12,7 @@
 		printf("%s\n", parts[i]);
 	}
  */
-int
-string_split(char* path, char *tokens[], const char *delimiter) {
+int string_split(char* path, char *tokens[], const char *delimiter) {
     int i = 0;
     char *copy = NULL;
     char *token = NULL;
@@ -46,11 +45,25 @@ string_split(char* path, char *tokens[], const char *delimiter) {
 
     error:
         free(copy);
-        for(int k = 0; k < i; k++) {
+        int k;
+        for(k = 0; k < i; k++) {
             free(tokens[k]);
         }
         return -1;
 }
 
+// get the parent directory of a file from an absolute path
+char* getParentDirectory(const char* path) {
+    char* position;
+    position = strrchr(path, '/');
+    char* parentPath = strndup(path, (path-position+1));
+    return parentPath;
+}
 
+// extract the filename from an absolute path
+char* getFilenameFromPath(const char* path) {
+    char *filename = NULL;
+    filename = strrchr (path, '/') + 1;
+    return filename;
+}
 

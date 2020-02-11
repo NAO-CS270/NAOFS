@@ -1,4 +1,6 @@
 # Manually added
+*.vim
+*.swp
 build
 
 # Created by https://www.gitignore.io/api/c,linux,macos,clion+all
