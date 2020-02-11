@@ -40,7 +40,7 @@ static int create_callback(const char *path, mode_t mode, struct fuse_file_info 
         getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
         iput(parentInode);
 
-        newFilesiNode = iget(inodeNumber, 0);
+        newFilesiNode = iget(newInodeNumber, 0);
         size_t fd = createFileDescriptorEntry(newFilesiNode, fi->flags);
         iput(newFilesiNode);
     }
