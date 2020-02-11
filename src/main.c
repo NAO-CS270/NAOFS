@@ -201,6 +201,10 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
     return 0;
 }
 
+static int access_callback(const char* path, int mode) {
+    return 0;
+}
+
 static struct fuse_operations OPERATIONS = {
         .getattr = getattr_callback,
         .read = read_callback,
@@ -209,6 +213,7 @@ static struct fuse_operations OPERATIONS = {
         .mkdir = mkdir_callback,
         .create = create_callback,
         .readdir = readdir_callback,
+        .access = access_callback,
 //        .link = link_callback,
 //        .unlink = unlink_callback,
 };
