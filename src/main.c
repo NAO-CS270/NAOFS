@@ -52,13 +52,13 @@ static int create_callback(const char *path, mode_t mode, struct fuse_file_info 
 // TODO: Update the size of the file
 // TODO: Call create here
 static int open_callback(const char *path, struct fuse_file_info *fi) {
-    if(fi->flags & O_CREAT) {
-        return fi -> fd = create_callback(path, 0, fi);
+    if(fi -> flags & O_CREAT) {
+        return fi -> fh = create_callback(path, 0, fi);
     }
 
     inCoreiNode *inode;
     inode = getFileINode(path, strlen(path));
-    size_t fd = createFileDescriptorEntry(inode, fi->flags);
+    size_t fd = createFileDescriptorEntry(inode, fi -> flags);
 
     if(fd == -1) {
         // print errors
@@ -156,7 +156,25 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
 
 // creates a new special file(dir, pipe, link). Returns -1 on error
 static int mkdir_callback(const char* path, mode_t mode) {
-    create_callback(path, mode, NULL);
+    inCoreiNode* newFilesiNode;
+    newFilesiNode = getFileINode(path, strlen(path));
+    size_t fd;
+    // assign new inode from the file system
+    size_t newInodeNumber = getNewINode();
+
+    // create new directory entry in parent directory
+    char *parentDirPath;
+    parentDirPath = getParentDirectory(path);
+    inCoreiNode *parentInode = getFileINode(parentDirPath, strlen(parentDirPath));
+
+    // include new file name and newly assigned inode number
+    char *filename = getFilenameFromPath(path);
+    getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
+    iput(parentInode);
+    fd = createFileDescriptorEntry(newFilesiNode, mode);
+    iput(newFilesiNode);
+
+
     // TODO: use the right device number, using 0 for now
     inCoreiNode *newInode = iget(newInodeNumber, 0);
     // add "." and ".." in the newly created inode
@@ -169,7 +187,7 @@ static struct fuse_operations OPERATIONS = {
         .getattr = getattr_callback,
         .read = read_callback,
         .open = open_callback,
-        .write = write_callback
+        .write = write_callback,
         .mkdir = mkdir_callback,
         .create = create_callback,
 //        .link = link_callback,
