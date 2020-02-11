@@ -73,7 +73,7 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
         tempOffset = tempOffset + blockBytesRead + 1;
         free(metaBlock);
     }
-    inode->disk_iNode->size = size; //TODO: Do we need to call iput here?
+    inode->size = size; //TODO: Do we need to call iput here?
     iput(inode);
     return blockBytesRead;
 }
@@ -118,7 +118,7 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
         bytesWritten += bytesWritten + bmapResp->ioBytesInBlock;
         tempOffset = tempOffset + bmapResp->ioBytesInBlock + 1;
     }
-    inode->disk_iNode->size = bytesWritten;
+    inode->size = bytesWritten;
     iput(inode);
     return bytesWritten;
 }

@@ -4,12 +4,19 @@ cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 # Project's name
 project(naofs)
 
+include(FindPkgConfig)
+
 # Headers are in `include` directory
 include_directories(include)
 
-file(GLOB SOURCES "src/*/*.c")
+pkg_check_modules(FUSE REQUIRED fuse)
+
+file(GLOB SOURCES "src/*.c")
 
 add_executable(naofs test/test_block_fetch.c ${SOURCES})
+
+target_compile_options(naofs PRIVATE -D_FILE_OFFSET_BITS=64)
+
 
 
 
