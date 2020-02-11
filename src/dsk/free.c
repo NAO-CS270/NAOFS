@@ -30,8 +30,8 @@ void _freeInto(int freeListBlockNumber, size_t blockNumber) {
 void diskBlockFree(disk_block* diskBlockNumber, size_t leftSize) {
     disk_block* blockToBeFreed = (disk_block*)malloc(sizeof(disk_block));
     blockToBeFreed = getDiskBlock(diskBlockNumber, blockToBeFreed);
-
-    for (int i = 0; i < BLOCK_SIZE - 1 && leftSize > 0; ++i) {
+    int i;
+    for (i = 0; i < BLOCK_SIZE - 1 && leftSize > 0; ++i) {
         blockFree(blockToBeFreed -> data[i]);
         leftSize -= BLOCK_SIZE;
     }
@@ -44,7 +44,8 @@ void diskBlockFree(disk_block* diskBlockNumber, size_t leftSize) {
 
 void inodeBlocksFree(inCoreiNode *inode) {
     size_t leftSize = inode->size;
-    for (int i = 0; i < BLOCKS_IN_INODE - 1 && leftSize > 0; ++i) {
+    int i;
+    for (i = 0; i < BLOCKS_IN_INODE - 1 && leftSize > 0; ++i) {
         blockFree(inode->dataBlockNums[i]);
         leftSize -= BLOCK_SIZE;
     }
