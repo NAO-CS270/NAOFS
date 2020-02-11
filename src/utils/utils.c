@@ -45,7 +45,8 @@ int string_split(char* path, char *tokens[], const char *delimiter) {
 
     error:
         free(copy);
-        for(int k = 0; k < i; k++) {
+        int k;
+        for(k = 0; k < i; k++) {
             free(tokens[k]);
         }
         return -1;
