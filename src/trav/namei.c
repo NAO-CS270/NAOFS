@@ -1,5 +1,6 @@
 #include "trav/directory.h"
 #include "incoreInodeOps/iget.h"
+#include "incoreInodeOps/iput.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -47,7 +48,7 @@ size_t processNextLevel(char *path, char *workingBuffer, inCoreiNode *workingINo
 }
 
 
-void getFileINode(char *path, size_t bufLen, inCoreiNode *iNodeData) {
+inCoreiNode* getFileINode(char *path, size_t bufLen) {
 	size_t pathLen = checkAndGetLen(path, bufLen);
 	char *workingBuffer = (char *)malloc((pathLen + 1)*sizeof(char));
 	memset(workingBuffer, 0, pathLen + 1);
@@ -63,6 +64,7 @@ void getFileINode(char *path, size_t bufLen, inCoreiNode *iNodeData) {
 			break;
 		}
 	}
+    return workingINode;
 }
 
 
