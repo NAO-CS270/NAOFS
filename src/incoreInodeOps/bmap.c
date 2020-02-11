@@ -5,7 +5,7 @@
 // num of block addresses in indirect block
 #define blkAddrNos (BLOCK_SIZE / BLOCK_ADDRESS_SIZE)
 // max size mapped by all the direct blocks
-#define directBlkMaxSize  BLOCK_SIZE * DIRECT_BLOCKS)
+#define directBlkMaxSize  (BLOCK_SIZE * DIRECT_BLOCKS)
 // max size mapped by all the single indirect blocks
 #define singleIndirectBlkMaxSize (BLOCK_SIZE * blkAddrNos)
 // max size mapped by all the double indirect blocks
