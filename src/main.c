@@ -24,7 +24,7 @@ static int truncateFile(inCoreiNode* inode) {
     inode -> size = 0;
 }
 
-static int create_callback(const char *path, mode_t mode, fuse_file_info *fi) {
+static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
     inCoreiNode* newFilesiNode;
     newFilesiNode = getFileINode(path, strlen(path));
     size_t fd;
@@ -164,7 +164,7 @@ static int mkdir_callback(const char* path, mode_t mode) {
     // TODO: use the right device number, using 0 for now
     inCoreiNode *newInode = iget(newInodeNumber, 0);
     // add "." and ".." in the newly created inode
-    updateNewDirMetaData(newInode, newInodeNumber, parentInode, parentInode->inode_number);
+    updateNewDirMetaData(newInode, newInodeNumber, parentInode->inode_number);
     newInode -> type = T_DIRECTORY;
     iput(newInode);
 }
@@ -176,6 +176,8 @@ static struct fuse_operations OPERATIONS = {
         .write = write_callback
         .mkdir = mkdir_callback,
         .create = create_callback,
+//        .link = link_callback,
+//        .unlink = unlink_callback,
 };
 
 int main(int argc, char *argv[]) {
