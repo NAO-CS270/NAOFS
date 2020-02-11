@@ -24,26 +24,28 @@ static int truncateFile(inCoreiNode* inode) {
     inode -> size = 0;
 }
 
-// TODO: keep a check for if a file already exists: it truncates.
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
     inCoreiNode* newFilesiNode;
     newFilesiNode = getFileINode(path, strlen(path));
+    size_t fd;
     if (newFilesiNode == NULL) {
+        // assign new inode from the file system
+        size_t newInodeNumber = getNewINode();
+
+        // create new directory entry in parent directory
         char *parentDirPath;
         parentDirPath = getParentDirectory(path);
         inCoreiNode *parentInode = getFileINode(parentDirPath, strlen(parentDirPath));
 
-        // assign new inode from the file system
-        size_t newInodeNumber = getNewINode();
-
+        // include new file name and newly assigned inode number
         char *filename = getFilenameFromPath(path);
         getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
         iput(parentInode);
-
-        newFilesiNode = iget(newInodeNumber, 0);
-        size_t fd = createFileDescriptorEntry(newFilesiNode, fi->flags);
-        iput(newFilesiNode);
+    } else {
+        truncateFile(newFilesiNode);
     }
+    fd = createFileDescriptorEntry(newFilesiNode, fi -> flags);
+    iput(newFilesiNode);
     return fd;
 }
 
@@ -158,7 +160,7 @@ static int mkdir_callback(const char* path, mode_t mode) {
     // TODO: use the right device number, using 0 for now
     inCoreiNode *newInode = iget(newInodeNumber, 0);
     // add "." and ".." in the newly created inode
-    updateNewDirMetaData(newInode, newInodeNumber, parentInode, parentInode->inode_number);
+    updateNewDirMetaData(newInode, newInodeNumber, parentInode->inode_number);
     newInode -> type = T_DIRECTORY;
     iput(newInode);
 }
@@ -170,6 +172,8 @@ static struct fuse_operations OPERATIONS = {
         .write = write_callback
         .mkdir = mkdir_callback,
         .create = create_callback,
+//        .link = link_callback,
+//        .unlink = unlink_callback,
 };
 
 int main(int argc, char *argv[]) {
