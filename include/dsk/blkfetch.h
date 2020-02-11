@@ -3,9 +3,9 @@
 
 #include "dsk/mdisk.h"
 
-extern disk_block* getDiskBlock(int blockNumber, disk_block *blockData);
+extern disk_block* getDiskBlock(size_t blockNumber, disk_block *blockData);
 
-extern void writeDiskBlock(int blockNumber, disk_block* blockData);
+extern void writeDiskBlock(size_t blockNumber, disk_block* blockData);
 
 #endif
 

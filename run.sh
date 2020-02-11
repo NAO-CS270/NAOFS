@@ -3,6 +3,7 @@
 cmake -Bbuild -H.
 cd build
 make
-./naofs
-cd ../
-rm -rf build
+
+mkdir fsRoot
+gnome-terminal -x bash -c "./naofs fsRoot -d -f -s"
+cd fsRoot/

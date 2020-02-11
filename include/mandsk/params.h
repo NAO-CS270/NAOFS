@@ -4,8 +4,6 @@
 // TODO: Remove this variable later
 #define DIRECT_BLOCKS 10
 
-#include <stddef.h>
-
 #define DISK_SIZE 1024
 
 #define BLOCK_ADDRESS_SIZE 4  // affects definition of indirect block in bmap.h
@@ -16,9 +14,12 @@
 #define NUM_OF_BLOCKS (1<<(BLOCK_ADDRESS_SIZE*8))
 #define INODE_SIZE (1<<7) // TODO: sizeof(iNode)?
 #define NUM_OF_INODES (1<<(INODE_ADDRESS_SIZE*8))
-#define DIRECT_BLOCKS 10
-#define SINGLE_INDIRECT_BLOCKS 1
-#define DOUBLE_INDIRECT_BLOCKS 1
+
+#define DIRECT_BLOCK_LIMIT 9
+
+#define SINGLE_INDIRECT_BLOCK 10
+#define DOUBLE_INDIRECT_BLOCK 11
+#define TRIPLE_INDIRECT_BLOCK 12
 
 #define INODE_BUFFER_SIZE 32
 #define INODE_HASH_SIZE 8
