@@ -27,24 +27,27 @@ size_t checkAndGetLen(char *path, size_t bufLen) {
 }
 
 
-void operate(char *workingBuffer, inCoreiNode *workingINode) {
+bool operate(char *workingBuffer, inCoreiNode *workingINode) {
     size_t iNodeNum = findINodeInDirectory(workingINode, workingBuffer);
+    if (iNodeNum == 0)
+        return false;
     iput(workingINode);
     workingINode = iget(iNodeNum, 0);
+    return true;
 }
 
 
-size_t processNextLevel(char *path, char *workingBuffer, inCoreiNode *workingINode) {
-    size_t counter;
-    for (counter=0 ; ; counter++) {
-        if ((path[counter] == '/') || (path[counter] == '\0')) {
-            operate(workingBuffer, workingINode);
+bool processNextLevel(char *path, size_t* counter, char *workingBuffer, inCoreiNode *workingINode) {
+    for (int i = 0; ; ++i, ++(*counter)) {
+        if ((path[*counter] == '/') || (path[*counter] == '\0')) {
+            workingBuffer[i] = 0;
+            if (operate(workingBuffer, workingINode) == 0)
+                return false;
             break;
         }
-        workingBuffer[counter] = path[counter];
-        counter++;
+        workingBuffer[i] = path[*counter];
     }
-    return counter;
+    return true;
 }
 
 
@@ -56,13 +59,10 @@ inCoreiNode* getFileINode(char *path, size_t bufLen) {
 	inCoreiNode *workingINode = iget(0, 0);
 
 	size_t counter;
-	for (counter=0 ; ; counter++) {
-		memset(workingBuffer, 0, pathLen + 1);
-		counter += processNextLevel(path, workingBuffer, workingINode);
-
-		if (path[counter] == '\0') {
-			break;
-		}
+	for (counter=0 ;path[counter] != '\0' ; counter++) {
+	    if (processNextLevel(path, &counter, workingBuffer, workingINode) == false) {
+            return NULL;
+	    }
 	}
     return workingINode;
 }
