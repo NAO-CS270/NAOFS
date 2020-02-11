@@ -8,4 +8,6 @@
 
 #include <pthread.h>
 
+extern size_t getNewINode();
+
 #endif
