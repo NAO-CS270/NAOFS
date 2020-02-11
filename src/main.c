@@ -86,7 +86,6 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     char* ptrIntoBuf = buf;
     int blockBytesRead = 0;
     int tempOffset = offset;
-    char* ptrIntoBuffer = buf;
     if(fi->fh < 0) {
         return -1;
     }
@@ -122,7 +121,6 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
     int bytesWritten = 0;
     bool fullBlockWrite = false;
     int tempOffset = offset;
-    char* ptrIntoBuffer = buf;
 
     struct fuse_context* fuse_context = fuse_get_context();
     inCoreiNode *inode = file_descriptor_table[fi->fh].inode;

@@ -5,4 +5,4 @@
 
 extern void freeINode(size_t iNodeNum);
 
-#endif _IFREE_H
+#endif //_IFREE_H
