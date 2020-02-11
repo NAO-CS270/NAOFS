@@ -7,12 +7,15 @@
 #include "fileTables.h"
 #include "incoreInodeOps/bmap.h"
 #include "dsk/blkfetch.h"
+#include "dsk/free.h"
 #include "utils/utils.h"
 #include "incoreInodeOps/iput.h"
 #include "incoreInodeOps/iget.h"
 #include "mkfs/ialloc.h"
 #include "trav/directory.h"
-#define FUSE_USE_VERSION 29
+#include "trav/namei.h"
+#include "utils/utils.h"
+#define FUSE_USE_VERSION 39
 #include <fuse/fuse.h>
 #include <stdio.h>
 #include <string.h>

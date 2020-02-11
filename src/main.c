@@ -51,7 +51,7 @@ static int create_callback(const char *path, mode_t mode, struct fuse_file_info 
 
 // TODO: Update the size of the file
 // TODO: Call create here
-static int open_callback(const char *path, fuse_file_info *fi) {
+static int open_callback(const char *path, struct fuse_file_info *fi) {
     if(fi -> flags & O_CREAT) {
         return fi -> fh = create_callback(path, 0, fi);
     }

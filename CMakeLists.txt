@@ -13,7 +13,7 @@ pkg_check_modules(FUSE REQUIRED fuse)
 
 file(GLOB SOURCES "src/*.c")
 
-add_executable(naofs test/test_block_fetch.c ${SOURCES})
+add_executable(naofs ${SOURCES})
 
 target_compile_options(naofs PRIVATE -D_FILE_OFFSET_BITS=64)
 
