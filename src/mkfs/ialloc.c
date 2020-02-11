@@ -1,26 +1,34 @@
+#include "incoreInodeOps/iget.h"
 #include "mkfs/ialloc.h"
+#include "time.h"
 
 static const size_t iNodeNumsPerBlock = BLOCK_SIZE/INODE_ADDRESS_SIZE;
 
 static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
+
+void setNewiNodeMetadata(size_t iNodeNumber) {
+    inCoreiNode* iNode = iget(iNodeNumber, 0);
+    iNode -> type = T_REGULAR;
+    time(&(iNode -> creation_time));
+}
 
 /* Returns first free iNode number, if any exists, `0` otherwise. Also removes
  * the iNode number from the input `iNodeList`.
  */
 size_t checkAndGetFreeINode(iNodeListBlock *iNodeList) {
 	size_t counter = 0;
-	size_t freeINode;
+	size_t freeINode = 0;
 
-	while (counter < iNodeNumsPerBlock) {
+	while (counter < iNodeNumsPerBlock && freeINode == 0) {
 		freeINode = (iNodeList -> iNodeNos)[counter];
 		counter++;
-
-		if (freeINode == 0) {
-			continue;
-		}
-		(iNodeList -> iNodeNos)[counter-1] = 0;
-		break;
 	}
+	if (counter == iNodeNumsPerBlock) {
+	    // throw error
+	    return -1;
+	}
+
+    (iNodeList -> iNodeNos)[counter-1] = 0;
 	return freeINode;
 }
 
@@ -62,7 +70,7 @@ size_t getNewINode() {
 	writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
 	free(iNodeListData);
 	free(iNodeList);
-
+	setNewiNodeMetadata(freeINode);
 	pthread_mutex_unlock(&iNodeListMutex);
 	return freeINode;
 }
