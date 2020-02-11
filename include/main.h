@@ -7,8 +7,8 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <fcntl.h>
-#include "./fileTables.h"
-#include "./mkfs/bmap.h"
-#include "./incoreInodeOps/freeList.h"
+#include "fileTables.h"
+#include "mkfs/bmap.h"
+#include "incoreInodeOps/freeList.h"
 
 #endif //MAIN_H
