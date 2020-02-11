@@ -19,11 +19,10 @@ size_t checkAndGetLen(const char *path, size_t bufLen) {
             continue;
         }
         if (path[counter] == '\0') {
-            return counter;
+            return counter + 1;
         }
     }
-    path[bufLen-1] = '\0';
-    return bufLen;
+    return -1;
 }
 
 void operate(char *workingBuffer, inCoreiNode *workingINode) {
@@ -57,14 +56,16 @@ size_t processNextLevel(const char *path, size_t counter, char *workingBuffer, i
  */
 inCoreiNode* getFileINode(const char *path, size_t bufLen) {
 	size_t pathLen = checkAndGetLen(path, bufLen);
-	char *workingBuffer = (char *)malloc((pathLen + 1)*sizeof(char));
-	memset(workingBuffer, 0, pathLen + 1);
+	if (pathLen == -1)
+        return NULL;
+	char *workingBuffer = (char *)malloc((pathLen)*sizeof(char));
+	memset(workingBuffer, 0, pathLen);
 
 	inCoreiNode *workingINode = iget(0, 0);
 
 	size_t counter;
 	for (counter=0 ; ; counter++) {
-		memset(workingBuffer, 0, pathLen + 1);
+		memset(workingBuffer, 0, pathLen);
 		counter = processNextLevel(path, counter, workingBuffer, workingINode);
 
 		if (workingINode == NULL) {
