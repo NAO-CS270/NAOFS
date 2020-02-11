@@ -125,27 +125,12 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
 
 // creates a new special file(dir, pipe, link). Returns -1 on error
 static int mkdir_callback(const char* path, mode_t mode) {
-    char* parentDirPath;
-    parentDirPath = getParentDirectory(path);
-
-    // TODO: There is going to be an error thrown by namei
-    inCoreiNode *parentInode = namei(parentDirPath);
-    if (NULL != parentInode) {
-        iput(inode);
-        return -1;
-    }
-
-    // assign new inode from the file system
-    size_t newInodeNumber = getNewINode();
-
-    char *filename = getFilenameFromPath(path);
-    getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
-    iput(parentInode);
-
+    create_callback(path, mode, NULL);
     // TODO: use the right device number, using 0 for now
     inCoreiNode *newInode = iget(newInodeNumber, 0);
     // add "." and ".." in the newly created inode
     updateNewDirMetaData(newInode, newInodeNumber, parentInode, parentInode->inode_number);
+    newInode -> type = T_DIRECTORY;
     iput(newInode);
 }
 
