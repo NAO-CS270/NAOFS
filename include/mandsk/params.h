@@ -1,6 +1,9 @@
 #ifndef _PARAMS_H
 #define _PARAMS_H
 
+// TODO: Remove this variable later
+#define DIRECT_BLOCKS 10
+
 #include <stddef.h>
 
 #define DISK_SIZE 1024
