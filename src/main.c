@@ -24,26 +24,28 @@ static int truncateFile(inCoreiNode* inode) {
     inode -> size = 0;
 }
 
-// TODO: keep a check for if a file already exists: it truncates.
-static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
+static int create_callback(const char *path, mode_t mode, fuse_file_info *fi) {
     inCoreiNode* newFilesiNode;
     newFilesiNode = getFileINode(path, strlen(path));
+    size_t fd;
     if (newFilesiNode == NULL) {
+        // assign new inode from the file system
+        size_t newInodeNumber = getNewINode();
+
+        // create new directory entry in parent directory
         char *parentDirPath;
         parentDirPath = getParentDirectory(path);
         inCoreiNode *parentInode = getFileINode(parentDirPath, strlen(parentDirPath));
 
-        // assign new inode from the file system
-        size_t newInodeNumber = getNewINode();
-
+        // include new file name and newly assigned inode number
         char *filename = getFilenameFromPath(path);
         getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
         iput(parentInode);
-
-        newFilesiNode = iget(inodeNumber, 0);
-        size_t fd = createFileDescriptorEntry(newFilesiNode, fi->flags);
-        iput(newFilesiNode);
+    } else {
+        truncateFile(newFilesiNode);
     }
+    fd = createFileDescriptorEntry(newFilesiNode, fi -> flags);
+    iput(newFilesiNode);
     return fd;
 }
 
