@@ -13,7 +13,7 @@ typedef  struct fileTable {
 
 FileTable file_descriptor_table[MAX_FD];
 
-extern size_t putFileDescriptorEntry(inCoreiNode *inode, size_t mode);
+extern size_t createFileDescriptorEntry(inCoreiNode *inode, size_t mode);
 extern void initFileTableEntries();
 
 typedef struct fileTable fileTable;
