@@ -17,6 +17,8 @@ void iput(inCoreiNode* inode) {
         if (inode->inode_changed && inode->file_data_changed) {
             // TODO: Will do once foofooman's commit is in.
             //writeDiskInode(inode->inode_number, inode->disk_inode);
+            inode->inode_changed = false;
+            inode->file_data_changed = false;
         }
         // get hash Q node
         Node* node = hashLookup(inode->device_number, inode->inode_number);
