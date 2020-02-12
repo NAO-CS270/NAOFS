@@ -3,6 +3,8 @@
 #include "trav/namei.h"
 #include "utils/utils.h"
 #include "mkfs/mkfs.h"
+#include "incoreInodeOps/hashQ.h"
+#include "mkfs/iNodeManager.h"
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
     inCoreiNode* inode = getFileINode(path, strlen(path));
@@ -25,7 +27,8 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
     } else {
         stbuf -> st_mode = S_IFREG | 0777;
         stbuf -> st_nlink = 1;
-    }
+    } 
+	iput(inode);
     printf("returning from getAttr");
     return 0;
 }
@@ -120,9 +123,9 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
         tempOffset = tempOffset + bytesToRead;
         free(metaBlock);
     }
-    fetchInodeFromDisk(inode->inode_number, inode);
     inode -> size = max(inode -> size, size);
     time(&inode -> access_time);
+    inode -> inode_changed = true;
     iput(inode);
 	free(bmapResp);
     return blockBytesRead;
@@ -155,12 +158,15 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
         free(metaBlock);
         bytesWritten += bytesToWrite;
         tempOffset += bytesToWrite;
+        inode -> size = max(inode -> size, offset + bytesWritten);
     }
 	free(bmapResp);
-    fetchInodeFromDisk(inode->inode_number, inode);
-    inode -> size = max(inode -> size, offset + bytesWritten);
-    time(inode -> access_time);
-    time(inode -> modified_time);
+    time(&(inode -> access_time));
+    time(&(inode -> modified_time));
+
+    inode -> inode_changed = true;
+    inode -> file_data_changed = true;
+
     iput(inode);
     return bytesWritten;
 }
@@ -238,9 +244,10 @@ int main(int argc, char *argv[]) {
     //TODO: create directory table for /
 	makeFileSystem();
     initFreeInCoreINodeList();
-
+	initHashQueues();
     // initialize the file table entries here
     initFileTableEntries();
+
     return fuse_main(argc, argv, &OPERATIONS, NULL);
 }
 

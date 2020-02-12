@@ -10,6 +10,8 @@ void initFreeInCoreINodeList() {
     for(i = 0; i < INODE_BUFFER_SIZE; i++) {
         Node* node = (Node*)malloc(sizeof(struct Node));
         node->inode = (inCoreiNode*)malloc(sizeof(inCoreiNode));
+		node->hash_next = NULL;
+		node->hash_prev = NULL;
 
 		freeListInsert(node);
     }

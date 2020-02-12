@@ -33,7 +33,7 @@ struct iNodeListBlock {
 typedef struct iNodeListBlock iNodeListBlock;
 
 struct iNodesBlock {
-	iNode iNodesList[INODES_PER_BLOCK];
+	iNode *iNodesList;
 };
 typedef struct iNodesBlock iNodesBlock;
 

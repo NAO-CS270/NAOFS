@@ -5,6 +5,7 @@
 #include "incoreInodeOps/node.h"
 #include "mandsk/params.h"
 
+extern void initHashQueues();
 
 // (device number + inode number) % INODE_HASH_SIZE
 extern size_t getHash(size_t deviceNumber, size_t inodeNumber);

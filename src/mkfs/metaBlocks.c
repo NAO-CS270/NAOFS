@@ -93,36 +93,17 @@ disk_block *writeINodeListBlock(iNodeListBlock *theBlock, disk_block *blockPtr) 
 }
 
 iNodesBlock *makeINodesBlock(disk_block *blockPtr, iNodesBlock *theBlock) {
-	unsigned char *ptrIntoBlock = blockPtr->data;
-	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
+	size_t iNodeStructSize = sizeof(iNode);
 
-	iNode *iNodePtr = theBlock->iNodesList;
-	size_t iNodeStructSize = sizeof(iNode);			// TODO: This should go away once structure is fixed.
-
-	while (ptrIntoBlock < endOfBlock) {
-		memcpy(iNodePtr, ptrIntoBlock, iNodeStructSize);
-
-		ptrIntoBlock += INODE_SIZE;
-		iNodePtr++;									// TODO: Make sure this increases appropriately.
-	}
+	memcpy(theBlock->iNodesList, blockPtr->data, INODES_PER_BLOCK*iNodeStructSize);
 
 	return theBlock;
 }
 
 disk_block *writeINodesBlock(iNodesBlock *theBlock, disk_block *blockPtr) {
-	unsigned char *ptrIntoBlock = blockPtr->data;
-	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
+	size_t iNodeStructSize = sizeof(iNode);
 
-	iNode *iNodePtr = theBlock->iNodesList;
-	size_t iNodeStructSize = sizeof(iNode);			// TODO: This should go away once structure is fixed.
-
-	while (ptrIntoBlock < endOfBlock) {
-		memcpy(ptrIntoBlock, iNodePtr, iNodeStructSize);
-
-		ptrIntoBlock += INODE_SIZE;
-		iNodePtr++;									// TODO: Make sure this increases appropriately.
-	}
-
+	memcpy(blockPtr->data, theBlock->iNodesList, INODES_PER_BLOCK*iNodeStructSize);
 	return blockPtr;
 }
 

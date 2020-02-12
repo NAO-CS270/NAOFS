@@ -9,7 +9,7 @@ disk_block* fetchMemoryDiskBlock(size_t blockNumber, disk_block *blockData) {
 		*blockData = mem_disk[0];
 	}
 	else {
-		*blockData = mem_disk[blockNumber - 1];
+		*blockData = mem_disk[blockNumber];
 	}
 
 	return blockData;
