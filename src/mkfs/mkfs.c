@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static size_t numOfINodeBlocks = 0;
 
@@ -93,6 +94,7 @@ void makeFileSystem() {
 	// `numOfINodeBlocks` is global static, and is expected to be set appropriately before this.
 	initializeDiskBlocks(FREE_LIST_BLOCK, 4 + numOfINodeBlocks);
 
+	printf("Hellyeah\n");
 	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
 
@@ -100,7 +102,19 @@ void makeFileSystem() {
 	writeSuperBlock(theSuperBlock, superBlockData);
 	writeDiskBlock(SUPER_BLOCK, superBlockData);
 
+	assignRootData();
+
 	free(superBlockData);
 	free(theSuperBlock);
+}
+
+void assignRootData() {
+	size_t rootINodeNum = getNewINode();
+	iNode *rootINode = (iNode *)malloc(sizeof(iNode));
+	getDiskInode(rootINodeNum, rootINode);
+	size_t blockNum = blockAlloc();
+	rootINode->dataBlockNums[0] = blockNum;
+	writeDiskInode(rootINodeNum, rootINode);
+	free(rootINode);
 }
 

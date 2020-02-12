@@ -64,13 +64,12 @@ size_t getNewINode() {
 		fetchFreeINodes(iNodeList);
 		freeINode = checkAndGetFreeINode(iNodeList);
 	}
-
+	
 	markINodeFree(freeINode, T_REGULAR);
 	writeINodeListBlock(iNodeList, iNodeListData);
 	writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
 	free(iNodeListData);
 	free(iNodeList);
-	setNewiNodeMetadata(freeINode);
 	pthread_mutex_unlock(&iNodeListMutex);
 	return freeINode;
 }
