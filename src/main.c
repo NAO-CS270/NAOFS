@@ -6,32 +6,7 @@
 #include "incoreInodeOps/hashQ.h"
 #include "mkfs/iNodeManager.h"
 
-static int getattr_callback(const char *path, struct stat *stbuf) {
-    inCoreiNode* inode = getFileINode(path, strlen(path));
-    debug_print("inode %p %d %d %d %d", inode, inode -> owner_uid, inode -> group_uid, inode -> size, inode -> type);
-    if (inode == NULL)
-        return -ENOENT;
-
-    memset(stbuf, 0, sizeof(struct stat));
-    stbuf -> st_atime = inode -> access_time;
-    stbuf -> st_mtime = inode -> modified_time;
-    stbuf -> st_ctime = inode -> modified_time;
-    stbuf -> st_uid = (uid_t) inode -> owner_uid;
-    stbuf -> st_gid = (gid_t) inode -> group_uid;
-//    stbuf -> st_nlink = inode -> linksCount;  TODO
-    stbuf -> st_size = inode -> size;
-
-    if (inode -> type == T_DIRECTORY) {
-        stbuf -> st_mode = S_IFDIR | 0755;
-        stbuf -> st_nlink = 2;
-    } else {
-        stbuf -> st_mode = S_IFREG | 0777;
-        stbuf -> st_nlink = 1;
-    } 
-	iput(inode);
-    printf("returning from getAttr");
-    return 0;
-}
+#include "interface/getAttr.h"
 
 static int truncateFile(inCoreiNode* inode) {
     inodeBlocksFree(inode);
@@ -227,17 +202,24 @@ static int access_callback(const char* path, int mode) {
     return 0;
 }
 
+static int getattr_callback(const char *path, struct stat *stbuf) {
+	memset(stbuf, 0, sizeof(struct stat));
+	
+	return attrPopulate(path, stbuf);
+}
+
 static struct fuse_operations OPERATIONS = {
-        .getattr = getattr_callback,
-        .read = read_callback,
-        .open = open_callback,
-        .write = write_callback,
-        .mkdir = mkdir_callback,
-        .create = create_callback,
-        .readdir = readdir_callback,
-        .access = access_callback,
-//        .link = link_callback,
-//        .unlink = unlink_callback,
+	.getattr = getattr_callback,
+        //.getattr = getattr_callback,
+        //.read = read_callback,
+        //.open = open_callback,
+        //.write = write_callback,
+    .mkdir = mkdir_callback,
+        //.create = create_callback,
+        //.readdir = readdir_callback,
+        //.access = access_callback,
+        //.link = link_callback,
+        //.unlink = unlink_callback,
 };
 
 int main(int argc, char *argv[]) {

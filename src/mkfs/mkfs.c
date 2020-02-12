@@ -19,6 +19,7 @@ void assignRootData() {
 	iNode *rootINode = (iNode *)malloc(sizeof(iNode));
 	getDiskInode(rootINodeNum, rootINode);
 	size_t blockNum = blockAlloc();
+	rootINode->type = T_DIRECTORY;
 	rootINode->dataBlockNums[0] = blockNum;
 	writeDiskInode(rootINodeNum, rootINode);
 	free(rootINode);
