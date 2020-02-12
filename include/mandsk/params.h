@@ -8,7 +8,9 @@
 
 #define BLOCK_ADDRESS_SIZE 2ll  // affects definition of indirect block in bmap.h
 #define INODE_ADDRESS_SIZE 1ll
-#define FILENAME_SIZE 64ll
+#define FILENAME_SIZE 15ll
+
+#define DIRECTORY_ENTRIES_IN_BLOCK (BLOCK_SIZE / (FILENAME_SIZE + INODE_ADDRESS_SIZE))
 
 #define BLOCK_SIZE 1024ll
 #define NUM_OF_BLOCKS (1ll<<(BLOCK_ADDRESS_SIZE*8ll))

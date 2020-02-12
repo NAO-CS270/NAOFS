@@ -23,7 +23,7 @@ typedef struct blkTreeOffset blkTreeOffset;
  * 	inode: in-core copy of inode
  *	blockNumToAdd: block to address to add
  */
-extern void insertDataBlockINode (inCoreiNode* inode, size_t blockNumToAdd);
+extern void insertDataBlockInINode (inCoreiNode* inode, size_t blockNumToAdd);
 
 /**
  *	Calculates different offsets based on the given file offset

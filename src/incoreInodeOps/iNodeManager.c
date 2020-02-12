@@ -131,7 +131,7 @@ void updateIndex(inCoreiNode* iNode, size_t blockNumToAdd, blkTreeOffset *blkOff
  * 	inode: in-core copy of inode
  *	blockNumToAdd: block to address to add
  */
-void insertDataBlockINode (inCoreiNode* iNode, size_t blockNumToAdd) {
+void insertDataBlockInINode(inCoreiNode* iNode, size_t blockNumToAdd) {
 	size_t size = iNode->size;
 	if (size % BLOCK_SIZE != 0) {
 		// TODO: handle error

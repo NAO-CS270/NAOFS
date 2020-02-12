@@ -25,31 +25,21 @@ void freeListInsert(Node* node) {
 }
 
 void freeListRemove(Node* node) {
-    Node* head = freeList;
-    // Since we are using a pointer, can't we delete it right away?
-    while(NULL != head) {
-        if(head->inode->inode_number == node->inode->inode_number) {
-            // if tail node has to be removed
-            if(NULL == head->next) {
-                head->prev->next = NULL;
-            } // if head has to be removed
-            else if(NULL == head->prev) {
-                head->next->prev = NULL;
-                Node* temp = head->next;
-                head->next = NULL;
-                head->prev = NULL;
-                head = temp;
-                return;
-            } else {
-                head->next->prev = head->prev;
-                head->prev->next = head->next;
-            }
-            head->next = NULL;
-            head->prev = NULL;
-            return;
-        }
-        head = head->next;
-    }
+    Node* workingNode = freeList;
+    while(NULL != workingNode) {
+		if (node == workingNode) {
+			if (node->next != NULL) {
+				node->next->prev = node->prev;
+			}
+			if (node->prev != NULL) {
+				node->prev->next = node->next;
+			}
+			node->next = NULL;
+			node->prev = NULL;
+			break;
+		}
+		workingNode = workingNode->next;
+	}
 }
 
 extern Node* getFreeINodeFromList() {

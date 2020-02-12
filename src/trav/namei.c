@@ -34,7 +34,7 @@ size_t checkAndGetLen(const char *path, size_t bufLen, char *pathBuf) {
 	}
 }
 
-void operate(char *path, size_t startAt, size_t endAt, inCoreiNode *workingINode) {
+void operate(const char *path, size_t startAt, size_t endAt, inCoreiNode *workingINode) {
 	if (startAt == endAt) {
 		return ;
 	}
@@ -80,9 +80,9 @@ inCoreiNode* getFileINode(const char *path, size_t bufLen) {
     char *pathBuffer = (char *)malloc((bufLen + 1)*sizeof(char));
 	size_t pathLen = checkAndGetLen(path, bufLen, pathBuffer);
     
-	debug_print("Given path - %s, length = %d\n", path, pathLen);
+	debug_print("Given path - %s, length = %ld\n", path, pathLen);
 	inCoreiNode *workingINode = iget(0, 0);
-	debug_print("%d\n", workingINode->inode_number);
+	debug_print("%ld\n", workingINode->inode_number);
 
 	size_t counter;
 	for (counter=0 ; ; counter++) {

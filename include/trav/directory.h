@@ -6,8 +6,6 @@
 #include "inode/iNode.h"
 #include "inode/inCoreiNode.h"
 
-#define ENTRIES_PER_BLOCK (BLOCK_SIZE/sizeof(nameINodePair))
-
 struct nameINodePair {
 	char name[FILENAME_SIZE];
 	size_t iNodeNum;
@@ -15,7 +13,7 @@ struct nameINodePair {
 typedef struct nameINodePair nameINodePair;
 
 struct directoryTable {
-	nameINodePair entries[ENTRIES_PER_BLOCK];
+	nameINodePair entries[DIRECTORY_ENTRIES_IN_BLOCK];
 };
 typedef struct directoryTable directoryTable;
 

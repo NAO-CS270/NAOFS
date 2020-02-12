@@ -50,7 +50,7 @@ size_t searchDirectory(directoryTable *dataPtr, char *entryName) {
 	nameINodePair iNodeData;
 
 	size_t counter;
-	for (counter=0 ; counter<ENTRIES_PER_BLOCK ; counter++) {
+	for (counter=0 ; counter<DIRECTORY_ENTRIES_IN_BLOCK ; counter++) {
 		iNodeData = dataPtr->entries[counter];
 
 		if (0 == strncmp(entryName, iNodeData.name, FILENAME_SIZE)) {
@@ -58,7 +58,7 @@ size_t searchDirectory(directoryTable *dataPtr, char *entryName) {
 		}
 	}
 
-	if (ENTRIES_PER_BLOCK == counter) {
+	if (DIRECTORY_ENTRIES_IN_BLOCK == counter) {
 		return 0;
 	}
 	return iNodeData.iNodeNum;
@@ -98,10 +98,10 @@ size_t findINodeInDirectory(inCoreiNode *iNodePtr, char *entryName) {
 void getAndUpdateDirectoryTable(inCoreiNode* parentInode, size_t newInodeNumber, char* filename) {
     // TODO: See what needs to be done when the validateSearch fails, also, how do we fetch the files here
     // validateSearch(parentInode);
-
     fetchInodeFromDisk(parentInode->inode_number, parentInode);
     // fetch the directory table from the disk
-    bmapResponse *bmapResp = bmap(parentInode, parentInode->size);
+    bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
+	bmap(parentInode, parentInode->size, bmapResp);
     disk_block *blkPtr = (disk_block *) malloc(sizeof(disk_block));
     getDiskBlock(bmapResp->blockNumber, blkPtr);
     // fetch the directory table from the disk block
@@ -111,13 +111,13 @@ void getAndUpdateDirectoryTable(inCoreiNode* parentInode, size_t newInodeNumber,
     size_t counter;
     nameINodePair *iNodeData;
 
-    for(counter = 0; counter < ENTRIES_PER_BLOCK; counter++) {
+    for(counter = 0; counter < DIRECTORY_ENTRIES_IN_BLOCK ; counter++) {
         iNodeData = &(dirData->entries[counter]);
         if(NULL == iNodeData) {
             break;
         }
     }
-    if (counter == ENTRIES_PER_BLOCK) {
+    if (counter == DIRECTORY_ENTRIES_IN_BLOCK) {
         // TODO: Throw an error in this case
     }
     // counter is the new index at which the entry has to be made
@@ -128,9 +128,10 @@ void getAndUpdateDirectoryTable(inCoreiNode* parentInode, size_t newInodeNumber,
     dirData->entries[counter] = *(iNodeData);
 
     // TODO: (Aarti) is this correct?
-    memcpy(blkPtr, dirData, bmapResp->ioBytesInBlock);
+    memcpy(blkPtr, dirData, bmapResp->bytesLeftInBlock);
     writeMemoryDiskBlock(bmapResp->blockNumber, blkPtr);
 
+	free(bmapResp);
     free(dirData);
     free(blkPtr);
 }
@@ -144,7 +145,8 @@ void updateNewDirMetaData(inCoreiNode* inode, size_t newInodeNumber, size_t pare
     directoryTable *dirData = (directoryTable*)malloc(sizeof(directoryTable));
     disk_block *blkPtr = (disk_block*)malloc(sizeof(disk_block));
 
-    bmapResponse* bmapResp = bmap(inode, inode->size);
+    bmapResponse* bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
+	bmap(inode, inode->size, bmapResp);
     getDiskBlock(bmapResp->blockNumber, blkPtr);
     dirData = makeDirectoryTable(blkPtr, dirData);
 
@@ -157,9 +159,10 @@ void updateNewDirMetaData(inCoreiNode* inode, size_t newInodeNumber, size_t pare
     dirData->entries[1].iNodeNum = parentInodeNumber;
 
     // TODO: (Aarti) is this correct?
-    memcpy(blkPtr, dirData, bmapResp->ioBytesInBlock);
+    memcpy(blkPtr, dirData, bmapResp->bytesLeftInBlock);
     writeMemoryDiskBlock(bmapResp->blockNumber, blkPtr);
 
+	free(bmapResp);
     free(dirData);
     free(blkPtr);
 }
@@ -168,9 +171,11 @@ directoryTable* getDirectoryEntries(inCoreiNode* inode) {
     directoryTable *dirTable = (directoryTable*)malloc(sizeof(directoryTable));
     disk_block *blkPtr = (disk_block*)malloc(sizeof(disk_block));
 
-    bmapResponse* bmapResp = bmap(inode, inode->size);
+    bmapResponse* bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
+	bmap(inode, inode->size, bmapResp);
     blkPtr = getDiskBlock(bmapResp->blockNumber, blkPtr);
     dirTable = makeDirectoryTable(blkPtr, dirTable);
 
+	free(bmapResp);
     return dirTable;
 }

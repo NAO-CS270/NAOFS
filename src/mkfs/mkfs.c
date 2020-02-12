@@ -4,6 +4,9 @@
 #include "mandsk/params.h"
 #include "mkfs/freeBlockList.h"
 #include "mkfs/metaBlocks.h"
+#include "dsk/alloc.h"
+#include "mkfs/iNodeManager.h"
+#include "mkfs/ialloc.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -89,13 +92,13 @@ void initializeDiskBlocks(size_t freeBlockNum, size_t startPos) {
 }
 
 void assignRootData() {
-    size_t rootINodeNum = getNewINode();
-    iNode *rootINode = (iNode *)malloc(sizeof(iNode));
-    getDiskInode(rootINodeNum, rootINode);
-    size_t blockNum = blockAlloc();
-    rootINode->dataBlockNums[0] = blockNum;
-    writeDiskInode(rootINodeNum, rootINode);
-    free(rootINode);
+	size_t rootINodeNum = getNewINode();
+	iNode *rootINode = (iNode *)malloc(sizeof(iNode));
+	getDiskInode(rootINodeNum, rootINode);
+	size_t blockNum = blockAlloc();
+	rootINode->dataBlockNums[0] = blockNum;
+	writeDiskInode(rootINodeNum, rootINode);
+	free(rootINode);
 }
 
 /* Only this method must be exposed to be called as MKFS API. */
@@ -104,7 +107,6 @@ void makeFileSystem() {
 	// `numOfINodeBlocks` is global static, and is expected to be set appropriately before this.
 	initializeDiskBlocks(FREE_LIST_BLOCK, 4 + numOfINodeBlocks);
 
-	printf("Hellyeah\n");
 	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
 

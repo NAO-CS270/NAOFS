@@ -49,7 +49,7 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
         fetchediNode = node -> inode;
     }
     fetchediNode -> inode_changed = true;
-	printf("Returning iNode number %d\n", fetchediNode->inode_number);
+	printf("Returning iNode number %ld\n", fetchediNode->inode_number);
 
     return fetchediNode;
 }
