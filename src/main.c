@@ -98,6 +98,7 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     if(fi->fh < 0) {
         return -1;
     }
+    printf("reading %s ", path);
     struct fuse_context* fuse_context = fuse_get_context();
     // TODO: perform access permission checks
     inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
@@ -109,16 +110,18 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
         }
         // fetch the block from the disk and copy the data in the buffer
         disk_block* metaBlock = (disk_block*)malloc(sizeof(disk_block));
-        metaBlock = getDiskBlock(bmapResp->blockNumber, metaBlock);
-        memcpy(ptrIntoBuf, metaBlock->data, bmapResp->ioBytesInBlock);
-        ptrIntoBuf += bmapResp->ioBytesInBlock + 1;
+        metaBlock = getDiskBlock(bmapResp -> blockNumber, metaBlock);
+        size_t bytesToRead = min(bmapResp -> ioBytesInBlock, size - blockBytesRead);
+        memcpy(ptrIntoBuf, metaBlock -> data + bmapResp -> byteOffsetInBlock, bytesToRead);
+        ptrIntoBuf += bytesToRead;
 
-        blockBytesRead += bmapResp->ioBytesInBlock;
-        tempOffset = tempOffset + blockBytesRead + 1;
+        blockBytesRead += bytesToRead;
+        tempOffset = tempOffset + bytesToRead;
         free(metaBlock);
     }
     fetchInodeFromDisk(inode->inode_number, inode);
-    inode->size = size;
+    inode -> size = max(inode -> size, size);
+    time(&inode -> access_time);
     iput(inode);
     return blockBytesRead;
 }
