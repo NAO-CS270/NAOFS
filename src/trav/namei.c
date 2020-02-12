@@ -74,6 +74,7 @@ inCoreiNode* getFileINode(const char *path, size_t bufLen) {
 
 	size_t counter;
 	for (counter=0 ; ; counter++) {
+	    debug_print("counter = %d ", counter);
 		memset(workingBuffer, 0, pathLen);
 		counter = processNextLevel(truncatedPath, counter, workingBuffer, workingINode);
 

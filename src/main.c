@@ -191,8 +191,8 @@ static int mkdir_callback(const char* path, mode_t mode) {
 }
 
 static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
-    filler(buf, ".", NULL, 0);
-    filler(buf, "..", NULL, 0);
+//    filler(buf, ".", NULL, 0);
+//    filler(buf, "..", NULL, 0);
 
     inCoreiNode* inode = getFileINode(path, strlen(path));
     if(inode == NULL) {
