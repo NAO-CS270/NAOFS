@@ -1,5 +1,7 @@
 #include "incoreInodeOps/iput.h"
 
+#include <stdio.h>
+
 void iput(inCoreiNode* inode) {
     // take lock, the thread calling iput should release lock and call it
     // pthread_mutex_lock(&(inode->iNodeMutex));
@@ -29,4 +31,6 @@ void iput(inCoreiNode* inode) {
         freeListInsert(node);
     }
     pthread_mutex_unlock(&(inode->iNodeMutex));
+	printf("Released lock for inode %ld\n", inode->inode_number);
 }
+
