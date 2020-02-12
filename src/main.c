@@ -224,6 +224,7 @@ static struct fuse_operations OPERATIONS = {
 };
 
 int main(int argc, char *argv[]) {
+    //TODO: create directory table for /
     initFreeInCoreINodeList();
 
     // initialize the file table entries here
