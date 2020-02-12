@@ -13,7 +13,7 @@
 size_t checkAndGetLen(const char *path, size_t bufLen) {
     size_t counter;
     for (counter = 0 ; counter<bufLen ; counter++) {
-        debug_print("curr_char: %c", path[counter]);
+        debug_print("curr_char: %c buffLen: %d", path[counter], bufLen);
         if (isalnum(path[counter]) != 0) {
             continue;
         }
