@@ -1,6 +1,12 @@
+#include "utils/utils.h"
+
 #include <stdlib.h>
 #include <string.h>
-#include "utils/utils.h"
+#include <execinfo.h>
+#include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 /**
  * Usage:
@@ -67,3 +73,20 @@ char* getFilenameFromPath(const char* path) {
     return filename;
 }
 
+/*
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
+
+void print_backtrace (void) {
+  unw_cursor_t cursor; unw_context_t uc;
+  unw_word_t ip, sp;
+
+  unw_getcontext(&uc);
+  unw_init_local(&cursor, &uc);
+  while (unw_step(&cursor) > 0) {
+    unw_get_reg(&cursor, UNW_REG_IP, &ip);
+    unw_get_reg(&cursor, UNW_REG_SP, &sp);
+    printf ("ip = %lx, sp = %lx\n", (long) ip, (long) sp);
+  }
+}
+*/
