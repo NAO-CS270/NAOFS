@@ -1,10 +1,13 @@
 #include "main.h"
 #include "trav/namei.h"
+#include "utils/utils.h"
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
+    debug_print("path: %s", path);
     memset(stbuf, 0, sizeof(struct stat));
 
     stbuf->st_mode = 0777;
+
     if (strcmp(path, "/") == 0) {
         stbuf->st_mode = S_IFDIR | 0755;
         stbuf->st_nlink = 2;
@@ -188,6 +191,9 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
     filler(buf, "..", NULL, 0);
 
     inCoreiNode* inode = getFileINode(path, strlen(path));
+    if(inode == NULL) {
+        debug_print("inode not found for path: %s", path);
+    }
     directoryTable* dirTable = getDirectoryEntries(inode);
 
     int i;
