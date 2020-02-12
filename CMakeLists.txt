@@ -16,7 +16,8 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 
 add_executable(naofs ${SOURCES})
 
-target_compile_options(naofs PRIVATE -D_FILE_OFFSET_BITS=64)
+add_definitions(-rdynamic -g -ggdb)
+target_compile_options(naofs PRIVATE -D_FILE_OFFSET_BITS=64 -rdynamic -g -ggdb)
 
 target_include_directories(naofs PRIVATE ${FUSE_INCLUDE_DIR})
 target_link_libraries(naofs ${FUSE_LIBRARIES})
