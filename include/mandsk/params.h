@@ -8,8 +8,8 @@
 
 #define DISK_SIZE 1024ll
 
-#define BLOCK_ADDRESS_SIZE 4ll  // affects definition of indirect block in bmap.h
-#define INODE_ADDRESS_SIZE 4ll
+#define BLOCK_ADDRESS_SIZE 2ll  // affects definition of indirect block in bmap.h
+#define INODE_ADDRESS_SIZE 1ll
 #define FILENAME_SIZE 64ll
 
 #define BLOCK_SIZE 1024ll

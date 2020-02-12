@@ -27,7 +27,10 @@ size_t checkAndGetLen(const char *path, size_t bufLen) {
     return -1;
 }
 
-void operate(char *workingBuffer, inCoreiNode *workingINode) {
+void operate(char *workingBuffer, inCoreiNode *workingINode, size_t curFile) {
+	if (curFile == 0) {
+		return ;
+	}
     size_t iNodeNum = findINodeInDirectory(workingINode, workingBuffer);
     iput(workingINode);
 	if (iNodeNum == 0) {
@@ -43,12 +46,13 @@ void operate(char *workingBuffer, inCoreiNode *workingINode) {
  * tries to find the file in the directory.
  */
 size_t processNextLevel(const char *path, size_t counter, char *workingBuffer, inCoreiNode *workingINode) {
-    for (; ; counter++) {
+	size_t curFile = 0;
+    for (; ; counter++, curFile++) {
         if ((path[counter] == '/') || (path[counter] == '\0')) {
-            operate(workingBuffer, workingINode);
+            operate(workingBuffer, workingINode, curFile);
             break;
         }
-        workingBuffer[counter] = path[counter];
+        workingBuffer[curFile] = path[counter];
     }
     return counter;
 }
@@ -73,7 +77,7 @@ inCoreiNode* getFileINode(const char *path, size_t bufLen) {
 	inCoreiNode *workingINode = iget(0, 0);
 
 	size_t counter;
-	for (counter=0 ; ; counter++) {
+	for (counter=1 ; ; counter++) {
 	    debug_print("counter = %d ", counter);
 		memset(workingBuffer, 0, pathLen);
 		counter = processNextLevel(truncatedPath, counter, workingBuffer, workingINode);

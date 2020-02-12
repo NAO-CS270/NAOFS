@@ -6,7 +6,7 @@
 static const size_t iNodeSize = INODE_SIZE;			// TODO - Update
 
 void initializeINode(iNode *iNodePtr, size_t iNodeNum) {
-	memset(iNodePtr, 0, iNodeSize);
+	memset(iNodePtr, 0, sizeof(iNode));
 
 	if (iNodeNum >= NUM_OF_INODES) {
 		// throw appropriate error
@@ -29,7 +29,7 @@ void initializeINode(iNode *iNodePtr, size_t iNodeNum) {
 size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum) {
 	memset(blockPtr, 0, BLOCK_SIZE);
 
-	iNode * iNodePtr = (iNode *)malloc(iNodeSize);
+	iNode * iNodePtr = (iNode *)malloc(sizeof(iNode));
 	size_t iNodeCounter = iNodeNum;
 
 	unsigned char *ptrIntoBlock = (blockPtr->data);
@@ -48,7 +48,7 @@ size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum) {
 }
 
 size_t initINodeListBlock(disk_block * blockPtr, size_t *iNodeList, size_t listSize) {
-	memcpy(blockPtr, 0, BLOCK_SIZE);
+	memset(blockPtr, 0, BLOCK_SIZE);
 	size_t counter = 0;
 
 	unsigned char *ptrIntoBlock = (blockPtr->data);
