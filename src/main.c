@@ -204,7 +204,7 @@ static int access_callback(const char* path, int mode) {
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
 	memset(stbuf, 0, sizeof(struct stat));
-	
+
 	return attrPopulate(path, stbuf);
 }
 
