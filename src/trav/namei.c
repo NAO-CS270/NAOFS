@@ -57,9 +57,15 @@ size_t processNextLevel(const char *path, size_t counter, char *workingBuffer, i
  * along the path doesn't exist.
  */
 inCoreiNode* getFileINode(const char *path, size_t bufLen) {
-	size_t pathLen = checkAndGetLen(path, bufLen);
-	if (pathLen == -1)
+    char* truncatedPath = (char *)malloc((bufLen + 1)*sizeof(char));
+    memcpy(truncatedPath, path, bufLen);
+    truncatedPath[bufLen] = '\0';
+
+	size_t pathLen = checkAndGetLen(truncatedPath, bufLen);
+	if (pathLen == -1) {
+	    free(truncatedPath);
         return NULL;
+    }
     debug_print("pathLen = %d", pathLen);
     char *workingBuffer = (char *)malloc((pathLen)*sizeof(char));
 	memset(workingBuffer, 0, pathLen);
@@ -69,16 +75,17 @@ inCoreiNode* getFileINode(const char *path, size_t bufLen) {
 	size_t counter;
 	for (counter=0 ; ; counter++) {
 		memset(workingBuffer, 0, pathLen);
-		counter = processNextLevel(path, counter, workingBuffer, workingINode);
+		counter = processNextLevel(truncatedPath, counter, workingBuffer, workingINode);
 
 		if (workingINode == NULL) {
 			return NULL;
 		}
 
-		if (path[counter] == '\0') {
+		if (truncatedPath[counter] == '\0') {
 			break;
 		}
 	}
+	free(truncatedPath);
     return workingINode;
 }
 
