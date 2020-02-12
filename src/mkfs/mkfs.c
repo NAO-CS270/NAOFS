@@ -14,10 +14,23 @@
 
 static size_t numOfINodeBlocks = 0;
 
-size_t writeINodeListToDisk(size_t freeBlockNum, size_t *iNodeList, size_t iNodeListSize) {
+void assignRootData() {
+	size_t rootINodeNum = 0;
+	iNode *rootINode = (iNode *)malloc(sizeof(iNode));
+	getDiskInode(rootINodeNum, rootINode);
+	size_t blockNum = blockAlloc();
+	rootINode->dataBlockNums[0] = blockNum;
+	writeDiskInode(rootINodeNum, rootINode);
+	free(rootINode);
+}
+
+size_t writeINodeListToDisk(size_t freeBlockNum, size_t iNodeListSize) {
+	assignRootData();
+
 	size_t iNodeCounter = 0;
+	size_t *iNodeList = (size_t *)malloc(iNodeListSize * sizeof(size_t));
 	while (iNodeCounter < iNodeListSize) {
-		*(iNodeList + iNodeCounter) = iNodeCounter;
+		*(iNodeList + iNodeCounter) = iNodeCounter + 1;
 		iNodeCounter++;
 	}
 
@@ -26,6 +39,7 @@ size_t writeINodeListToDisk(size_t freeBlockNum, size_t *iNodeList, size_t iNode
 	writeDiskBlock(freeBlockNum, metaBlock);
 	free(metaBlock);
 
+	free(iNodeList);
 	return rememberedINode;
 }
 
@@ -64,9 +78,8 @@ size_t initializeINodeData(size_t freeBlockNum, size_t startPos) {
 
 	// Keeping this an array of `size_t`, but storing in disk must be done in units of `INODE_ADDRESS_SIZE`.
 	size_t iNodeListSize = getINodeListSize();
-	size_t *iNodeList = (size_t *)malloc(iNodeListSize * sizeof(size_t));
 
-	size_t iNodeToRemember = writeINodeListToDisk(freeBlockNum, iNodeList, iNodeListSize);
+	size_t iNodeToRemember = writeINodeListToDisk(freeBlockNum, iNodeListSize);
 	return iNodeToRemember;
 }
 
@@ -91,20 +104,13 @@ void initializeDiskBlocks(size_t freeBlockNum, size_t startPos) {
 	free(metaBlock);
 }
 
-void assignRootData() {
-	size_t rootINodeNum = getNewINode();
-	iNode *rootINode = (iNode *)malloc(sizeof(iNode));
-	getDiskInode(rootINodeNum, rootINode);
-	size_t blockNum = blockAlloc();
-	rootINode->dataBlockNums[0] = blockNum;
-	writeDiskInode(rootINodeNum, rootINode);
-	free(rootINode);
-}
-
 /* Only this method must be exposed to be called as MKFS API. */
 void makeFileSystem() {
+	initializeINodeParams();
+
 	size_t iNodeToRemember = initializeINodeData(INODE_LIST_BLOCK, INODE_BLOCKS_HEAD);
 	// `numOfINodeBlocks` is global static, and is expected to be set appropriately before this.
+	
 	initializeDiskBlocks(FREE_LIST_BLOCK, 4 + numOfINodeBlocks);
 
 	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
@@ -113,8 +119,6 @@ void makeFileSystem() {
 	(theSuperBlock->remembered_inode) = iNodeToRemember;
 	writeSuperBlock(theSuperBlock, superBlockData);
 	writeDiskBlock(SUPER_BLOCK, superBlockData);
-
-	assignRootData();
 
 	free(superBlockData);
 	free(theSuperBlock);

@@ -3,6 +3,8 @@
 #include "trav/namei.h"
 #include "utils/utils.h"
 #include "mkfs/mkfs.h"
+#include "incoreInodeOps/hashQ.h"
+#include "mkfs/iNodeManager.h"
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
     inCoreiNode* inode = getFileINode(path, strlen(path));
@@ -25,7 +27,8 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
     } else {
         stbuf -> st_mode = S_IFREG | 0777;
         stbuf -> st_nlink = 1;
-    }
+    } 
+	iput(inode);
     printf("returning from getAttr");
     return 0;
 }
@@ -237,9 +240,10 @@ int main(int argc, char *argv[]) {
     //TODO: create directory table for /
 	makeFileSystem();
     initFreeInCoreINodeList();
-
+	initHashQueues();
     // initialize the file table entries here
     initFileTableEntries();
+
     return fuse_main(argc, argv, &OPERATIONS, NULL);
 }
 

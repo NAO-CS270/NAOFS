@@ -1,6 +1,7 @@
 #include "inode/inCoreiNode.h"
 
 void insertDiskInodeData(iNode* disk_inode, inCoreiNode* in_core) {
+	pthread_mutex_init(&(in_core->iNodeMutex), NULL);
 	in_core->device_number = disk_inode->device_number;
 	in_core->inode_number = disk_inode->inode_number;
 	in_core->modified_time = disk_inode->modified_time;

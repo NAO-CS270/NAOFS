@@ -1,12 +1,21 @@
 #include "incoreInodeOps/hashQ.h"
 
-#define inodeHashSize INODE_HASH_SIZE
+#include <stdio.h>
 
-static Node* hashQ[inodeHashSize];
+static Node* hashQ[INODE_HASH_SIZE];
+
+void initHashQueues() {
+	size_t counter;
+
+	while (counter < INODE_HASH_SIZE) {
+		hashQ[counter] = NULL;
+		counter ++;
+	}
+}
 
 // returns the index of the inode in hashQ
 size_t getHash(size_t deviceNumber, size_t inodeNumber) {
-    return (deviceNumber + inodeNumber << 6 + inodeNumber << 16 - inodeNumber) % inodeHashSize;
+    return (deviceNumber + inodeNumber << 6 + inodeNumber << 16 - inodeNumber) % INODE_HASH_SIZE;
 }
 
 // insert into the hash table
@@ -28,10 +37,8 @@ void insertInHash(Node* node) {
 Node* hashLookup(size_t deviceNumber, size_t inodeNumber) {
     size_t hash_number = getHash(deviceNumber, inodeNumber);
     Node* head = hashQ[hash_number];
-    if(NULL == head) {
-        return NULL;
-    }
     while(head != NULL) {
+		//printf("Hash lookup %ld\n", head->inode->inode_number);
         if(head->inode->inode_number == inodeNumber) {
             return head;
         }
