@@ -197,6 +197,7 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
     inCoreiNode* inode = getFileINode(path, strlen(path));
     if(inode == NULL) {
         debug_print("inode not found for path: %s", path);
+        return 0;
     }
     directoryTable* dirTable = getDirectoryEntries(inode);
 
