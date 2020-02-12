@@ -37,9 +37,10 @@ void diskBlockFree(size_t diskBlockNumber, size_t* leftSize, int recursionLevel)
             diskBlockFree(blockToBeFreed->data[i], leftSize, recursionLevel - 1);
         free(blockToBeFreed);
     }
+    else
+        *leftSize -= BLOCK_SIZE;
 
     blockFree(diskBlockNumber);
-    *leftSize -= BLOCK_SIZE;
 }
 
 void inodeBlocksFree(inCoreiNode *inode) {

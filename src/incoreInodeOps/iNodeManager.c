@@ -2,6 +2,7 @@
 
 #include "dsk/blkfetch.h"
 #include "dsk/alloc.h"
+#include "dsk/params.h"
 #include "mkfs/metaBlocks.h"
 
 #include <stdlib.h>
