@@ -3,9 +3,9 @@
 #include <string.h>
 #include "mkfs/freeBlockList.h"
 
-static size_t blockSize = BLOCK_SIZE;
-static size_t blockAddressSize = BLOCK_ADDRESS_SIZE;
-static size_t numOfBlocks = NUM_OF_BLOCKS;
+#define blockSize BLOCK_SIZE
+#define blockAddressSize BLOCK_ADDRESS_SIZE
+#define numOfBlocks NUM_OF_BLOCKS
 
 disk_block* makeOneBlock(disk_block *blockPtr, size_t startNode) {
 	memset(blockPtr, 0, blockSize);
@@ -16,7 +16,7 @@ disk_block* makeOneBlock(disk_block *blockPtr, size_t startNode) {
 
 	size_t nodeCounter = startNode;
 
-	while (ptrIntoBlock < blockSize && nodeCounter < numOfBlocks) {
+	while (ptrIntoBlock < endOfBlock && nodeCounter < numOfBlocks) {
 		memcpy(ptrIntoBlock, &nodeCounter, blockAddressSize);
 		
 		ptrIntoBlock += blockAddressSize;

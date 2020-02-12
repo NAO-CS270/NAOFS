@@ -66,7 +66,7 @@ size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums) {
 }
 
 /* Modifies iNode with iNode number `iNodeNum` as the boolean `toSetType` and writes it to disk. */
-void markINodeFree(size_t iNodeNum, bool toSetType) {
+void markINodeFree(size_t iNodeNum, iNodeType nodeType) {
 	if (iNodeNum >= NUM_OF_INODES) {
 		// TODO - Throw an error
 		return ;
@@ -83,7 +83,7 @@ void markINodeFree(size_t iNodeNum, bool toSetType) {
 
 	while (iNodeIterator < iNodesInABlock) {
 		if ((theINode->inode_number) == iNodeNum) {
-			(theINode->type) = toSetType;
+			(theINode->type) = nodeType;
 			break;
 		}
 		theINode++;

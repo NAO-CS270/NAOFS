@@ -1,8 +1,12 @@
 #include "main.h"
 #include "trav/namei.h"
+#include "utils/utils.h"
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
+    debug_print("path: %s", path);
     memset(stbuf, 0, sizeof(struct stat));
+
+    stbuf->st_mode = 0777;
 
     if (strcmp(path, "/") == 0) {
         stbuf->st_mode = S_IFDIR | 0755;
@@ -16,7 +20,8 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
 //        //stbuf->st_size = strlen(filecontent);
 //        return 0;
 //    }
-    return -ENOENT;
+    //return -ENOENT;
+    return 0;
 }
 
 static int truncateFile(inCoreiNode* inode) {
@@ -80,7 +85,6 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     char* ptrIntoBuf = buf;
     int blockBytesRead = 0;
     int tempOffset = offset;
-    char* ptrIntoBuffer = buf;
     if(fi->fh < 0) {
         return -1;
     }
@@ -116,7 +120,6 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
     int bytesWritten = 0;
     bool fullBlockWrite = false;
     int tempOffset = offset;
-    char* ptrIntoBuffer = buf;
 
     struct fuse_context* fuse_context = fuse_get_context();
     inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
@@ -183,6 +186,30 @@ static int mkdir_callback(const char* path, mode_t mode) {
     iput(newInode);
 }
 
+static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
+//    filler(buf, ".", NULL, 0);
+//    filler(buf, "..", NULL, 0);
+
+    inCoreiNode* inode = getFileINode(path, strlen(path));
+    if(inode == NULL) {
+        debug_print("inode not found for path: %s", path);
+        return 0;
+    }
+    directoryTable* dirTable = getDirectoryEntries(inode);
+
+    int i;
+    nameINodePair *iNodeData;
+    for(i=0; i<ENTRIES_PER_BLOCK;i++) {
+        iNodeData = &(dirTable->entries[i]);
+        filler(buf, iNodeData->name, NULL, 0);
+    }
+    return 0;
+}
+
+static int access_callback(const char* path, int mode) {
+    return 0;
+}
+
 static struct fuse_operations OPERATIONS = {
         .getattr = getattr_callback,
         .read = read_callback,
@@ -190,11 +217,14 @@ static struct fuse_operations OPERATIONS = {
         .write = write_callback,
         .mkdir = mkdir_callback,
         .create = create_callback,
+        .readdir = readdir_callback,
+        .access = access_callback,
 //        .link = link_callback,
 //        .unlink = unlink_callback,
 };
 
 int main(int argc, char *argv[]) {
+    //TODO: create directory table for /
     initFreeInCoreINodeList();
 
     // initialize the file table entries here

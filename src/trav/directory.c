@@ -21,10 +21,10 @@ directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBloc
 	while (ptrIntoBlock != endOfBlock) {
 		fileData = &(theBlock->entries[counter]);
 		
-		memcpy(fileData->name, ptrIntoBlock, FILENAME_SIZE);
+		memcpy(&(fileData->name), ptrIntoBlock, FILENAME_SIZE);
 		ptrIntoBlock += FILENAME_SIZE;
 
-		memcpy(fileData->iNodeNum, ptrIntoBlock, INODE_ADDRESS_SIZE);
+		memcpy(&(fileData->iNodeNum), ptrIntoBlock, INODE_ADDRESS_SIZE);
 		ptrIntoBlock += INODE_ADDRESS_SIZE;
 
 		counter++;
@@ -162,4 +162,17 @@ void updateNewDirMetaData(inCoreiNode* inode, size_t newInodeNumber, size_t pare
 
     free(dirData);
     free(blkPtr);
+}
+
+directoryTable* getDirectoryEntries(inCoreiNode* inode) {
+    fetchInodeFromDisk(inode->inode_number, inode);
+
+    directoryTable *dirTable = (directoryTable*)malloc(sizeof(directoryTable));
+    disk_block *blkPtr = (disk_block*)malloc(sizeof(disk_block));
+
+    bmapResponse* bmapResp = bmap(inode, inode->size);
+    getDiskBlock(bmapResp->blockNumber, blkPtr);
+    dirTable = makeDirectoryTable(blkPtr, dirTable);
+
+    return dirTable;
 }

@@ -27,8 +27,8 @@ void _freeInto(int freeListBlockNumber, size_t blockNumber) {
     free(freeListBlock);
     free(diskBlock);
 }
-
-void diskBlockFree(disk_block* diskBlockNumber, size_t leftSize) {
+//TODO: Fix recursion, INCORRECT!
+void diskBlockFree(size_t diskBlockNumber, size_t leftSize) {
     disk_block* blockToBeFreed = (disk_block*)malloc(sizeof(disk_block));
     blockToBeFreed = getDiskBlock(diskBlockNumber, blockToBeFreed);
     int i;
