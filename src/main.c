@@ -25,6 +25,7 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
         stbuf -> st_mode = S_IFREG | 0777;
         stbuf -> st_nlink = 1;
     }
+    debug_print("returning from getAttr");
     return 0;
 }
 
