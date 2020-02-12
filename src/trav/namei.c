@@ -1,6 +1,7 @@
 #include "trav/directory.h"
 #include "incoreInodeOps/iget.h"
 #include "incoreInodeOps/iput.h"
+#include "utils/utils.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +13,7 @@
 size_t checkAndGetLen(const char *path, size_t bufLen) {
     size_t counter;
     for (counter = 0 ; counter<bufLen ; counter++) {
+        debug_print("curr_char: %c", path[counter]);
         if (isalnum(path[counter]) != 0) {
             continue;
         }
@@ -58,7 +60,8 @@ inCoreiNode* getFileINode(const char *path, size_t bufLen) {
 	size_t pathLen = checkAndGetLen(path, bufLen);
 	if (pathLen == -1)
         return NULL;
-	char *workingBuffer = (char *)malloc((pathLen)*sizeof(char));
+    debug_print("pathLen = %d", pathLen);
+    char *workingBuffer = (char *)malloc((pathLen)*sizeof(char));
 	memset(workingBuffer, 0, pathLen);
 
 	inCoreiNode *workingINode = iget(0, 0);
