@@ -3,7 +3,7 @@
 
 static disk_block mem_disk[DISK_SIZE];
 
-disk_block* fetchMemoryDiskBlock(int blockNumber, disk_block *blockData) {
+disk_block* fetchMemoryDiskBlock(size_t blockNumber, disk_block *blockData) {
 	if (blockNumber > DISK_SIZE) {
 		// Throw appropriate exception
 		*blockData = mem_disk[0];
@@ -15,7 +15,7 @@ disk_block* fetchMemoryDiskBlock(int blockNumber, disk_block *blockData) {
 	return blockData;
 }
 
-void writeMemoryDiskBlock(int blockNumber, disk_block* blockData) {
+void writeMemoryDiskBlock(size_t blockNumber, disk_block* blockData) {
 	if (blockNumber >= DISK_SIZE) {
 		// Throw appropriate exception
 	}
