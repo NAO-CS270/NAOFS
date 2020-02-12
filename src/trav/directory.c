@@ -165,8 +165,6 @@ void updateNewDirMetaData(inCoreiNode* inode, size_t newInodeNumber, size_t pare
 }
 
 directoryTable* getDirectoryEntries(inCoreiNode* inode) {
-    fetchInodeFromDisk(inode->inode_number, inode);
-
     directoryTable *dirTable = (directoryTable*)malloc(sizeof(directoryTable));
     disk_block *blkPtr = (disk_block*)malloc(sizeof(disk_block));
 

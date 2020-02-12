@@ -16,9 +16,11 @@ void insertInHash(Node* node) {
     Node* head = hashQ[index];
 
     // change the hash pointers
-    node->hash_prev = NULL;
     node->hash_next = head;
-    head->hash_prev = node;
+	if (head != NULL) {
+		head->hash_prev = node;
+	}
+    node->hash_prev = NULL;
     hashQ[index] = node;
 }
 
