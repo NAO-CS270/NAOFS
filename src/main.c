@@ -1,27 +1,30 @@
+#include <sys/stat.h>
 #include "main.h"
 #include "trav/namei.h"
 #include "utils/utils.h"
 #include "mkfs/mkfs.h"
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
-    debug_print("path: %s", path);
+    inCoreiNode* inode = getFileINode(path, strlen(path));
+    if (inode == NULL)
+        return -ENOENT;
+
     memset(stbuf, 0, sizeof(struct stat));
+    stbuf -> st_atime = inode -> access_time;
+    stbuf -> st_mtime = inode -> modified_time;
+    stbuf -> st_ctime = inode -> modified_time;
+    stbuf -> st_uid = (uid_t) inode -> owner_uid;
+    stbuf -> st_gid = (gid_t) inode -> group_uid;
+//    stbuf -> st_nlink = inode -> linksCount;  TODO
+    stbuf -> st_size = inode -> size;
 
-    stbuf->st_mode = 0777;
-
-    if (strcmp(path, "/") == 0) {
-        stbuf->st_mode = S_IFDIR | 0755;
-        stbuf->st_nlink = 2;
-        return 0;
+    if (inode -> type == T_DIRECTORY) {
+        stbuf -> st_mode = S_IFDIR | 0755;
+        stbuf -> st_nlink = 2;
+    } else {
+        stbuf -> st_mode = S_IFREG | 0777;
+        stbuf -> st_nlink = 1;
     }
-
-//    if (strcmp(path, filepath) == 0) {
-//        stbuf->st_mode = S_IFREG | 0777;
-//        stbuf->st_nlink = 1;
-//        //stbuf->st_size = strlen(filecontent);
-//        return 0;
-//    }
-    //return -ENOENT;
     return 0;
 }
 
