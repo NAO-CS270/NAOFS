@@ -1,27 +1,32 @@
+#include <sys/stat.h>
 #include "main.h"
 #include "trav/namei.h"
 #include "utils/utils.h"
 #include "mkfs/mkfs.h"
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
-    debug_print("path: %s", path);
+    inCoreiNode* inode = getFileINode(path, strlen(path));
+    debug_print("inode %p %d %d %d %d", inode, inode -> owner_uid, inode -> group_uid, inode -> size, inode -> type);
+    if (inode == NULL)
+        return -ENOENT;
+
     memset(stbuf, 0, sizeof(struct stat));
+    stbuf -> st_atime = inode -> access_time;
+    stbuf -> st_mtime = inode -> modified_time;
+    stbuf -> st_ctime = inode -> modified_time;
+    stbuf -> st_uid = (uid_t) inode -> owner_uid;
+    stbuf -> st_gid = (gid_t) inode -> group_uid;
+//    stbuf -> st_nlink = inode -> linksCount;  TODO
+    stbuf -> st_size = inode -> size;
 
-    stbuf->st_mode = 0777;
-
-    if (strcmp(path, "/") == 0) {
-        stbuf->st_mode = S_IFDIR | 0755;
-        stbuf->st_nlink = 2;
-        return 0;
+    if (inode -> type == T_DIRECTORY) {
+        stbuf -> st_mode = S_IFDIR | 0755;
+        stbuf -> st_nlink = 2;
+    } else {
+        stbuf -> st_mode = S_IFREG | 0777;
+        stbuf -> st_nlink = 1;
     }
-
-//    if (strcmp(path, filepath) == 0) {
-//        stbuf->st_mode = S_IFREG | 0777;
-//        stbuf->st_nlink = 1;
-//        //stbuf->st_size = strlen(filecontent);
-//        return 0;
-//    }
-    //return -ENOENT;
+    printf("returning from getAttr");
     return 0;
 }
 
@@ -89,6 +94,7 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     if(fi->fh < 0) {
         return -1;
     }
+    printf("reading %s ", path);
     struct fuse_context* fuse_context = fuse_get_context();
     // TODO: perform access permission checks
     inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
@@ -100,16 +106,18 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
         }
         // fetch the block from the disk and copy the data in the buffer
         disk_block* metaBlock = (disk_block*)malloc(sizeof(disk_block));
-        metaBlock = getDiskBlock(bmapResp->blockNumber, metaBlock);
-        memcpy(ptrIntoBuf, metaBlock->data, bmapResp->ioBytesInBlock);
-        ptrIntoBuf += bmapResp->ioBytesInBlock + 1;
+        metaBlock = getDiskBlock(bmapResp -> blockNumber, metaBlock);
+        size_t bytesToRead = min(bmapResp -> ioBytesInBlock, size - blockBytesRead);
+        memcpy(ptrIntoBuf, metaBlock -> data + bmapResp -> byteOffsetInBlock, bytesToRead);
+        ptrIntoBuf += bytesToRead;
 
-        blockBytesRead += bmapResp->ioBytesInBlock;
-        tempOffset = tempOffset + blockBytesRead + 1;
+        blockBytesRead += bytesToRead;
+        tempOffset = tempOffset + bytesToRead;
         free(metaBlock);
     }
     fetchInodeFromDisk(inode->inode_number, inode);
-    inode->size = size;
+    inode -> size = max(inode -> size, size);
+    time(&inode -> access_time);
     iput(inode);
     return blockBytesRead;
 }
