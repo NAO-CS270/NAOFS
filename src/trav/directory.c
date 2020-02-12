@@ -171,7 +171,7 @@ directoryTable* getDirectoryEntries(inCoreiNode* inode) {
     disk_block *blkPtr = (disk_block*)malloc(sizeof(disk_block));
 
     bmapResponse* bmapResp = bmap(inode, inode->size);
-    getDiskBlock(bmapResp->blockNumber, blkPtr);
+    blkPtr = getDiskBlock(bmapResp->blockNumber, blkPtr);
     dirTable = makeDirectoryTable(blkPtr, dirTable);
 
     return dirTable;
