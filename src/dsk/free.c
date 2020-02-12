@@ -32,10 +32,14 @@ void diskBlockFree(size_t diskBlockNumber, size_t* leftSize, int recursionLevel)
     if (recursionLevel) {
         disk_block *blockToBeFreed = (disk_block *) malloc(sizeof(disk_block));
         blockToBeFreed = getDiskBlock(diskBlockNumber, blockToBeFreed);
+        freeDiskListBlock* diskBlocks = (freeDiskListBlock*)malloc(sizeof(freeDiskListBlock));
+        diskBlocks = makeFreeDiskListBlock (blockToBeFreed, diskBlocks);
+
         int i;
-        for (i = 0; i < BLOCK_SIZE && *leftSize > 0; ++i)
-            diskBlockFree(blockToBeFreed->data[i], leftSize, recursionLevel - 1);
+        for (i = 0; i < BLOCK_ADDRESSES_PER_BLOCK && *leftSize > 0; ++i)
+            diskBlockFree(diskBlocks -> blkNos[i], leftSize, recursionLevel - 1);
         free(blockToBeFreed);
+        free(diskBlocks);
     }
     else
         *leftSize -= BLOCK_SIZE;
