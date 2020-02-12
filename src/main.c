@@ -6,7 +6,7 @@
 
 static int getattr_callback(const char *path, struct stat *stbuf) {
     inCoreiNode* inode = getFileINode(path, strlen(path));
-    debug_print("inode %p ", inode);
+    debug_print("inode %p %d %d %d %d", inode, inode -> owner_uid, inode -> group_uid, inode -> size, inode -> type);
     if (inode == NULL)
         return -ENOENT;
 
