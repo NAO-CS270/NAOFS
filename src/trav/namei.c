@@ -61,7 +61,7 @@ inCoreiNode* getFileINode(const char *path, size_t bufLen) {
     memcpy(truncatedPath, path, bufLen);
     truncatedPath[bufLen] = '\0';
 
-	size_t pathLen = checkAndGetLen(truncatedPath, bufLen);
+	size_t pathLen = checkAndGetLen(truncatedPath, bufLen + 1);
 	if (pathLen == -1) {
 	    free(truncatedPath);
         return NULL;
