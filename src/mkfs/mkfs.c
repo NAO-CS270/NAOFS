@@ -88,6 +88,16 @@ void initializeDiskBlocks(size_t freeBlockNum, size_t startPos) {
 	free(metaBlock);
 }
 
+void assignRootData() {
+    size_t rootINodeNum = getNewINode();
+    iNode *rootINode = (iNode *)malloc(sizeof(iNode));
+    getDiskInode(rootINodeNum, rootINode);
+    size_t blockNum = blockAlloc();
+    rootINode->dataBlockNums[0] = blockNum;
+    writeDiskInode(rootINodeNum, rootINode);
+    free(rootINode);
+}
+
 /* Only this method must be exposed to be called as MKFS API. */
 void makeFileSystem() {
 	size_t iNodeToRemember = initializeINodeData(INODE_LIST_BLOCK, INODE_BLOCKS_HEAD);
@@ -106,15 +116,5 @@ void makeFileSystem() {
 
 	free(superBlockData);
 	free(theSuperBlock);
-}
-
-void assignRootData() {
-	size_t rootINodeNum = getNewINode();
-	iNode *rootINode = (iNode *)malloc(sizeof(iNode));
-	getDiskInode(rootINodeNum, rootINode);
-	size_t blockNum = blockAlloc();
-	rootINode->dataBlockNums[0] = blockNum;
-	writeDiskInode(rootINodeNum, rootINode);
-	free(rootINode);
 }
 
