@@ -129,7 +129,6 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
         return -1;
     }
     int bytesWritten = 0;
-    bool fullBlockWrite = false;
     int tempOffset = offset;
 
     struct fuse_context* fuse_context = fuse_get_context();
@@ -138,35 +137,27 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
     bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
     while(bytesWritten < size) {
 		bmap(inode, tempOffset, bmapResp);
-        if(bmapResp == NULL) {
-            // TODO: Call alloc here
-            fullBlockWrite = true;
-        } else {
-            if (bmapResp->byteOffsetInBlock == 0 && bmapResp->bytesLeftInBlock == BLOCK_SIZE) {
-                // no need to read the block from the disk. This is cause the entire block has to
-                // be overwritten anyway.
-                fullBlockWrite = true;
-            }
-        }
+        if(bmapResp == NULL)
+            return -1;
+
+        // TODO: optimize with full block write
         disk_block *metaBlock = (disk_block *) malloc(sizeof(disk_block));
-        if(fullBlockWrite) {
-            memcpy(metaBlock->data, buf, bmapResp->bytesLeftInBlock);
-            writeMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
-        } else {
-            metaBlock = getDiskBlock(bmapResp->blockNumber, metaBlock);
-            unsigned char* ptrIntoBlock = metaBlock->data;
-            ptrIntoBlock += bmapResp->bytesLeftInBlock;
-            memcpy(ptrIntoBlock, buf, bmapResp->bytesLeftInBlock);
-            writeMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
-        }
+        metaBlock = getDiskBlock(bmapResp -> blockNumber, metaBlock);
+        unsigned char* ptrIntoBlock = metaBlock -> data + bmapResp -> byteOffsetInBlock;
+
+        size_t bytesToWrite = min(bmapResp -> bytesLeftInBlock, size - bytesWritten);
+        memcpy(ptrIntoBlock, buf, bytesToWrite);
+        writeMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
         free(metaBlock);
-        bytesWritten += bytesWritten + bmapResp->bytesLeftInBlock;
-        tempOffset = tempOffset + bmapResp->bytesLeftInBlock + 1;
+        bytesWritten += bytesToWrite;
+        tempOffset += bytesToWrite;
     }
-    fetchInodeFromDisk(inode->inode_number, inode);
-    inode->size = bytesWritten;
-    iput(inode);
 	free(bmapResp);
+    fetchInodeFromDisk(inode->inode_number, inode);
+    inode -> size = max(inode -> size, offset + bytesWritten);
+    time(inode -> access_time);
+    time(inode -> modified_time);
+    iput(inode);
     return bytesWritten;
 }
 
