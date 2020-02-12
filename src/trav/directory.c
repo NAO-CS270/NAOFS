@@ -64,8 +64,8 @@ size_t searchDirectory(directoryTable *dataPtr, char *entryName) {
 	return iNodeData.iNodeNum;
 }
 
-/* Fetches the disk blocks corresponding to the file `iNodePtr` and finds the
- * iNode of `entryName`. Returns `0` if not found.
+/* Considering passed `iNodePtr` as corresponding to a directory, fetches its disk blocks
+ * and finds the iNode of `entryName` in the directory. Returns `0` if not found.
  */
 size_t findINodeInDirectory(inCoreiNode *iNodePtr, char *entryName) {
 	validateSearch(iNodePtr);
