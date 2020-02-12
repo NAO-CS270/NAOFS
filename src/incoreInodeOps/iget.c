@@ -1,5 +1,8 @@
 #include "incoreInodeOps/iget.h"
 #include "time.h"
+#include "utils/utils.h"
+
+#include <stdio.h>
 
 void fetchInodeFromDisk(size_t iNodeNumber, inCoreiNode* inode) {
     iNode* disk_inode = (iNode*)malloc(sizeof(iNode));
@@ -27,6 +30,7 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
     }
     else {
         if (checkFreeListEmpty()) {
+			printf("iGet returning NULL as Free List is empty\n");
             // TODO: Error handling
             return NULL;
         }
@@ -45,6 +49,7 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
         fetchediNode = node -> inode;
     }
     fetchediNode -> inode_changed = true;
+	printf("Returning iNode number %d\n", fetchediNode->inode_number);
 
     return fetchediNode;
 }
