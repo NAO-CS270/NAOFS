@@ -12,7 +12,7 @@
  */
 size_t checkAndGetLen(const char *path, size_t bufLen, char *pathBuf) {
     size_t counter;
-    for (counter = 0 ; counter<bufLen ; counter++) {
+    for (counter = 0 ; counter < bufLen ; counter++) {
 		pathBuf[counter] = path[counter];
         if (isalnum(path[counter]) != 0) {
             continue;
@@ -24,23 +24,18 @@ size_t checkAndGetLen(const char *path, size_t bufLen, char *pathBuf) {
 			break;
         }
     }
-	if (pathBuf[counter - 1] == '/') {
-		pathBuf[counter - 1] = '\0';
-		return counter - 1;
-	}
-	else {
-		pathBuf[counter] = '\0';
-		return counter;
-	}
+	pathBuf[counter] = '\0';
+	return counter;
 }
 
 void operate(const char *path, size_t startAt, size_t endAt, inCoreiNode *workingINode) {
 	if (startAt == endAt) {
 		return ;
 	}
-	size_t bufLen = endAt - startAt + 1;
+	size_t bufLen = endAt - startAt;
 	char *workingBuffer = (char *)malloc(sizeof(char) * (bufLen + 1));
 	memcpy(workingBuffer, path+startAt, bufLen);
+	workingBuffer[bufLen] = '\0';
 
     size_t iNodeNum = findINodeInDirectory(workingINode, workingBuffer);
 	free(workingBuffer);
@@ -62,11 +57,11 @@ size_t processNextLevel(const char *path, size_t startAt, inCoreiNode *workingIN
 	size_t endAt = startAt;
     while(1) {
         if ((path[endAt] == '/') || (path[endAt] == '\0')) {
-            operate(path, startAt, endAt, workingINode);
             break;
         }
 		endAt++;
     }
+    operate(path, startAt, endAt, workingINode);
 	if (path[endAt] == '\0') {
 		return endAt - 1;
 	}
@@ -85,7 +80,7 @@ inCoreiNode* getFileINode(const char *path, size_t bufLen) {
 	debug_print("%ld\n", workingINode->inode_number);
 
 	size_t counter;
-	for (counter=0 ; ; counter++) {
+	for (counter=1 ; ; counter++) {
 		if (path[counter] == '\0') {
 			break;
 		}
