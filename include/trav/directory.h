@@ -20,8 +20,8 @@ typedef struct directoryTable directoryTable;
 extern directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBlock);
 extern size_t findINodeInDirectory(inCoreiNode *iNodePtr, char *entryName);
 
-extern void getAndUpdateDirectoryTable(inCoreiNode* inode, size_t newInodeNumber, char* filename);
-void updateNewDirMetaData(inCoreiNode* inode, size_t newInodeNumber, size_t parentInodeNumber);
+extern int getAndUpdateDirectoryTable(inCoreiNode* inode, size_t newInodeNumber, char* filename);
+extern int updateNewDirMetaData(inCoreiNode* inode, size_t parentInodeNumber);
 
 extern directoryTable* getDirectoryEntries(inCoreiNode* inode);
 

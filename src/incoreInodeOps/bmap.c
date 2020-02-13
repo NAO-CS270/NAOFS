@@ -47,6 +47,7 @@ int bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response, bmapMode mod
 	}
 	if (offset == fileSize && (offset%BLOCK_SIZE) == 0 && mode == APPEND_MODE) {
 		size_t newBlock = blockAlloc();
+		printf("Allocated new block in bmap - %ld\n", newBlock);
 		insertDataBlockInINode(iNode, newBlock);
 		createBMapResponse(newBlock, 0, response);
 		return 0;
@@ -57,7 +58,7 @@ int bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response, bmapMode mod
 
 	size_t dataBlockNum;
 	if (indirectionOffsets->offsetIndirection == DIRECT) {
-		dataBlockNum = indirectionOffsets->offsets[0];
+		dataBlockNum = iNode->dataBlockNums[indirectionOffsets->offsets[0]];
 	}
 	else {
 		size_t iNodeBlockIndex = DIRECT_BLOCK_LIMIT + indirectionOffsets->offsetIndirection;

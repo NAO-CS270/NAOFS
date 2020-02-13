@@ -31,3 +31,5 @@ extern void insertDataBlockInINode (inCoreiNode* inode, size_t blockNumToAdd);
  *	offset: offset of the file
  */
 extern void calculateOffset(size_t offset, blkTreeOffset* blkOffset);
+
+extern void updateINodeMetadata(inCoreiNode *iNode, int sizeDifference);

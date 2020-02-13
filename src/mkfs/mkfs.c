@@ -12,8 +12,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static size_t numOfINodeBlocks = 0;
-
 void assignRootData() {
 	size_t rootINodeNum = 0;
 	iNode *rootINode = (iNode *)malloc(sizeof(iNode));
@@ -58,9 +56,8 @@ void createINodes(size_t startPos) {
 
 	size_t iNodeCounter = 0;
 
-	numOfINodeBlocks = (NUM_OF_INODES * INODE_SIZE) / BLOCK_SIZE;
 	size_t blockCounter = startPos;
-	size_t endOfINodeBlocks = blockCounter + numOfINodeBlocks;
+	size_t endOfINodeBlocks = blockCounter + NUM_OF_INODE_BLOCKS;
 
 	while (blockCounter < endOfINodeBlocks) {
 		iNodeCounter = populateINodesIn(metaBlock, iNodeCounter);
@@ -90,17 +87,20 @@ size_t initializeINodeData(size_t freeBlockNum, size_t startPos) {
  * TODO - Consider zero-ing all the blocks
  */
 void initializeDiskBlocks(size_t freeBlockNum, size_t startPos) {
-	size_t blockMemSize = sizeof(disk_block);
 	size_t freeBlocksPerBlock = BLOCK_SIZE / BLOCK_ADDRESS_SIZE;
 
-	disk_block *metaBlock = (disk_block *)malloc(blockMemSize);
+	disk_block *metaBlock = (disk_block *)malloc(sizeof(disk_block));
 	size_t pointerBlockNumber = freeBlockNum;
-
+	size_t nextFreeListNumber;
 	while (pointerBlockNumber < NUM_OF_BLOCKS) {
-		metaBlock = makeOneBlock(metaBlock, pointerBlockNumber);
+		nextFreeListNumber = makeOneBlock(metaBlock, startPos);
 		
 		writeDiskBlock(pointerBlockNumber, metaBlock);
-		pointerBlockNumber += freeBlocksPerBlock;
+		if (nextFreeListNumber == 0) {
+			break;
+		}
+		pointerBlockNumber = nextFreeListNumber;
+		startPos += freeBlocksPerBlock;
 	}
 	free(metaBlock);
 }
@@ -110,9 +110,8 @@ void makeFileSystem() {
 	initializeINodeParams();
 
 	size_t iNodeToRemember = initializeINodeData(INODE_LIST_BLOCK, INODE_BLOCKS_HEAD);
-	// `numOfINodeBlocks` is global static, and is expected to be set appropriately before this.
 	
-	initializeDiskBlocks(FREE_LIST_BLOCK, 4 + numOfINodeBlocks);
+	initializeDiskBlocks(FREE_LIST_BLOCK, 4 + NUM_OF_INODE_BLOCKS);
 
 	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));

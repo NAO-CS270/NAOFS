@@ -5,6 +5,7 @@
 #include "mandsk/params.h"
 #include "mkfs/metaBlocks.h"
 
+#include <time.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -122,6 +123,8 @@ void updateIndex(inCoreiNode* iNode, size_t blockNumToAdd, blkTreeOffset *blkOff
 	size_t *dataBlockIndex = iNode->dataBlockNums + DIRECT_BLOCK_LIMIT + 1 + indirection;
 
 	allocateAllNeededBlocks(dataBlockIndex, blockNumToAdd, offsets + indirection, indirection);
+
+	updateINodeMetadata(iNode, 0);
 }
 
 /**
@@ -132,6 +135,7 @@ void updateIndex(inCoreiNode* iNode, size_t blockNumToAdd, blkTreeOffset *blkOff
  *	blockNumToAdd: block to address to add
  */
 void insertDataBlockInINode(inCoreiNode* iNode, size_t blockNumToAdd) {
+	printf("Adding block %ld in iNode %ld", blockNumToAdd, iNode->inode_number);
 	size_t size = iNode->size;
 	if (size % BLOCK_SIZE != 0) {
 		// TODO: handle error
@@ -143,5 +147,14 @@ void insertDataBlockInINode(inCoreiNode* iNode, size_t blockNumToAdd) {
 
 	updateIndex(iNode, blockNumToAdd, blkOffset);
 	free(blkOffset);
+}
+
+void updateINodeMetadata(inCoreiNode *iNode, int sizeDifference) {
+	iNode->size += sizeDifference;
+
+	iNode->modified_time = time(NULL);
+
+	iNode->file_data_changed = true;
+	iNode->inode_changed = true;
 }
 

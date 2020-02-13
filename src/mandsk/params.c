@@ -3,6 +3,7 @@
 
 size_t INODE_SIZE;
 size_t INODES_PER_BLOCK;
+size_t NUM_OF_INODE_BLOCKS;
 
 void initializeINodeParams() {
     size_t iNodeStructSize = sizeof(iNode);
@@ -16,5 +17,6 @@ void initializeINodeParams() {
 
     INODE_SIZE = iNodeSize;
     INODES_PER_BLOCK = BLOCK_SIZE/INODE_SIZE;
+	NUM_OF_INODE_BLOCKS = INODE_SIZE * NUM_OF_INODES / BLOCK_SIZE;
 }
 

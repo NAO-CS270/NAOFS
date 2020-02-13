@@ -14,32 +14,52 @@ void initHashQueues() {
 }
 
 // returns the index of the inode in hashQ
-size_t getHash(size_t deviceNumber, size_t inodeNumber) {
-    return (deviceNumber + inodeNumber << 6 + inodeNumber << 16 - inodeNumber) % INODE_HASH_SIZE;
+size_t getHash(size_t iNodeNumber, size_t deviceNumber) {
+    return (deviceNumber + iNodeNumber << 6 + iNodeNumber << 16 - iNodeNumber) % INODE_HASH_SIZE;
 }
 
-// insert into the hash table
-void insertInHash(Node* node) {
-    inCoreiNode* inode = node->inode;
-    size_t index = getHash(inode->device_number, inode->inode_number);
-    Node* head = hashQ[index];
+void removeFromHashQ(Node *node) {
+	size_t hashIndex = getHash(node->inode->inode_number, node->inode->device_number);
+	
+	if (hashQ[hashIndex] == node) {
+		hashQ[hashIndex] = node->hash_next;
+	}
+	if (node->hash_next != NULL) {
+		node->hash_next->hash_prev = node->hash_prev;
+	}
+	if (node->hash_prev != NULL) {
+		node->hash_prev->hash_next = node->hash_next;
+	}
 
-    // change the hash pointers
+	node->hash_next = NULL;
+	node->hash_prev = NULL;
+}
+
+void insertInHash(Node *node, size_t iNodeNumber, size_t deviceNumber) {
+    size_t hashIndex = getHash(iNodeNumber, deviceNumber);
+    Node* head = hashQ[hashIndex];
+
     node->hash_next = head;
 	if (head != NULL) {
 		head->hash_prev = node;
 	}
     node->hash_prev = NULL;
-    hashQ[index] = node;
+    hashQ[hashIndex] = node;
+}
+
+void updateInHashQ(Node *node, size_t iNodeNumber, size_t deviceNumber) {
+	removeFromHashQ(node);
+
+	insertInHash(node, iNodeNumber, deviceNumber);
 }
 
 // returns the inode cached in the hash queue, NULL if not found
-Node* hashLookup(size_t deviceNumber, size_t inodeNumber) {
-    size_t hash_number = getHash(deviceNumber, inodeNumber);
+Node* hashLookup(size_t iNodeNumber, size_t deviceNumber) {
+    size_t hash_number = getHash(iNodeNumber, deviceNumber);
+	printf("iNode number %ld is mapped to queueu number %ld\n", iNodeNumber, hash_number);
     Node* head = hashQ[hash_number];
     while(head != NULL) {
-		//printf("Hash lookup %ld\n", head->inode->inode_number);
-        if(head->inode->inode_number == inodeNumber) {
+        if(head->inode->inode_number == iNodeNumber) {
             return head;
         }
         head = head->hash_next;

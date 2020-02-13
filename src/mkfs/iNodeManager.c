@@ -1,10 +1,10 @@
 #include "mkfs/iNodeManager.h"
 #include "inode/iNode.h"
+#include "mandsk/params.h"
 
 #include <stdio.h>
 #include <string.h>
 
-#define iNodesInABlock BLOCK_SIZE/INODE_SIZE
 #define iNodeNumsInABlock (BLOCK_SIZE/INODE_ADDRESS_SIZE)
 #define endOfINodeBlocks (INODE_BLOCKS_HEAD + ((INODE_SIZE * NUM_OF_INODES) / BLOCK_SIZE))
 
@@ -26,7 +26,7 @@ size_t getFromBlock(iNodesBlock *blockOfINodes, size_t *nextAddrAt) {
 	size_t collectedCount = 0;
 	size_t iNodeIterator = 0;
 
-	while (iNodeIterator < iNodesInABlock) {
+	while (iNodeIterator < INODES_PER_BLOCK) {
 		if (theINode->type == T_FREE) {
 			*nextAddrAt = theINode->inode_number;
 			nextAddrAt++;
@@ -52,7 +52,7 @@ size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums) {
 	iNodesBlock *iNodesList = (iNodesBlock *)malloc(sizeof(iNodesBlock));
 	iNodesList->iNodesList = listOfINodes;
 
-	size_t blockCounter = (startINodeNum/iNodesInABlock) + INODE_BLOCKS_HEAD;
+	size_t blockCounter = (startINodeNum/INODES_PER_BLOCK) + INODE_BLOCKS_HEAD;
 	size_t freeINodeCounter = 0;
 
 	while (freeINodeCounter < iNodeNumsInABlock) {
@@ -78,7 +78,7 @@ void markINodeFree(size_t iNodeNum, iNodeType nodeType) {
 		// TODO - Throw an error
 		return ;
 	}
-	size_t blockNum = (iNodeNum/iNodesInABlock) + INODE_BLOCKS_HEAD;
+	size_t blockNum = (iNodeNum/INODES_PER_BLOCK) + INODE_BLOCKS_HEAD;
 
 	disk_block *iNodesData = (disk_block*)malloc(sizeof(disk_block));
 	iNodesData = getDiskBlock(blockNum, iNodesData);
@@ -92,7 +92,7 @@ void markINodeFree(size_t iNodeNum, iNodeType nodeType) {
 	iNode *theINode = blockOfINodes->iNodesList;
 	size_t iNodeIterator = 0;
 
-	while (iNodeIterator < iNodesInABlock) {
+	while (iNodeIterator < INODES_PER_BLOCK) {
 		if ((theINode->inode_number) == iNodeNum) {
 			(theINode->type) = nodeType;
 			break;
@@ -107,21 +107,18 @@ void markINodeFree(size_t iNodeNum, iNodeType nodeType) {
 	free(blockOfINodes);
 }
 
-void getDiskInode(size_t iNodeNum, iNode* inode) {
+int getDiskInode(size_t iNodeNum, iNode* inode) {
 	if (iNodeNum >= NUM_OF_INODES) {
-		// TODO - Throw an error
-		free(inode);
-		inode = NULL;
-		return ;
+		return -1;
 	}
 
-	size_t blockNum = (iNodeNum/iNodesInABlock) + INODE_BLOCKS_HEAD;
+	size_t blockNum = (iNodeNum/INODES_PER_BLOCK) + INODE_BLOCKS_HEAD;
 	disk_block* metaBlock = (disk_block*)malloc(BLOCK_SIZE);
 	getDiskBlock(blockNum, metaBlock);
 
 	unsigned char *ptrIntoBlock = metaBlock->data;
 
-	size_t index = iNodeNum % iNodesInABlock;
+	size_t index = iNodeNum % INODES_PER_BLOCK;
 	memcpy(inode, ptrIntoBlock + (index * INODE_SIZE), sizeof(iNode));
 
 	free(metaBlock);
@@ -134,7 +131,7 @@ void writeDiskInode(size_t iNodeNum, iNode* inode) {
 		return ;
 	}
 
-	size_t blockNum = (iNodeNum/iNodesInABlock) + INODE_BLOCKS_HEAD;
+	size_t blockNum = (iNodeNum/INODES_PER_BLOCK) + INODE_BLOCKS_HEAD;
 	disk_block* metaBlock = (disk_block*)malloc(BLOCK_SIZE);
 	metaBlock = getDiskBlock(blockNum, metaBlock);
 
@@ -145,7 +142,7 @@ void writeDiskInode(size_t iNodeNum, iNode* inode) {
 	iNodeBlk = makeINodesBlock(metaBlock, iNodeBlk);
 
 	iNode* iNodesList = iNodeBlk->iNodesList;
-	size_t index = iNodeNum % iNodesInABlock;
+	size_t index = iNodeNum % INODES_PER_BLOCK;
 
 	// the doubtful part, this or memcpy
 	(iNodesList[index]) = *inode;

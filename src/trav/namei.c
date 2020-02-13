@@ -30,7 +30,7 @@ size_t checkAndGetLen(const char *path, size_t bufLen, char *pathBuf) {
 
 int operate(const char *path, size_t startAt, size_t endAt, inCoreiNode *workingINode) {
 	if (startAt == endAt) {
-		return ;
+		return -1;
 	}
 	size_t bufLen = endAt - startAt;
 	char *workingBuffer = (char *)malloc(sizeof(char) * (bufLen + 1));
