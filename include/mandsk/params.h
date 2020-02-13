@@ -33,5 +33,7 @@
 extern size_t INODE_SIZE;
 extern size_t INODES_PER_BLOCK;
 
+extern void initializeINodeParams();
+
 #endif
 

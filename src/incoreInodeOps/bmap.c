@@ -36,19 +36,20 @@ void createBMapResponse(size_t blockNum, size_t offset, bmapResponse *response) 
 	response->bytesLeftInBlock = BLOCK_SIZE - offset;
 }
 
-void bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response) {
+int bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response, bmapMode mode) {
 	size_t fileSize = iNode->size;
 	printf("Inside bmap, filesize - %ld, offset - %ld\n", fileSize, offset);
-	if (offset > fileSize) {
-		free(response);
-		response = NULL;
-		return ;
+	if (offset >= fileSize) {
+	    if (mode == READ_MODE || offset > fileSize) {
+	        printf("bmap: illegal Offset access\n");
+            return -1;
+        }
 	}
-	if (offset == fileSize && (offset%BLOCK_SIZE) == 0) {
+	if (offset == fileSize && (offset%BLOCK_SIZE) == 0 && mode == APPEND_MODE) {
 		size_t newBlock = blockAlloc();
 		insertDataBlockInINode(iNode, newBlock);
 		createBMapResponse(newBlock, 0, response);
-		return ;
+		return 0;
 	}
 	
 	blkTreeOffset *indirectionOffsets = (blkTreeOffset *)malloc(sizeof(blkTreeOffset));
@@ -64,4 +65,6 @@ void bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response) {
 	}
 
 	createBMapResponse(dataBlockNum, offset%BLOCK_SIZE, response);
+
+	return 0;
 }

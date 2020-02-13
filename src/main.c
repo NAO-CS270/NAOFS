@@ -78,7 +78,7 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
     inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
     bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
     while(blockBytesRead < size) {
-        bmap(inode, tempOffset, bmapResp);
+        bmap(inode, tempOffset, bmapResp, READ_MODE);
         // trying to read end of the file
         if(bmapResp->bytesLeftInBlock == 0) {
             break;
@@ -114,9 +114,10 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
 
     bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
     while(bytesWritten < size) {
-		bmap(inode, tempOffset, bmapResp);
-        if(bmapResp == NULL)
+		size_t retValue = bmap(inode, tempOffset, bmapResp, APPEND_MODE);
+        if(retValue == -1) {
             return -1;
+		}
 
         // TODO: optimize with full block write
         disk_block *metaBlock = (disk_block *) malloc(sizeof(disk_block));
@@ -161,6 +162,7 @@ static int mkdir_callback(const char* path, mode_t mode) {
 	}
 
 	iNodeNum = getNewINode();
+	printf("mkdir callback, inode_number: %ld, parent inode_number: %ld\n", iNodeNum, parentINode->inode_number);
     getAndUpdateDirectoryTable(parentINode, iNodeNum, filename);
 
     // TODO: use the right device number, using 0 for now

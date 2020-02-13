@@ -23,7 +23,14 @@ typedef struct bmapResponse bmapResponse;
  *	offset: logical offset of byte wrt file
  *	returns bmapResponse: converts logical file offset to filesys offset
  */
-extern void bmap(inCoreiNode* inode, size_t offset, bmapResponse *reponse);
+
+enum bmapMode {
+    READ_MODE = 0,
+    APPEND_MODE = 1,
+};
+typedef enum bmapMode bmapMode;
+
+extern int bmap(inCoreiNode* inode, size_t offset, bmapResponse *reponse, bmapMode mode);
 
 #endif //BMAP_H
 
