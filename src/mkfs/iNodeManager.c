@@ -2,6 +2,7 @@
 #include "inode/iNode.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #define iNodesInABlock BLOCK_SIZE/INODE_SIZE
 #define iNodeNumsInABlock (BLOCK_SIZE/INODE_ADDRESS_SIZE)
