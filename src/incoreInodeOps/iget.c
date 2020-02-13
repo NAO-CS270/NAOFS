@@ -7,6 +7,7 @@
 void fetchInodeFromDisk(size_t iNodeNumber, inCoreiNode* inode) {
     iNode* disk_inode = (iNode*)malloc(sizeof(iNode));
     getDiskInode(iNodeNumber, disk_inode);
+
     insertDiskInodeData(disk_inode, inode);
     free(disk_inode);
 }
@@ -18,22 +19,29 @@ inCoreiNode *updateAndGetINode(Node *coreNode) {
 	pthread_mutex_lock(&(iNodeToReturn->iNodeMutex));
 	printf("Acquired lock for iNode %ld\n", iNodeToReturn->inode_number);
 
-	if (iNodeToReturn->reference_count == 0) {
-		freeListRemove(coreNode);
-	}
 	(iNodeToReturn->reference_count)++;
-	iNodeToReturn->inode_changed = true;
 	return iNodeToReturn;
 }
 
 inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
-    Node* node = hashLookup(deviceNumber, iNodeNumber);
+	printf("iGet iNode %ld\n", iNodeNumber);
+    Node* node = hashLookup(iNodeNumber, deviceNumber);
 
-    if(NULL == node) {
-		node = getFreeINodeFromList();
+    if(node == NULL) {
+		printf("iNode not in HashQ\n");
+		
+		node = popFreeList();
+		if (node == NULL) {
+			return NULL;
+		}
+		updateInHashQ(node, iNodeNumber, deviceNumber);
 		fetchInodeFromDisk(iNodeNumber, node->inode);
-		insertInHash(node);
     }
+	else {
+		if (node->inode->reference_count == 0) {
+			freeListRemove(node);
+		}
+	}
 
 	return updateAndGetINode(node);
 }

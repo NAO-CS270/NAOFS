@@ -1,30 +1,25 @@
+#include "mkfs/freeBlockList.h"
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mkfs/freeBlockList.h"
 
-#define blockSize BLOCK_SIZE
-#define blockAddressSize BLOCK_ADDRESS_SIZE
-#define numOfBlocks NUM_OF_BLOCKS
-
-disk_block* makeOneBlock(disk_block *blockPtr, size_t startNode) {
-	memset(blockPtr, 0, blockSize);
+size_t makeOneBlock(disk_block *blockPtr, size_t startNode) {
+	memset(blockPtr, 0, BLOCK_SIZE);
 
 	unsigned char *ptrIntoBlock = blockPtr->data;
-	unsigned char *endOfBlock = ptrIntoBlock + blockSize;
-	ptrIntoBlock += blockAddressSize;
+	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
 
 	size_t nodeCounter = startNode;
 
-	while (ptrIntoBlock < endOfBlock && nodeCounter < numOfBlocks) {
-		memcpy(ptrIntoBlock, &nodeCounter, blockAddressSize);
-		
-		ptrIntoBlock += blockAddressSize;
+	while (ptrIntoBlock < endOfBlock && nodeCounter < NUM_OF_BLOCKS) {
+		memcpy(ptrIntoBlock, &nodeCounter, BLOCK_ADDRESS_SIZE);
 		nodeCounter++;
+		ptrIntoBlock += BLOCK_ADDRESS_SIZE;
 	}
-	if (nodeCounter < numOfBlocks) {
-		memcpy(endOfBlock - BLOCK_SIZE, &nodeCounter, blockAddressSize);
+	if (ptrIntoBlock == endOfBlock) {
+		return nodeCounter-1;
 	}
-
-	return blockPtr;
+	return 0;
 }
+

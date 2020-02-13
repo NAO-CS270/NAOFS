@@ -14,7 +14,7 @@
 
 extern size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums);
 extern void markINodeFree(size_t iNodeNum, iNodeType nodeType);
-extern void getDiskInode(size_t iNodeNum, iNode* inode);
+extern int getDiskInode(size_t iNodeNum, iNode* inode);
 extern void writeDiskInode(size_t iNodeNum, iNode* inode);
 
 #endif

@@ -1,12 +1,13 @@
-#include <sys/stat.h>
 #include "main.h"
 #include "trav/namei.h"
 #include "utils/utils.h"
 #include "mkfs/mkfs.h"
 #include "incoreInodeOps/hashQ.h"
 #include "mkfs/iNodeManager.h"
-
 #include "interface/getAttr.h"
+#include "interface/mkdir.h"
+
+#include <sys/stat.h>
 
 static int truncateFile(inCoreiNode* inode) {
     inodeBlocksFree(inode);
@@ -147,39 +148,6 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
     return bytesWritten;
 }
 
-/* 
- * Edge cases to handle:
- * Handle the directory to create is `..`.
- * creates a new special file(dir, pipe, link). Returns -1 on error
- */
-static int mkdir_callback(const char* path, mode_t mode) {
-    char *parentDirPath = getParentDirectory(path);
-	inCoreiNode *parentINode = getFileINode(parentDirPath, strlen(parentDirPath));
-	if (NULL == parentINode) {
-		return -1;
-	}
-
-    char *filename = getFilenameFromPath(path);
-	size_t iNodeNum = findINodeInDirectory(parentINode, filename);
-	if (iNodeNum != 0) {
-		return -1;
-	}
-
-	iNodeNum = getNewINode();
-	printf("mkdir callback, inode_number: %ld, parent inode_number: %ld\n", iNodeNum, parentINode->inode_number);
-    getAndUpdateDirectoryTable(parentINode, iNodeNum, filename);
-
-    // TODO: use the right device number, using 0 for now
-    inCoreiNode *newINode = iget(iNodeNum, 0);
-    newINode -> type = T_DIRECTORY;
-    // size_t fd = createFileDescriptorEntry(newFilesiNode, mode);;
-    // add "." and ".." in the newly created inode
-    updateNewDirMetaData(newINode, iNodeNum, parentINode->inode_number);
-
-	iput(parentINode);
-    iput(newINode);
-}
-
 static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
 //    filler(buf, ".", NULL, 0);
 //    filler(buf, "..", NULL, 0);
@@ -209,6 +177,11 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
 
 	return attrPopulate(path, stbuf);
 }
+
+static int mkdir_callback(const char* path, mode_t mode) {
+	return createDirectory(path, mode);
+}
+
 
 static struct fuse_operations OPERATIONS = {
 	.getattr = getattr_callback,

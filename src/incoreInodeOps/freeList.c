@@ -1,15 +1,20 @@
-#include <stdlib.h>
 #include "incoreInodeOps/freeList.h"
 
-/* This is doubly-linked, non-circular linked list. */
+#include <string.h>
+#include <stdlib.h>
+
+/* This is a doubly-linked circular linked list. */
 static Node* freeList;
 
 void initFreeInCoreINodeList() {
     freeList = NULL;
-    int i;
-    for(i = 0; i < INODE_BUFFER_SIZE; i++) {
-        Node* node = (Node*)malloc(sizeof(struct Node));
+    int counter;
+    for(counter = 0; counter < INODE_BUFFER_SIZE; counter++) {
+        Node* node = (Node*)malloc(sizeof(Node));
+		memset(node, 0, sizeof(Node));
+
         node->inode = (inCoreiNode*)malloc(sizeof(inCoreiNode));
+		memset(node->inode, 0, sizeof(inCoreiNode));
 		node->hash_next = NULL;
 		node->hash_prev = NULL;
 
@@ -18,29 +23,57 @@ void initFreeInCoreINodeList() {
 }
 
 void freeListInsert(Node* node) {
-	node->next = freeList;
-	node->prev = NULL;
-	if (freeList != NULL) {
-		freeList->prev = node;
+	if (freeList == NULL) {
+		freeList = node;
+		node->next = freeList;
+		node->prev = freeList;
+		return ;
 	}
-	freeList = node;
+	node->next = freeList;
+	node->prev = freeList->prev;
+	freeList->prev->next = node;
+	freeList->prev = node;
+}
+
+Node *popFreeList() {
+	if (freeList == NULL) {
+		return NULL;
+	}
+
+	Node *toReturn = freeList;
+	if (freeList->next == freeList) {
+		freeList = NULL;
+		return toReturn;
+	}
+
+	freeList->prev->next = freeList->next;
+	freeList->next->prev = freeList->prev;
+	freeList = freeList->next;
+	toReturn->next = NULL;
+	toReturn->prev = NULL;
+	return toReturn;
 }
 
 void freeListRemove(Node* node) {
     Node* workingNode = freeList;
+	if (freeList != NULL && node == freeList && freeList->next == freeList) {
+		freeList = NULL;
+		node->next = NULL;
+		node->prev = NULL;
+		return ;
+	}
     while(NULL != workingNode) {
 		if (node == workingNode) {
-			if (node->next != NULL) {
-				node->next->prev = node->prev;
-			}
-			if (node->prev != NULL) {
-				node->prev->next = node->next;
-			}
+			node->next->prev = node->prev;
+			node->prev->next = node->next;
 			node->next = NULL;
 			node->prev = NULL;
 			break;
 		}
 		workingNode = workingNode->next;
+		if (workingNode == freeList) {
+			break;
+		}
 	}
 }
 

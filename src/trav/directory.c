@@ -2,16 +2,15 @@
 #include "mandsk/params.h"
 #include "inode/iNode.h"
 #include "dsk/blkfetch.h"
-
-#include <stdlib.h>
-#include <string.h>
 #include "inode/inCoreiNode.h"
 #include "incoreInodeOps/bmap.h"
 #include "incoreInodeOps/iget.h"
+#include "incoreInodeOps/iNodeManager.h"
 
+#include <stdlib.h>
+#include <string.h>
 
-/* Sets data of `blockPtr` in `theBlock` appropriately
- */
+/* Sets data of `blockPtr` in `theBlock` appropriately. */
 directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBlock) {
 	unsigned char *ptrIntoBlock = blockPtr->data;
 	unsigned char *endOfBlock = ptrIntoBlock + BLOCK_SIZE;
@@ -36,11 +35,13 @@ directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBloc
  * of verifying whether the user has permissions to traverse through the directory. Should throw
  * appropriate exception if these checks fail.
  */
-void validateSearch(inCoreiNode *iNodePtr) {
+int validateSearch(inCoreiNode *iNodePtr) {
 	if ((iNodePtr->type != T_DIRECTORY) || (iNodePtr->mode & P_XUSR != P_XUSR)) {
 		// TODO - throw an appropriate error
 		printf("Directory traversal got iNode of non-directory\n");
+		return -1;
 	}
+	return 0;
 }
 
 /* Iterates through the directory `dataPtr` to find an entry corresponding to
@@ -82,6 +83,7 @@ size_t findINodeInDirectory(inCoreiNode *iNodePtr, char *entryName) {
 		    foundINode = 0;
 			break;
 		}
+
 		printf("Searching directory block num - %ld\n", bmapResp -> blockNumber);
 		getDiskBlock(bmapResp -> blockNumber, blockPtr);
 		makeDirectoryTable(blockPtr, dirData);
@@ -100,79 +102,58 @@ size_t findINodeInDirectory(inCoreiNode *iNodePtr, char *entryName) {
 	return foundINode;
 }
 
-// fetches the directory entry table from the parent inode and adds a new entry
-// at the end of the table. 0
-void getAndUpdateDirectoryTable(inCoreiNode* parentInode, size_t newInodeNumber, char* filename) {
-    // TODO: See what needs to be done when the validateSearch fails, also, how do we fetch the files here
-    // validateSearch(parentInode);
-    fetchInodeFromDisk(parentInode->inode_number, parentInode);
-    // fetch the directory table from the disk
-    bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
-	bmap(parentInode, parentInode->size, bmapResp, READ_MODE);
-    disk_block *blkPtr = (disk_block *) malloc(sizeof(disk_block));
-    getDiskBlock(bmapResp->blockNumber, blkPtr);
-    // fetch the directory table from the disk block
-    directoryTable *dirData = (directoryTable *) malloc(sizeof(directoryTable));
-    makeDirectoryTable(blkPtr, dirData);
+void addDirectoryEntry(size_t blockNum, size_t blockOffset, const char *filename, size_t iNodeNum) {
+	disk_block *blockPtr = (disk_block *) malloc(sizeof(disk_block));
+	getDiskBlock(blockNum, blockPtr);
 
-    size_t counter;
-    nameINodePair *iNodeData;
+	unsigned char *ptrIntoBlock = blockPtr->data;
+	ptrIntoBlock += blockOffset;
+	memcpy(ptrIntoBlock, filename, FILENAME_SIZE);
+	ptrIntoBlock += FILENAME_SIZE;
+	memcpy(ptrIntoBlock, &(iNodeNum), INODE_ADDRESS_SIZE);
 
-    for(counter = 0; counter < DIRECTORY_ENTRIES_IN_BLOCK ; counter++) {
-        iNodeData = &(dirData->entries[counter]);
-        if(NULL == iNodeData) {
-            break;
-        }
-    }
-    if (counter == DIRECTORY_ENTRIES_IN_BLOCK) {
-        // TODO: Throw an error in this case
-    }
-    // counter is the new index at which the entry has to be made
-    iNodeData = (nameINodePair*)malloc(sizeof(nameINodePair));
-    iNodeData->iNodeNum = newInodeNumber;
-    // TODO: strcpy
-    memcpy(iNodeData->name, filename, FILENAME_SIZE);
-    dirData->entries[counter] = *(iNodeData);
-
-    // TODO: (Aarti) is this correct?
-    memcpy(blkPtr, dirData, bmapResp->bytesLeftInBlock);
-    writeMemoryDiskBlock(bmapResp->blockNumber, blkPtr);
-
-	free(bmapResp);
-    free(dirData);
-    free(blkPtr);
+	writeDiskBlock(blockNum, blockPtr);
+	free(blockPtr);
 }
 
-// add "." and ".." entries to the directory entry table
-// "." -> newInodeNumber
-// ".." -> parentInodeNumber
-void updateNewDirMetaData(inCoreiNode* inode, size_t newInodeNumber, size_t parentInodeNumber) {
-    fetchInodeFromDisk(parentInodeNumber, inode);
+/* Fetches the directory disk block of `parentINode` and adds a new entry for `filename`
+ * at the end of the table.
+ */
+int getAndUpdateDirectoryTable(inCoreiNode* parentINode, size_t newInodeNumber, char* filename) {
+    int retValue = validateSearch(parentINode);
+	if (retValue == -1) {
+		printf("Incorrect permissions or file type of parent. Can't create directory.\n");
+		return -1;
+	}
 
-    directoryTable *dirData = (directoryTable*)malloc(sizeof(directoryTable));
-    memset(dirData, 0, sizeof(directoryTable));
-    disk_block *blkPtr = (disk_block*)malloc(sizeof(disk_block));
-
-    bmapResponse* bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
-	bmap(inode, inode->size, bmapResp, APPEND_MODE);
-    getDiskBlock(bmapResp->blockNumber, blkPtr);
-    dirData = makeDirectoryTable(blkPtr, dirData);
-
-    // since this is called at the time of mkdir, the directory entry table will be empty.
-    memset(dirData->entries[0].name, 0, FILENAME_SIZE); dirData->entries[0].name[0] = '.';
-    dirData->entries[0].iNodeNum = newInodeNumber;
-
-    //dirData->entries[1].name = "..";
-    memcpy(dirData->entries[1].name, dirData->entries[0].name, FILENAME_SIZE); dirData->entries[0].name[1] = '.';
-    dirData->entries[1].iNodeNum = parentInodeNumber;
-
-    // TODO: (Aarti) is this correct?
-    memcpy(blkPtr, dirData, bmapResp->bytesLeftInBlock);
-    writeMemoryDiskBlock(bmapResp->blockNumber, blkPtr);
+    bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
+	retValue = bmap(parentINode, parentINode->size, bmapResp, APPEND_MODE);
+	if (retValue == -1) {
+		printf("BMap failed.\n");
+		return -1;
+	}
+    
+	addDirectoryEntry(bmapResp->blockNumber, bmapResp->byteOffsetInBlock, filename, newInodeNumber);
+	updateINodeMetadata(parentINode, DIRECTORY_ENTRY_SIZE);
 
 	free(bmapResp);
-    free(dirData);
-    free(blkPtr);
+}
+
+/* Adds entries for `.` and `..` in `iNode` with parent iNode `parentINodeNumber`.*/
+int updateNewDirMetaData(inCoreiNode* iNode, size_t parentINodeNumber) {
+    bmapResponse* bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
+
+	int retValue = bmap(iNode, iNode->size, bmapResp, APPEND_MODE);
+	if (retValue == -1) {
+		printf("BMap failed.\n");
+		return -1;
+	}
+
+	addDirectoryEntry(bmapResp->blockNumber, bmapResp->byteOffsetInBlock, ".", iNode->inode_number);
+	addDirectoryEntry(bmapResp->blockNumber, (bmapResp->byteOffsetInBlock) + DIRECTORY_ENTRY_SIZE, "..", parentINodeNumber);
+	updateINodeMetadata(iNode, 2*DIRECTORY_ENTRY_SIZE);
+
+	free(bmapResp);
 }
 
 directoryTable* getDirectoryEntries(inCoreiNode* inode) {
@@ -187,3 +168,4 @@ directoryTable* getDirectoryEntries(inCoreiNode* inode) {
 	free(bmapResp);
     return dirTable;
 }
+

@@ -11,6 +11,7 @@ extern void freeListInsert(Node* node);
 // remove node from the freelist
 extern void freeListRemove(Node* node);
 // get first incore inode from freelist
+extern Node* popFreeList();
 extern Node* getFreeINodeFromList();
 // check if freelist is empty
 extern bool checkFreeListEmpty();
