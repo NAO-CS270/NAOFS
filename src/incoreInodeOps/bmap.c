@@ -38,6 +38,7 @@ void createBMapResponse(size_t blockNum, size_t offset, bmapResponse *response) 
 
 void bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response) {
 	size_t fileSize = iNode->size;
+	printf("Inside bmap, filesize - %ld, offset - %ld\n", fileSize, offset);
 	if (offset > fileSize) {
 		free(response);
 		response = NULL;

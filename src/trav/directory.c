@@ -39,6 +39,7 @@ directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBloc
 void validateSearch(inCoreiNode *iNodePtr) {
 	if ((iNodePtr->type != T_DIRECTORY) || (iNodePtr->mode & P_XUSR != P_XUSR)) {
 		// TODO - throw an appropriate error
+		printf("Directory traversal got iNode of non-directory\n");
 	}
 }
 
@@ -53,15 +54,11 @@ size_t searchDirectory(directoryTable *dataPtr, char *entryName) {
 	for (counter=0 ; counter<DIRECTORY_ENTRIES_IN_BLOCK ; counter++) {
 		iNodeData = dataPtr->entries[counter];
 
-		if (0 == strncmp(entryName, iNodeData.name, FILENAME_SIZE)) {
-			break;
+		if (0 == strcmp(entryName, iNodeData.name)) {
+			return iNodeData.iNodeNum;
 		}
 	}
-
-	if (DIRECTORY_ENTRIES_IN_BLOCK == counter) {
-		return 0;
-	}
-	return iNodeData.iNodeNum;
+	return 0;
 }
 
 /* Considering passed `iNodePtr` as corresponding to a directory, fetches its disk blocks
@@ -74,11 +71,18 @@ size_t findINodeInDirectory(inCoreiNode *iNodePtr, char *entryName) {
 	disk_block *blockPtr = (disk_block *)malloc(sizeof(disk_block));
 	size_t foundINode = 0;
 	
-	size_t counter;
-	for (counter=0 ; counter<BLOCKS_IN_INODE ; counter++) {
-		// TODO - Invoke `bmap` here, instead of directly accessing it.
-		size_t blockNum = iNodePtr->dataBlockNums[counter];
-		getDiskBlock(blockNum, blockPtr);
+	size_t blockNum;
+	size_t offsetIntoDirectory = 0;
+
+	bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse *));
+
+	while (true) {
+		bmap(iNodePtr, offsetIntoDirectory, bmapResp);
+		if (bmapResp == NULL) {
+			break;
+		}
+		printf("Parsing directory, block num %ld\n", bmapResp -> blockNumber);
+		getDiskBlock(bmapResp -> blockNumber, blockPtr);
 		makeDirectoryTable(blockPtr, dirData);
 
 		foundINode = searchDirectory(dirData, entryName);
@@ -86,6 +90,7 @@ size_t findINodeInDirectory(inCoreiNode *iNodePtr, char *entryName) {
 		if (foundINode != 0) {
 			break;
 		}
+		offsetIntoDirectory += BLOCK_SIZE;
 	}
 	free(dirData);
 	free(blockPtr);
