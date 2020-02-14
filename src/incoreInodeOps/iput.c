@@ -1,33 +1,20 @@
 #include "incoreInodeOps/iput.h"
+#include "incoreInodeOps/freeList.h"
 
 #include <stdio.h>
 
 void iput(inCoreiNode* inode) {
-    // take lock, the thread calling iput should release lock and call it
-    // pthread_mutex_lock(&(inode->iNodeMutex));
     inode->reference_count--;
-    if(inode->reference_count == 0) {
-        /** TODO: include link_count in the inCoreiNode struct
-         if(inode->link_count == 0) {
-             // handle file deletion here
- //            free disk blocks for file (algorithm: free); // free is described later
- //			set file type to 0;
- //			free inode (algorithm: ifree); // ifree is described later
-         } */
+	printf("iPut for %ld\n", inode->inode_number);
+	if(inode->reference_count == 0) {
+		// Write inode to disk if needed.
 
-        // writes inode data to disk
-        if (inode->inode_changed && inode->file_data_changed) {
-            // TODO: Will do once foofooman's commit is in.
-            //writeDiskInode(inode->inode_number, inode->disk_inode);
-            inode->inode_changed = false;
-            inode->file_data_changed = false;
-        }
-        // get hash Q node
-        Node* node = hashLookup(inode->device_number, inode->inode_number);
-        if(NULL == node) {
+        Node* node = hashLookup(inode->inode_number, inode->device_number);
+        if(node == NULL) {
             // TODO: handle this exception
         }
-        // remove it from free inode list
+
+		printf("Inserting iNode %ld\n", inode->inode_number);
         freeListInsert(node);
     }
     pthread_mutex_unlock(&(inode->iNodeMutex));

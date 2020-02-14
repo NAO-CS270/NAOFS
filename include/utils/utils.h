@@ -17,7 +17,7 @@
      _a < _b ? _a : _b; })
 
 extern int string_split(char*, char *[], const char*);
-extern char* getParentDirectory(const char* path);
-extern char* getFilenameFromPath(const char* path);
+extern void getParentDirectory(const char *path, char *dest);
+extern void getFilenameFromPath(const char *path, char *dest);
 
 #endif

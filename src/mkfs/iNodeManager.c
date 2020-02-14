@@ -103,6 +103,7 @@ void markINodeFree(size_t iNodeNum, iNodeType nodeType) {
 	writeINodesBlock(blockOfINodes, iNodesData);
 	writeDiskBlock(blockNum, iNodesData);
 
+	free(iNodesData);
 	free(listOfINodes);
 	free(blockOfINodes);
 }

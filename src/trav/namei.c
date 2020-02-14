@@ -28,40 +28,46 @@ size_t checkAndGetLen(const char *path, size_t bufLen, char *pathBuf) {
 	return counter;
 }
 
-int operate(const char *path, size_t startAt, size_t endAt, inCoreiNode *workingINode) {
-	if (startAt == endAt) {
-		return -1;
+inCoreiNode *operate(const char *path, size_t bufLen, inCoreiNode *workingINode) {
+	if (bufLen == 0) {
+		return workingINode;
 	}
-	size_t bufLen = endAt - startAt;
+
 	char *workingBuffer = (char *)malloc(sizeof(char) * (bufLen + 1));
-	memcpy(workingBuffer, path+startAt, bufLen);
+	memcpy(workingBuffer, path, bufLen);
 	workingBuffer[bufLen] = '\0';
 
-    size_t iNodeNum = findINodeInDirectory(workingINode, workingBuffer);
+	directoryEntry *entryBuffer = (directoryEntry *)malloc(sizeof(directoryEntry));
+	memset(entryBuffer, 0, sizeof(directoryEntry));
+
+	printf("Searching iNode %ld for %s\n", workingINode->inode_number, workingBuffer);
+    size_t retValue = searchINodeDirectoryEntries(workingINode, workingBuffer, 0, entryBuffer, 0);
+	size_t iNodeNum = entryBuffer->iNodeNum;
+
+	free(entryBuffer);
 	free(workingBuffer);
 
     iput(workingINode);
-	if (iNodeNum == 0) {
-		return -1;
+	if (retValue <= 0) {
+		return NULL;
 	}
-	workingINode = iget(iNodeNum, 0);
-	return 0;
+	return iget(iNodeNum, 0);
 }
 
 /**
  * Assumes the string `path`, starting at `counter` is the name of a file in the directory of `workingINode`. Then
  * tries to find the file in the directory.
  */
-size_t processNextLevel(const char *path, size_t startAt, inCoreiNode *workingINode) {
-	size_t endAt = startAt;
+int processNextLevel(const char *path, inCoreiNode **workingINode) {
+	size_t endAt = 0;
     while(1) {
         if ((path[endAt] == '/') || (path[endAt] == '\0')) {
             break;
         }
 		endAt++;
     }
-    size_t retValue = operate(path, startAt, endAt, workingINode);
-	if (retValue == -1) {
+    (*workingINode) = operate(path, endAt, *workingINode);
+	if ((*workingINode) == NULL) {
 		return -1;
 	}
 	if (path[endAt] == '\0') {
@@ -85,13 +91,15 @@ inCoreiNode* getFileINode(const char *path, size_t bufLen) {
 		if (path[counter] == '\0') {
 			break;
 		}
-		counter = processNextLevel(path, counter, workingINode);
+		size_t retValue = processNextLevel(path + counter, &workingINode);
 
-		if (counter == -1) {
+		if (retValue == -1) {
 			workingINode = NULL;
 			break;
 		}
+		counter += retValue;
 	}
+
 	free(pathBuffer);
     return workingINode;
 }

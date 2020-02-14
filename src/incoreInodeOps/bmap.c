@@ -67,5 +67,6 @@ int bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response, bmapMode mod
 
 	createBMapResponse(dataBlockNum, offset%BLOCK_SIZE, response);
 
+	free(indirectionOffsets);
 	return 0;
 }

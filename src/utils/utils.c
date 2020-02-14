@@ -59,18 +59,16 @@ int string_split(char* path, char *tokens[], const char *delimiter) {
 }
 
 // get the parent directory of a file from an absolute path
-char* getParentDirectory(const char* path) {
-    char* position;
-    position = strrchr(path, '/');
-    char* parentPath = strndup(path, (path-position+1));
-    return parentPath;
+void getParentDirectory(const char *path, char *dest) {
+	strcpy(dest, path);
+    char* position = strrchr(dest, '/') + 1;
+	*position = '\0';
 }
 
 // extract the filename from an absolute path
-char* getFilenameFromPath(const char* path) {
-    char *filename = NULL;
-    filename = strrchr (path, '/') + 1;
-    return filename;
+void getFilenameFromPath(const char* path, char *dest) {
+    char *filename = strrchr (path, '/') + 1;
+	strcpy(dest, filename);
 }
 
 /*

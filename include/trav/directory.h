@@ -6,19 +6,19 @@
 #include "inode/iNode.h"
 #include "inode/inCoreiNode.h"
 
-struct nameINodePair {
+struct directoryEntry {
 	char name[FILENAME_SIZE];
 	size_t iNodeNum;
 };
-typedef struct nameINodePair nameINodePair;
+typedef struct directoryEntry directoryEntry;
 
 struct directoryTable {
-	nameINodePair entries[DIRECTORY_ENTRIES_IN_BLOCK];
+	directoryEntry entries[DIRECTORY_ENTRIES_IN_BLOCK];
 };
 typedef struct directoryTable directoryTable;
 
 extern directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBlock);
-extern size_t findINodeInDirectory(inCoreiNode *iNodePtr, char *entryName);
+extern int searchINodeDirectoryEntries(inCoreiNode *iNodePtr, char *entryName, size_t offset, directoryEntry *entryBuffer, size_t numOfEntries);
 
 extern int getAndUpdateDirectoryTable(inCoreiNode* inode, size_t newInodeNumber, char* filename);
 extern int updateNewDirMetaData(inCoreiNode* inode, size_t parentInodeNumber);
@@ -34,3 +34,4 @@ typedef union directoryData directoryData;
 */
 
 #endif
+

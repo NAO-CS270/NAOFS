@@ -5,7 +5,7 @@
 #include "incoreInodeOps/hashQ.h"
 #include "mkfs/iNodeManager.h"
 #include "interface/getAttr.h"
-#include "interface/mkdir.h"
+#include "interface/directory.h"
 
 #include <sys/stat.h>
 
@@ -15,7 +15,11 @@ static int truncateFile(inCoreiNode* inode) {
 }
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
-    inCoreiNode* newFilesiNode;
+	size_t pathLen = strlen(path);
+	char *parentDirPath = (char *)malloc((pathLen + 1)*sizeof(char));
+	char *filename = (char *)malloc((pathLen + 1)*sizeof(char));
+    
+	inCoreiNode* newFilesiNode;
     newFilesiNode = getFileINode(path, strlen(path));
     size_t fd;
     if (newFilesiNode == NULL) {
@@ -23,12 +27,11 @@ static int create_callback(const char *path, mode_t mode, struct fuse_file_info 
         size_t newInodeNumber = getNewINode();
 
         // create new directory entry in parent directory
-        char *parentDirPath;
-        parentDirPath = getParentDirectory(path);
+        getParentDirectory(path, parentDirPath);
         inCoreiNode *parentInode = getFileINode(parentDirPath, strlen(parentDirPath));
 
         // include new file name and newly assigned inode number
-        char *filename = getFilenameFromPath(path);
+        getFilenameFromPath(path, filename);
         getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
         iput(parentInode);
     } else {
@@ -36,6 +39,9 @@ static int create_callback(const char *path, mode_t mode, struct fuse_file_info 
     }
     fd = createFileDescriptorEntry(newFilesiNode, fi -> flags);
     iput(newFilesiNode);
+
+	free(parentDirPath);
+	free(filename);
     return fd;
 }
 
@@ -144,26 +150,6 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
     return bytesWritten;
 }
 
-static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
-//    filler(buf, ".", NULL, 0);
-//    filler(buf, "..", NULL, 0);
-
-    inCoreiNode* inode = getFileINode(path, strlen(path));
-    if(inode == NULL) {
-        debug_print("inode not found for path: %s", path);
-        return 0;
-    }
-    directoryTable* dirTable = getDirectoryEntries(inode);
-
-    int i;
-    nameINodePair *iNodeData;
-    for(i=0; i<DIRECTORY_ENTRIES_IN_BLOCK ;i++) {
-        iNodeData = &(dirTable->entries[i]);
-        filler(buf, iNodeData->name, NULL, 0);
-    }
-    return 0;
-}
-
 static int access_callback(const char* path, int mode) {
     return 0;
 }
@@ -178,6 +164,9 @@ static int mkdir_callback(const char* path, mode_t mode) {
 	return createDirectory(path, mode);
 }
 
+static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
+	return readDirectory(path, buf, filler, offset, fi);
+}
 
 static struct fuse_operations OPERATIONS = {
 	.getattr = getattr_callback,
@@ -187,7 +176,7 @@ static struct fuse_operations OPERATIONS = {
         //.write = write_callback,
     .mkdir = mkdir_callback,
         //.create = create_callback,
-        //.readdir = readdir_callback,
+    .readdir = readdir_callback,
         //.access = access_callback,
         //.link = link_callback,
         //.unlink = unlink_callback,
