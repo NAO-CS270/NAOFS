@@ -25,7 +25,6 @@ int attrPopulate(const char *path, struct stat *stbuf) {
 	*/
     
 	if (inode->type == T_DIRECTORY) {
-		iput(inode);
 		stbuf->st_mode = S_IFDIR | 0755;
 		stbuf->st_nlink = 2;
 	}

@@ -39,6 +39,7 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
     }
 	else {
 		if (node->inode->reference_count == 0) {
+			printf("Removing iNode %ld from free list\n", node->inode->inode_number);
 			freeListRemove(node);
 		}
 	}

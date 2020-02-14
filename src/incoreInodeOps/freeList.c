@@ -6,6 +6,20 @@
 /* This is a doubly-linked circular linked list. */
 static Node* freeList;
 
+void printFreeList() {
+	int counter = 0;
+	Node *workingNode = freeList;
+
+	while (workingNode != NULL) {
+		workingNode = workingNode->next;
+		if (workingNode == freeList || counter == 40) {
+			break;
+		}
+		counter++;
+	}
+	printf("Free List Size - %ld\n", counter);
+}
+
 void initFreeInCoreINodeList() {
     freeList = NULL;
     int counter;
@@ -33,6 +47,8 @@ void freeListInsert(Node* node) {
 	node->prev = freeList->prev;
 	freeList->prev->next = node;
 	freeList->prev = node;
+	printf("From Insert\n");
+	printFreeList();
 }
 
 Node *popFreeList() {
@@ -45,10 +61,11 @@ Node *popFreeList() {
 		freeList = NULL;
 		return toReturn;
 	}
-
-	freeList->prev->next = freeList->next;
-	freeList->next->prev = freeList->prev;
-	freeList = freeList->next;
+	else {
+		freeList->prev->next = freeList->next;
+		freeList->next->prev = freeList->prev;
+		freeList = freeList->next;
+	}
 	toReturn->next = NULL;
 	toReturn->prev = NULL;
 	return toReturn;
@@ -62,8 +79,11 @@ void freeListRemove(Node* node) {
 		node->prev = NULL;
 		return ;
 	}
-    while(NULL != workingNode) {
+    while(workingNode != NULL) {
 		if (node == workingNode) {
+			if (freeList == node) {
+				freeList = node->next;
+			}
 			node->next->prev = node->prev;
 			node->prev->next = node->next;
 			node->next = NULL;
@@ -75,6 +95,8 @@ void freeListRemove(Node* node) {
 			break;
 		}
 	}
+	printf("From Remove ");
+	printFreeList();
 }
 
 extern Node* getFreeINodeFromList() {
