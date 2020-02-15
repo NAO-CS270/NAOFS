@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 /* This is a doubly-linked circular linked list. */
 static Node* freeList;
@@ -17,7 +18,7 @@ void printFreeList() {
 		}
 		counter++;
 	}
-	printf("Free List Size - %ld\n", counter);
+	printf("Free List Size - %d\n", counter);
 }
 
 void initFreeInCoreINodeList() {
@@ -29,6 +30,7 @@ void initFreeInCoreINodeList() {
 
         node->inode = (inCoreiNode*)malloc(sizeof(inCoreiNode));
 		memset(node->inode, 0, sizeof(inCoreiNode));
+		pthread_mutex_init(&(node->inode->iNodeMutex), NULL);
 		node->hash_next = NULL;
 		node->hash_prev = NULL;
 
@@ -47,8 +49,6 @@ void freeListInsert(Node* node) {
 	node->prev = freeList->prev;
 	freeList->prev->next = node;
 	freeList->prev = node;
-	//printf("From Insert\n");
-	//printFreeList();
 }
 
 Node *popFreeList() {
@@ -95,8 +95,6 @@ void freeListRemove(Node* node) {
 			break;
 		}
 	}
-	//printf("From Remove ");
-	//printFreeList();
 }
 
 extern Node* getFreeINodeFromList() {

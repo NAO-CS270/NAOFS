@@ -55,5 +55,6 @@ typedef struct inCoreiNode inCoreiNode;
 
 // inserts disk inode data into the incore inode
 extern void insertDiskInodeData(iNode* disk_inode, inCoreiNode* in_core);
+extern void getDiskINodeData(inCoreiNode* in_core, iNode* disk_inode);
 
 #endif //INCOREINODE_H

@@ -1,7 +1,6 @@
 #include "inode/inCoreiNode.h"
 
 void insertDiskInodeData(iNode* disk_inode, inCoreiNode* in_core) {
-	pthread_mutex_init(&(in_core->iNodeMutex), NULL);
 	in_core->device_number = disk_inode->device_number;
 	in_core->inode_number = disk_inode->inode_number;
 	in_core->modified_time = disk_inode->modified_time;
@@ -17,6 +16,26 @@ void insertDiskInodeData(iNode* disk_inode, inCoreiNode* in_core) {
 	int index = 0;
 	while (index < BLOCKS_IN_INODE) {
 		in_core->dataBlockNums[index] = disk_inode->dataBlockNums[index];
+		index++;
+	}
+}
+
+void getDiskINodeData(inCoreiNode* in_core, iNode* disk_inode) {
+	disk_inode->device_number = in_core->device_number;
+	disk_inode->inode_number = in_core->inode_number;
+	disk_inode->modified_time = in_core->modified_time;
+	disk_inode->access_time = in_core->access_time;
+	disk_inode->creation_time = in_core->creation_time;
+	disk_inode->linksCount = in_core->linksCount;
+	disk_inode->type = in_core->type;
+	disk_inode->mode = in_core->mode;
+	disk_inode->owner_uid = in_core->owner_uid;
+	disk_inode->group_uid = in_core->group_uid;
+	disk_inode->size = in_core->size;
+
+	int index = 0;
+	while (index < BLOCKS_IN_INODE) {
+		disk_inode->dataBlockNums[index] = in_core->dataBlockNums[index];
 		index++;
 	}
 }
