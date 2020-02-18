@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+apt-get install libfuse-dev
+
 # get the file system source code
 git clone https://github.com/NAO-CS270/NAOFS.git
 
