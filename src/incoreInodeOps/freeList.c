@@ -47,8 +47,8 @@ void freeListInsert(Node* node) {
 	node->prev = freeList->prev;
 	freeList->prev->next = node;
 	freeList->prev = node;
-	printf("From Insert\n");
-	printFreeList();
+	//printf("From Insert\n");
+	//printFreeList();
 }
 
 Node *popFreeList() {
@@ -95,8 +95,8 @@ void freeListRemove(Node* node) {
 			break;
 		}
 	}
-	printf("From Remove ");
-	printFreeList();
+	//printf("From Remove ");
+	//printFreeList();
 }
 
 extern Node* getFreeINodeFromList() {

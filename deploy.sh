@@ -13,8 +13,6 @@ make
 mkdir mount_dir
 ./naofs ./mount_dir
 
-fusermount -u ./mount_dir -o default_permissions
-
 # enter the file system and now execute the file system calls
 # TODO: Mention the system calls which are working at present
 cd mount_dir
