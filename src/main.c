@@ -5,7 +5,9 @@
 #include "incoreInodeOps/hashQ.h"
 #include "mkfs/iNodeManager.h"
 #include "interface/getAttr.h"
-#include "interface/directory.h"
+#include "interface/create.h"
+#include "interface/read.h"
+#include "inode/iNode.h"
 
 #include <sys/stat.h>
 
@@ -14,42 +16,11 @@ static int truncateFile(inCoreiNode* inode) {
     inode -> size = 0;
 }
 
-static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
-	size_t pathLen = strlen(path);
-	char *parentDirPath = (char *)malloc((pathLen + 1)*sizeof(char));
-	char *filename = (char *)malloc((pathLen + 1)*sizeof(char));
-    
-	inCoreiNode* newFilesiNode;
-    newFilesiNode = getFileINode(path, strlen(path));
-    size_t fd;
-    if (newFilesiNode == NULL) {
-        // assign new inode from the file system
-        size_t newInodeNumber = getNewINode();
-
-        // create new directory entry in parent directory
-        getParentDirectory(path, parentDirPath);
-        inCoreiNode *parentInode = getFileINode(parentDirPath, strlen(parentDirPath));
-
-        // include new file name and newly assigned inode number
-        getFilenameFromPath(path, filename);
-        getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
-        iput(parentInode);
-    } else {
-        truncateFile(newFilesiNode);
-    }
-    fd = createFileDescriptorEntry(newFilesiNode, fi -> flags);
-    iput(newFilesiNode);
-
-	free(parentDirPath);
-	free(filename);
-    return fd;
-}
-
 // TODO: Update the size of the file
 // TODO: Call create here
 static int open_callback(const char *path, struct fuse_file_info *fi) {
     if(fi -> flags & O_CREAT) {
-        return fi -> fh = create_callback(path, 0, fi);
+        return -1;//fi -> fh = create_callback(path, 0, fi);
     }
 
     inCoreiNode *inode;
@@ -161,22 +132,55 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
 }
 
 static int mkdir_callback(const char* path, mode_t mode) {
-	return createDirectory(path, mode);
+	return createFile(path, T_DIRECTORY, mode);
 }
 
 static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
 	return readDirectory(path, buf, filler, offset, fi);
 }
 
+static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
+	return createFile(path, T_REGULAR, mode);
+/*
+	size_t pathLen = strlen(path);
+	char *parentDirPath = (char *)malloc((pathLen + 1)*sizeof(char));
+	char *filename = (char *)malloc((pathLen + 1)*sizeof(char));
+    
+	inCoreiNode* newFilesiNode;
+    newFilesiNode = getFileINode(path, strlen(path));
+    size_t fd;
+    if (newFilesiNode == NULL) {
+        // assign new inode from the file system
+        size_t newInodeNumber = getNewINode();
+
+        // create new directory entry in parent directory
+        getParentDirectory(path, parentDirPath);
+        inCoreiNode *parentInode = getFileINode(parentDirPath, strlen(parentDirPath));
+
+        // include new file name and newly assigned inode number
+        getFilenameFromPath(path, filename);
+        getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
+        iput(parentInode);
+    } else {
+        truncateFile(newFilesiNode);
+    }
+    fd = createFileDescriptorEntry(newFilesiNode, fi -> flags);
+    iput(newFilesiNode);
+
+	free(parentDirPath);
+	free(filename);
+    return fd;
+*/
+}
+
 static struct fuse_operations OPERATIONS = {
 	.getattr = getattr_callback,
-        //.getattr = getattr_callback,
+    .mkdir = mkdir_callback,
+    .readdir = readdir_callback,
+	.create = create_callback,
         //.read = read_callback,
         //.open = open_callback,
         //.write = write_callback,
-    .mkdir = mkdir_callback,
-        //.create = create_callback,
-    .readdir = readdir_callback,
         //.access = access_callback,
         //.link = link_callback,
         //.unlink = unlink_callback,
