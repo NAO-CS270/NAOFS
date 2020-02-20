@@ -1,16 +1,16 @@
-#include "incoreInodeOps/iget.h"
-#include "mkfs/ialloc.h"
-#include "time.h"
+#include "dsk/blkfetch.h"
+#include "mandsk/params.h"
+#include "mkfs/diskParams.h"
+#include "mkfs/metaBlocks.h"
+#include "mkfs/iNodeManager.h"
+#include "inode/iNode.h"
+
+#include <pthread.h>
+#include <stdlib.h>
 
 static const size_t iNodeNumsPerBlock = BLOCK_SIZE/INODE_ADDRESS_SIZE;
 
 static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
-
-void setNewiNodeMetadata(size_t iNodeNumber) {
-    inCoreiNode* iNode = iget(iNodeNumber, 0);
-    iNode -> type = T_REGULAR;
-    time(&(iNode -> creation_time));
-}
 
 /* Returns first free iNode number, if any exists, `0` otherwise. Also removes
  * the iNode number from the input `iNodeList`.
@@ -49,7 +49,7 @@ void fetchFreeINodes(iNodeListBlock *iNodeList) {
 	free(theSuperBlock);
 }
 
-size_t getNewINode() {
+size_t getNewINode(iNodeType fileType, iNodeMode fileMode) {
 	pthread_mutex_lock(&iNodeListMutex);
 
 	disk_block *iNodeListData = (disk_block *)malloc(BLOCK_SIZE);
@@ -64,8 +64,8 @@ size_t getNewINode() {
 		fetchFreeINodes(iNodeList);
 		freeINode = checkAndGetFreeINode(iNodeList);
 	}
-	
-	markINodeFree(freeINode, T_REGULAR);
+
+	updateINodeData(freeINode, fileType, fileMode, 0, 0);
 	writeINodeListBlock(iNodeList, iNodeListData);
 	writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
 	free(iNodeListData);

@@ -57,9 +57,9 @@ void rememberIfNeeded(size_t iNodeNum, iNodeListBlock *iNodeList) {
 }
 
 void freeINode(size_t iNodeNum) {
-	markINodeFree(iNodeNum, T_FREE);
-	
 	pthread_mutex_lock(&iNodeListMutex);
+
+	updateINodeData(iNodeNum, T_FREE, P_RUSR | P_WUSR | P_RGRP, 0, 0);
 
 	disk_block *iNodeListData = (disk_block *)malloc(BLOCK_SIZE);
 	getDiskBlock(INODE_LIST_BLOCK, iNodeListData);

@@ -1,12 +1,23 @@
 #include "mkfs/iNodeManager.h"
 #include "inode/iNode.h"
 #include "mandsk/params.h"
+#include "mkfs/diskParams.h"
+#include "dsk/blkfetch.h"
 
+#include <stdbool.h>
+#include <time.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define iNodeNumsInABlock (BLOCK_SIZE/INODE_ADDRESS_SIZE)
 #define endOfINodeBlocks (INODE_BLOCKS_HEAD + ((INODE_SIZE * NUM_OF_INODES) / BLOCK_SIZE))
+
+enum iNodeAccessType {
+	INODE_READ = 0,
+	INODE_WRITE = 1,
+};
+typedef enum iNodeAccessType iNodeAccessType;
 
 size_t getReturnValue(iNodeListBlock *iNodeNums, size_t freeINodeCounter) {
 	if (freeINodeCounter == 0) {
@@ -72,87 +83,57 @@ size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums) {
 	return getReturnValue(iNodeNums, freeINodeCounter);
 }
 
-/* Modifies iNode with iNode number `iNodeNum` as the boolean `toSetType` and writes it to disk. */
-void markINodeFree(size_t iNodeNum, iNodeType nodeType) {
-	if (iNodeNum >= NUM_OF_INODES) {
-		// TODO - Throw an error
-		return ;
-	}
-	size_t blockNum = (iNodeNum/INODES_PER_BLOCK) + INODE_BLOCKS_HEAD;
-
-	disk_block *iNodesData = (disk_block*)malloc(sizeof(disk_block));
-	iNodesData = getDiskBlock(blockNum, iNodesData);
-	
-	iNode *listOfINodes = (iNode *)malloc(INODES_PER_BLOCK * sizeof(iNode));
-	iNodesBlock *blockOfINodes = (iNodesBlock *)malloc(sizeof(iNodesBlock));
-	blockOfINodes->iNodesList = listOfINodes;
-	
-	makeINodesBlock(iNodesData, blockOfINodes);
-	//TODO: Free iNotesData?
-	iNode *theINode = blockOfINodes->iNodesList;
-	size_t iNodeIterator = 0;
-
-	while (iNodeIterator < INODES_PER_BLOCK) {
-		if ((theINode->inode_number) == iNodeNum) {
-			(theINode->type) = nodeType;
-			break;
-		}
-		theINode++;
-		iNodeIterator++;
-	}
-	writeINodesBlock(blockOfINodes, iNodesData);
-	writeDiskBlock(blockNum, iNodesData);
-
-	free(iNodesData);
-	free(listOfINodes);
-	free(blockOfINodes);
-}
-
-int getDiskInode(size_t iNodeNum, iNode* inode) {
+int accessINodeAndItsBlock(size_t iNodeNum, iNode *inode, disk_block *blockPtr, iNodeAccessType accessType) {
 	if (iNodeNum >= NUM_OF_INODES) {
 		return -1;
 	}
 
-	size_t blockNum = (iNodeNum/INODES_PER_BLOCK) + INODE_BLOCKS_HEAD;
-	disk_block* metaBlock = (disk_block*)malloc(BLOCK_SIZE);
-	getDiskBlock(blockNum, metaBlock);
-
-	unsigned char *ptrIntoBlock = metaBlock->data;
-
-	size_t index = iNodeNum % INODES_PER_BLOCK;
-	memcpy(inode, ptrIntoBlock + (index * INODE_SIZE), sizeof(iNode));
-
-	free(metaBlock);
-}
-
-void writeDiskInode(size_t iNodeNum, iNode* inode) {
-	// TODO: get a lock before reading and release after writing
-	if (iNodeNum >= NUM_OF_INODES) {
-		// TODO - Throw an error
-		return ;
+	disk_block *metaBlock = blockPtr;
+	if (blockPtr == NULL) {
+		metaBlock = (disk_block *)malloc(BLOCK_SIZE);
 	}
 
 	size_t blockNum = (iNodeNum/INODES_PER_BLOCK) + INODE_BLOCKS_HEAD;
-	disk_block* metaBlock = (disk_block*)malloc(BLOCK_SIZE);
-	metaBlock = getDiskBlock(blockNum, metaBlock);
+	getDiskBlock(blockNum, metaBlock);
+	unsigned char *ptrIntoBlock = metaBlock->data;
 
-	iNode *listOfINodes = (iNode *)malloc(INODES_PER_BLOCK * sizeof(iNode));
-	iNodesBlock* iNodeBlk = (iNodesBlock*)malloc(sizeof(iNodesBlock));
-	iNodeBlk->iNodesList = listOfINodes;
-	
-	iNodeBlk = makeINodesBlock(metaBlock, iNodeBlk);
-
-	iNode* iNodesList = iNodeBlk->iNodesList;
 	size_t index = iNodeNum % INODES_PER_BLOCK;
+	if (accessType == INODE_READ) {
+		memcpy(inode, ptrIntoBlock + (index * INODE_SIZE), sizeof(iNode));
+	}
+	else {
+		memset(ptrIntoBlock + (index * INODE_SIZE), 0, INODE_SIZE);
+		memcpy(ptrIntoBlock + (index * INODE_SIZE), inode, sizeof(iNode));
+		writeDiskBlock(blockNum, metaBlock);
+	}
 
-	// the doubtful part, this or memcpy
-	(iNodesList[index]) = *inode;
+	if (blockPtr == NULL) {
+		free(metaBlock);
+	}
 
-	writeINodesBlock(iNodeBlk, metaBlock);
-	writeDiskBlock(blockNum, metaBlock);
+	return 0;
+}
 
-	free(listOfINodes);
-	free(iNodeBlk);
-	free(metaBlock);
+/* Modifies iNode with iNode number `iNodeNum` to given parameters.*/
+void updateINodeData(size_t iNodeNum, iNodeType iType, iNodeMode iMode, size_t o_uid, size_t g_uid) {
+	iNode *inode = (iNode *)malloc(sizeof(iNode));
+
+	accessINodeAndItsBlock(iNodeNum, inode, NULL, INODE_READ);
+	inode->creation_time = time(NULL);
+	inode->type = iType;
+	inode->mode = iMode;
+	inode->owner_uid = o_uid;
+	inode->group_uid = g_uid;
+
+	accessINodeAndItsBlock(iNodeNum, inode, NULL, INODE_WRITE);
+	free(inode);
+}
+
+int getDiskInode(size_t iNodeNum, iNode* inode) {
+	return accessINodeAndItsBlock(iNodeNum, inode, NULL, INODE_READ);
+}
+
+int writeDiskInode(size_t iNodeNum, iNode* inode) {
+	return accessINodeAndItsBlock(iNodeNum, inode, NULL, INODE_WRITE);
 }
 
