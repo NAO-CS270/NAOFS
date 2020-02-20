@@ -38,7 +38,7 @@ int createDirectory(const char* path, mode_t mode) {
 		return -1;
 	}
 
-	iNodeNum = getNewINode();
+	iNodeNum = getNewINode(T_DIRECTORY, P_RUSR | P_WUSR | P_XUSR | P_RGRP | P_ROTH);
 	printf("Creating directory %s in %s with iNode number: %ld\n", filename, parentDirPath, iNodeNum);
     getAndUpdateDirectoryTable(parentINode, iNodeNum, filename);
 
