@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(NAOFS C)
+project(NAOFS CXX)
 
 # place binaries and libraries according to GNU standards
 include(GNUInstallDirs)
@@ -9,7 +9,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
 
 #set(CMAKE_C_FLAGS "`pkg-config fuse --cflags --libs`")
-set(CMAKE_C_FLAGS "-D_FILE_OFFSET_BITS=64 -lulockmgr")
+set(CMAKE_CXX_FLAGS "-D_FILE_OFFSET_BITS=64 -lulockmgr")
 # we use this to get code coverage
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
