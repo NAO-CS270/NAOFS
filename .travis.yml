@@ -14,7 +14,6 @@ addons:
       - libc6-dev
       - libgcc-8-dev
       - g++
-      - tree
       - pkg-config
 
 before_install:
@@ -30,10 +29,7 @@ script:
   - cd build
   - make
   - mkdir fsRoot
-  - ls
-  - ls bin/
-  - tree
-  - ./naofs fsRoot -d -f -s
+  - ./bin/naofs fsRoot -d -f -s
 
 #after_success:
 #  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
