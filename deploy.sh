@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+sudo apt-get install software-properties-common -y
+sudo add-apt-repository ppa:george-edison55/cmake-3.x
+sudo apt-get update
+sudo apt-get install cmake g++ pkg-config libfuse-dev -y
+
+
 # get the file system source code
 git clone https://github.com/NAO-CS270/NAOFS.git
 
