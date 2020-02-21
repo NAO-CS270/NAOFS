@@ -1,9 +1,11 @@
 #ifndef INCOREINODE_H
 #define INCOREINODE_H
 
+#include "inode/iNode.h"
+
 #include <pthread.h>
 #include <stdbool.h>
-#include "inode/iNode.h"
+#include <sys/types.h>
 
 struct inCoreiNode {
     // mutex for this inode
@@ -18,19 +20,16 @@ struct inCoreiNode {
     // inode number
     size_t inode_number; 
 
-    // different times access, modified and created
-    time_t modified_time;
-    time_t access_time;
-    time_t creation_time;
+    // times accessed, modified and status changed
+    time_t access;
+    time_t modification;
+    time_t status_change;
 
     // link count
     size_t linksCount;
 
-    // type of the file
-    iNodeType type;
-
-    // file permissions
-    iNodeMode mode;
+    // File type and mode
+	mode_t file_mode;
 
     // id of the owner
     size_t owner_uid;
@@ -58,3 +57,4 @@ extern void insertDiskInodeData(iNode* disk_inode, inCoreiNode* in_core);
 extern void getDiskINodeData(inCoreiNode* in_core, iNode* disk_inode);
 
 #endif //INCOREINODE_H
+

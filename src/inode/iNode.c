@@ -16,7 +16,7 @@ void initializeINode(iNode *iNodePtr, size_t iNodeNum) {
 	iNodePtr->inode_number = iNodeNum;
 	iNodePtr->linksCount = 0;
 	iNodePtr->type = T_FREE;
-	iNodePtr->mode = P_RUSR | P_WUSR | P_RGRP;
+	iNodePtr->file_mode = 0;
 	iNodePtr->owner_uid = 0;
 	iNodePtr->group_uid = 0;
 	return ;

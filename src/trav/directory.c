@@ -7,8 +7,10 @@
 #include "incoreInodeOps/iget.h"
 #include "incoreInodeOps/iNodeManager.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 /* Sets data of `blockPtr` in `theBlock` appropriately. */
 directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBlock) {
@@ -36,7 +38,7 @@ directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBloc
  * appropriate exception if these checks fail.
  */
 int validateSearch(inCoreiNode *iNodePtr) {
-	if ((iNodePtr->type != T_DIRECTORY) || (iNodePtr->mode & P_XUSR != P_XUSR)) {
+	if (!S_ISDIR(iNodePtr->file_mode) || (iNodePtr->file_mode & S_IXUSR != S_IXUSR)) {
 		// TODO - throw an appropriate error
 		printf("Directory traversal got iNode of non-directory\n");
 		return -1;

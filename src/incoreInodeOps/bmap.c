@@ -5,6 +5,7 @@
 #include "mkfs/metaBlocks.h"
 #include "dsk/alloc.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 typedef freeDiskListBlock indirectBlock;
