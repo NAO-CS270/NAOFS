@@ -14,18 +14,18 @@ addons:
       - pkg-config
 
 before_install:
-  - pip install --user cpp-coveralls
+#  - pip install --user cpp-coveralls
+  - mkdir fsRoot
 
 script:
-  - make fuse
-  - mkdir CI-build
-  - cd CI-build
-  - cmake ..
-  - cmake --build .
-  - ctest
+  - cmake -Bbuild -H.
+  - cd build
+  - make
+  - mkdir fsRoot
+  - ./naofs fsRoot -d -f -s
 
-after_success:
-  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
+#after_success:
+#  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
 
 notifications:
   email: false
