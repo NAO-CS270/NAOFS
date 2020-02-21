@@ -32,11 +32,11 @@ target_compile_options(naofs PRIVATE -D_FILE_OFFSET_BITS=64 -rdynamic -g -ggdb)
 target_include_directories(naofs PRIVATE ${FUSE_INCLUDE_DIR})
 target_link_libraries(naofs ${FUSE_LIBRARIES})
 
-include(cmake/googletest.cmake)
-fetch_googletest(
-    ${PROJECT_SOURCE_DIR}/cmake
-    ${PROJECT_BINARY_DIR}/googletest
-    )
+#include(cmake/googletest.cmake)
+#fetch_googletest(
+#    ${PROJECT_SOURCE_DIR}/cmake
+#    ${PROJECT_BINARY_DIR}/googletest
+#    )
 
 enable_testing()
-add_subdirectory(test)
+#add_subdirectory(test)
