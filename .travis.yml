@@ -14,7 +14,6 @@ addons:
       - libc6-dev
       - libgcc-8-dev
       - g++
-      - tree
       - pkg-config
 
 before_install:
@@ -30,7 +29,6 @@ script:
   - cd build
   - make
   - mkdir fsRoot
-  - tree
   - ./naofs fsRoot -s
 
 #after_success:
