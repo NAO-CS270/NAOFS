@@ -1,54 +1,110 @@
+#include "incoreInodeOps/freeList.h"
+
+#include <string.h>
 #include <stdlib.h>
-#include "./freeList.h"
+#include <pthread.h>
+
+/* This is a doubly-linked circular linked list. */
+static Node* freeList;
+
+void printFreeList() {
+	int counter = 0;
+	Node *workingNode = freeList;
+
+	while (workingNode != NULL) {
+		workingNode = workingNode->next;
+		if (workingNode == freeList || counter == 40) {
+			break;
+		}
+		counter++;
+	}
+	printf("Free List Size - %d\n", counter);
+}
 
 void initFreeInCoreINodeList() {
     freeList = NULL;
-    for(int i = 0; i < INODE_BUFFER_SIZE; i++) {
-        Node* node = (Node*)malloc(sizeof(struct Node));
+    int counter;
+    for(counter = 0; counter < INODE_BUFFER_SIZE; counter++) {
+        Node* node = (Node*)malloc(sizeof(Node));
+		memset(node, 0, sizeof(Node));
+
         node->inode = (inCoreiNode*)malloc(sizeof(inCoreiNode));
-        node->inode->disk_iNode = (iNode*)malloc(sizeof(iNode));
-        freeListInsert(node);
+		memset(node->inode, 0, sizeof(inCoreiNode));
+		pthread_mutex_init(&(node->inode->iNodeMutex), NULL);
+		node->hash_next = NULL;
+		node->hash_prev = NULL;
+
+		freeListInsert(node);
     }
 }
 
 void freeListInsert(Node* node) {
-    Node* head = freeList;
-    if (head = NULL)
-        head = node;
-    node->next = head;
-    head->prev = node;
-    node->prev = NULL;
-    head = node;
+	if (freeList == NULL) {
+		freeList = node;
+		node->next = freeList;
+		node->prev = freeList;
+		return ;
+	}
+	node->next = freeList;
+	node->prev = freeList->prev;
+	freeList->prev->next = node;
+	freeList->prev = node;
+}
+
+Node *popFreeList() {
+	if (freeList == NULL) {
+		return NULL;
+	}
+
+	Node *toReturn = freeList;
+	if (freeList->next == freeList) {
+		freeList = NULL;
+		return toReturn;
+	}
+	else {
+		freeList->prev->next = freeList->next;
+		freeList->next->prev = freeList->prev;
+		freeList = freeList->next;
+	}
+	toReturn->next = NULL;
+	toReturn->prev = NULL;
+	return toReturn;
 }
 
 void freeListRemove(Node* node) {
-    Node* head = freeList;
-    while(NULL != head) {
-        if(head->inode->inode_number == node->inode->inode_number) {
-            // if tail node has to be removed
-            if(NULL == head->next) {
-                head->prev->next = NULL;
-            } // if head has to be removed
-            else if(NULL == head->prev) {
-                head->next->prev = NULL;
-                Node* temp = head->next;
-                head->next = NULL;
-                head->prev = NULL;
-                head = temp;
-                return;
-            } else {
-                head->next->prev = head->prev;
-                head->prev->next = head->next;
-            }
-            head->next = NULL;
-            head->prev = NULL;
-            return;
-        }
-        head = head->next;
-    }
+    Node* workingNode = freeList;
+	if (freeList != NULL && node == freeList && freeList->next == freeList) {
+		freeList = NULL;
+		node->next = NULL;
+		node->prev = NULL;
+		return ;
+	}
+    while(workingNode != NULL) {
+		if (node == workingNode) {
+			if (freeList == node) {
+				freeList = node->next;
+			}
+			node->next->prev = node->prev;
+			node->prev->next = node->next;
+			node->next = NULL;
+			node->prev = NULL;
+			break;
+		}
+		workingNode = workingNode->next;
+		if (workingNode == freeList) {
+			break;
+		}
+	}
 }
 
 extern Node* getFreeINodeFromList() {
     Node* head = freeList;
     return head;
 }
+
+extern bool checkFreeListEmpty() {
+    if (freeList == NULL)
+        return true;
+    return false;
+}
+

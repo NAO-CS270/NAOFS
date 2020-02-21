@@ -64,6 +64,12 @@ iput: $(incoreInodeOpssrc)iput.c $(incoreInodeOpssrc)iput.h $(blksrc)blkfetch.h 
 bmap: $(blksrc)bmap.c $(blksrc)bmap.h $(blksrc)mdisk.h $(incoreInodeOpssrc)node.h | $(blkbld)
 	$(CC) $(CFLAGS) -c $< -o $(blkbld)bmap.o
 
+alloc: $(blksrc)alloc.c $(blksrc)alloc.h $(blksrc)blkfetch.h $(mkfssrc)metaBlocks.h $(mkfssrc)diskParams.h | $(blkbld)
+	$(CC) $(CFLAGS) -c $< -o $(blkbld)alloc.o
+
+free: $(blksrc)free.c $(blksrc)free.h $(blksrc)blkfetch.h $(mkfssrc)metaBlocks.h $(mkfssrc)diskParams.h | $(blkbld)
+	$(CC) $(CFLAGS) -c $< -o $(blkbld)free.o
+
 $(mkfsbld):
 	mkdir -p $@
 

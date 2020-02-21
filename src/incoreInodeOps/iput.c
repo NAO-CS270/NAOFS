@@ -1,29 +1,54 @@
-#include "../incoreInodeOps/iput.h"
+#include "incoreInodeOps/iput.h"
+#include "incoreInodeOps/freeList.h"
+#include "incoreInodeOps/node.h"
+#include "incoreInodeOps/hashQ.h"
+#include "inode/inCoreiNode.h"
+#include "inode/iNode.h"
+#include "mkfs/iNodeManager.h"
 
-void iput(inCoreiNode* inode) {
-    // take lock, the thread calling iput should release lock and call it
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void writeINodeToDisk (inCoreiNode* inode) {
+    iNode* diskINode = (iNode*)malloc(sizeof(iNode));
+    getDiskINodeData(inode, diskINode);
+    writeDiskInode(inode->inode_number, diskINode);
+    free(diskINode);
+}
+
+int iput(inCoreiNode* inode) {
+	printf("iPut for %ld\n", inode->inode_number);
+    printf("Sleeping on lock for iNode %ld\n", inode->inode_number);
     pthread_mutex_lock(&(inode->iNodeMutex));
+    printf("Acquired lock for iNode %ld\n", inode->inode_number);
+    if (inode->reference_count == 0) {
+        pthread_mutex_unlock(&(inode->iNodeMutex));
+        printf("Released lock for inode %ld\n", inode->inode_number);
+        printf ("iPut - Reference count already zero\n");
+        return -1;
+    }
     inode->reference_count--;
-    if(inode->reference_count == 0) {
-        /** TODO: include link_count in the inCoreiNode struct
-         if(inode->link_count == 0) {
-             // handle file deletion here
- //            free disk blocks for file (algorithm: free); // free is described later
- //			set file type to 0;
- //			free inode (algorithm: ifree); // ifree is described later
-         } */
+	if(inode->reference_count == 0) {
+        if (inode->inode_changed || inode->file_data_changed) {
+            writeINodeToDisk(inode);
+			inode->inode_changed = false;
+			inode->file_data_changed = false;
+        }
 
-        // writes inode data to disk
-        if (inode->inode_changed && inode->file_data_changed) {
-            writeDiskInode(inode);
+        Node* node = hashLookup(inode->inode_number, inode->device_number);
+        if(node == NULL) {
+            pthread_mutex_unlock(&(inode->iNodeMutex));
+            printf("Released lock for inode %ld\n", inode->inode_number);
+            printf ("iPut - iNode not present in hashQ\n");
+            return -1;
         }
-        // get hash Q node
-        Node* node = hashLookup(inode->device_number, inode->inode_number);
-        if(NULL == node) {
-            // TODO: handle this exception
-        }
-        // remove it from free inode list
+
+		printf("Inserting iNode %ld\n", inode->inode_number);
         freeListInsert(node);
     }
     pthread_mutex_unlock(&(inode->iNodeMutex));
+	printf("Released lock for inode %ld\n", inode->inode_number);
+    return 0;
 }
+

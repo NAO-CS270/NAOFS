@@ -1,14 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "iNode.h"
-#include "../mandsk/params.h"
-#include "../dsk/mdisk.h"
-
-static const size_t iNodeSize = INODE_SIZE;			// TODO - Update
+#include "inode/iNode.h"
+#include "mkfs/iNodeManager.h"
 
 void initializeINode(iNode *iNodePtr, size_t iNodeNum) {
-	memset(iNodePtr, 0, iNodeSize);
+	memset(iNodePtr, 0, sizeof(iNode));
 
 	if (iNodeNum >= NUM_OF_INODES) {
 		// throw appropriate error
@@ -18,7 +15,7 @@ void initializeINode(iNode *iNodePtr, size_t iNodeNum) {
 	iNodePtr->device_number = 0;
 	iNodePtr->inode_number = iNodeNum;
 	iNodePtr->linksCount = 0;
-	iNodePtr->type = T_REGULAR;
+	iNodePtr->type = T_FREE;
 	iNodePtr->mode = P_RUSR | P_WUSR | P_RGRP;
 	iNodePtr->owner_uid = 0;
 	iNodePtr->group_uid = 0;
@@ -31,7 +28,8 @@ void initializeINode(iNode *iNodePtr, size_t iNodeNum) {
 size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum) {
 	memset(blockPtr, 0, BLOCK_SIZE);
 
-	iNode * iNodePtr = (iNode *)malloc(iNodeSize);
+	size_t iNodeStructSize = sizeof(iNode);
+	iNode * iNodePtr = (iNode *)malloc(iNodeStructSize);
 	size_t iNodeCounter = iNodeNum;
 
 	unsigned char *ptrIntoBlock = (blockPtr->data);
@@ -39,9 +37,9 @@ size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum) {
 
 	while (ptrIntoBlock < endOfBlock) {
 		initializeINode(iNodePtr, iNodeCounter);
-		memcpy(ptrIntoBlock, iNodePtr, iNodeSize);
-
-		ptrIntoBlock += iNodeSize;
+		memcpy(ptrIntoBlock, iNodePtr, iNodeStructSize);
+		
+		ptrIntoBlock += INODE_SIZE;
 		iNodeCounter++;
 	}
 
@@ -50,7 +48,7 @@ size_t populateINodesIn(disk_block * blockPtr, size_t iNodeNum) {
 }
 
 size_t initINodeListBlock(disk_block * blockPtr, size_t *iNodeList, size_t listSize) {
-	memcpy(blockPtr, 0, BLOCK_SIZE);
+	memset(blockPtr, 0, BLOCK_SIZE);
 	size_t counter = 0;
 
 	unsigned char *ptrIntoBlock = (blockPtr->data);

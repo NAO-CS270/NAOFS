@@ -1,45 +1,53 @@
-#include "./freeList.h"
-#include "./iget.h"
+#include "incoreInodeOps/iget.h"
+#include "inode/iNode.h"
+
+#include <stdio.h>
+#include <pthread.h>
+
+void fetchInodeFromDisk(size_t iNodeNumber, inCoreiNode* inode) {
+    iNode* disk_inode = (iNode*)malloc(sizeof(iNode));
+    getDiskInode(iNodeNumber, disk_inode);
+
+    insertDiskInodeData(disk_inode, inode);
+    free(disk_inode);
+}
+
+inCoreiNode *updateAndGetINode(Node *coreNode) {
+	inCoreiNode *iNodeToReturn = coreNode->inode;
+
+	(iNodeToReturn->reference_count)++;
+	pthread_mutex_unlock(&(iNodeToReturn->iNodeMutex));
+	printf("Released lock for inode %ld\n", iNodeToReturn->inode_number);
+	return iNodeToReturn;
+}
 
 inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
-    // looking for the inode in the hash Q
-    Node* node = hashLookup(deviceNumber, iNodeNumber);
-    if(NULL != node) {
-        inCoreiNode* inode = node->inode;
-        // get a lock on the inode, wait until another process releases it
-        pthread_mutex_lock(&(inode->iNodeMutex));
-        // TODO: special processing for mount points.
+	printf("iGet iNode %ld\n", iNodeNumber);
+    Node* node = hashLookup(iNodeNumber, deviceNumber);
 
-        // if also in free in list, remove it
-        if(inode->reference_count == 0) {
-            freeListRemove(node);
-        }
-        inode->reference_count++;
-        // returning locked inode
-        return inode;
+    if(node == NULL) {
+		printf("iNode not in HashQ\n");
+		
+		node = popFreeList();
+		if (node == NULL) {
+			return NULL;
+		}
+		printf("Sleeping on lock for iNode %ld\n", iNodeNumber);
+		pthread_mutex_lock(&(node->inode->iNodeMutex));
+		printf("Acquired lock for iNode %ld\n", iNodeNumber);
+		updateInHashQ(node, iNodeNumber, deviceNumber);
+		fetchInodeFromDisk(iNodeNumber, node->inode);
     }
-    if(NULL == freeList) {
-        // TODO: Error handling
-        return NULL;
-    }
-    // getting free inode from free list and removing it
-    node = getFreeINodeFromList();
-    node->inode->inode_number = iNodeNumber;
-    node->inode->device_number = deviceNumber;
-    freeListRemove(node);
+	else {
+		printf("Sleeping on lock for iNode %ld\n", node->inode->inode_number);
+		pthread_mutex_lock(&(node->inode->iNodeMutex));
+		printf("Acquired lock for iNode %ld\n", node->inode->inode_number);
+		if (node->inode->reference_count == 0) {
+			printf("Removing iNode %ld from free list\n", node->inode->inode_number);
+			freeListRemove(node);
+		}
+	}
 
-    // updating the hash Q entry with new inode
-    insertInHash(node);
-
-    // TODO: Take a lock while reading
-    // getting the disk inode
-    getDiskInode(node->inode);
-    // TODO: handle error if getDiskInode returns an error
-
-    // this lock has to be released by the process using iget
-//    pthread_mutex_lock(&(inode->iNodeMutex)); TODO: fix this line
-    node->inode->reference_count++;
-
-    // TODO: Update inode status?
-    return node->inode;
+	return updateAndGetINode(node);
 }
+

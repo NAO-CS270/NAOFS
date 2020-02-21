@@ -1,9 +1,9 @@
-#include "ialloc.h"
-#include "diskParams.h"
-#include "metaBlocks.h"
-#include "../dsk/blkfetch.h"
-#include "../mandsk/params.h"
-#include "./iNodeManager.h"
+#include "mkfs/ifree.h"
+#include "mkfs/diskParams.h"
+#include "mkfs/metaBlocks.h"
+#include "dsk/blkfetch.h"
+#include "mandsk/params.h"
+#include "mkfs/iNodeManager.h"
 
 #include <pthread.h>
 #include <stdlib.h>
@@ -43,12 +43,12 @@ void rememberIfNeeded(size_t iNodeNum, iNodeListBlock *iNodeList) {
 	}
 	
 	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
-	getDiskBlock(SUPER_BLOCK, superBLockData);
+	getDiskBlock(SUPER_BLOCK, superBlockData);
 
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
 	makeSuperBlock(superBlockData, theSuperBlock);
 
-	(theSuperBlock->rememberedINodeNum) = iNodeNum;
+	(theSuperBlock->remembered_inode) = iNodeNum;
 
 	writeSuperBlock(theSuperBlock, superBlockData);
 	writeDiskBlock(SUPER_BLOCK, superBlockData);
@@ -57,9 +57,9 @@ void rememberIfNeeded(size_t iNodeNum, iNodeListBlock *iNodeList) {
 }
 
 void freeINode(size_t iNodeNum) {
-	markINodeFree(freeINode, T_FREE);
-	
 	pthread_mutex_lock(&iNodeListMutex);
+
+	updateINodeData(iNodeNum, T_FREE, P_RUSR | P_WUSR | P_RGRP, 0, 0);
 
 	disk_block *iNodeListData = (disk_block *)malloc(BLOCK_SIZE);
 	getDiskBlock(INODE_LIST_BLOCK, iNodeListData);
@@ -77,7 +77,7 @@ void freeINode(size_t iNodeNum) {
 		writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
 	}
 	free(iNodeListData);
-	free(iNodeListBlock);
+	free(iNodeList);
 
 	pthread_mutex_unlock(&iNodeListMutex);
 }
