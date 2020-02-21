@@ -29,7 +29,7 @@ script:
   - cd build
   - make
   - mkdir fsRoot
-  - ./bin/naofs fsRoot -d -s
+  - ./bin/naofs fsRoot -s
 
 #after_success:
 #  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
