@@ -1,4 +1,4 @@
-language: cpp
+language: c
 os: linux
 sudo: false
 compiler: gcc
@@ -8,10 +8,12 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
+      - software-properties-common
       - libfuse-dev
       - linux-libc-dev
       - libc6-dev
       - libgcc-8-dev
+      - g++
       - pkg-config
 
 before_install:
@@ -21,6 +23,7 @@ before_install:
     CMAKE_URL="https://cmake.org/files/v3.10/cmake-3.10.0-Linux-x86_64.tar.gz"
     mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
     export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+  - cmake --version
 
 script:
   - cmake -Bbuild -H.

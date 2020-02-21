@@ -1,7 +1,7 @@
 # Specify the minimum version of CMake
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(NAOFS CXX)
+project(NAOFS C)
 
 include(FindPkgConfig)
 
@@ -17,10 +17,10 @@ pkg_check_modules(FUSE REQUIRED fuse)
 # find_package(FUSE REQUIRED)
 
 #set(CMAKE_C_FLAGS "`pkg-config fuse --cflags --libs`")
-set(CMAKE_CXX_FLAGS "-D_FILE_OFFSET_BITS=64 -lulockmgr")
+set(CMAKE_C_FLAGS "-D_FILE_OFFSET_BITS=64 -lulockmgr")
 # we use this to get code coverage
-if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+if(CMAKE_C_COMPILER_ID MATCHES GNU)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
 endif()
 
 file(GLOB_RECURSE SOURCES "src/*.c")
