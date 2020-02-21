@@ -18,7 +18,6 @@ addons:
 
 before_install:
 #  - pip install --user cpp-coveralls
-  - mkdir fsRoot
   - |
     CMAKE_URL="https://cmake.org/files/v3.10/cmake-3.10.0-Linux-x86_64.tar.gz"
     mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
@@ -30,6 +29,7 @@ script:
   - cd build
   - make
   - mkdir fsRoot
+  - ls
   - ./naofs fsRoot -d -f -s
 
 #after_success:
