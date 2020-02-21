@@ -108,7 +108,7 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
         free(metaBlock);
     }
     inode -> size = max(inode -> size, size);
-    time(&inode -> access_time);
+    time(&inode -> access);
     inode -> inode_changed = true;
     iput(inode);
 	free(bmapResp);
@@ -146,8 +146,8 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
         inode -> size = max(inode -> size, offset + bytesWritten);
     }
 	free(bmapResp);
-    time(&(inode -> access_time));
-    time(&(inode -> modified_time));
+    time(&(inode -> access));
+    time(&(inode -> modification));
 
     inode -> inode_changed = true;
     inode -> file_data_changed = true;
@@ -176,36 +176,6 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
 	return createFile(path, T_REGULAR, mode);
-/*
-	size_t pathLen = strlen(path);
-	char *parentDirPath = (char *)malloc((pathLen + 1)*sizeof(char));
-	char *filename = (char *)malloc((pathLen + 1)*sizeof(char));
-    
-	inCoreiNode* newFilesiNode;
-    newFilesiNode = getFileINode(path, strlen(path));
-    size_t fd;
-    if (newFilesiNode == NULL) {
-        // assign new inode from the file system
-        size_t newInodeNumber = getNewINode();
-
-        // create new directory entry in parent directory
-        getParentDirectory(path, parentDirPath);
-        inCoreiNode *parentInode = getFileINode(parentDirPath, strlen(parentDirPath));
-
-        // include new file name and newly assigned inode number
-        getFilenameFromPath(path, filename);
-        getAndUpdateDirectoryTable(parentInode, newInodeNumber, filename);
-        iput(parentInode);
-    } else {
-        truncateFile(newFilesiNode);
-    }
-    fd = createFileDescriptorEntry(newFilesiNode, fi -> flags);
-    iput(newFilesiNode);
-
-	free(parentDirPath);
-	free(filename);
-    return fd;
-*/
 }
 
 static struct fuse_operations OPERATIONS = {
@@ -226,7 +196,6 @@ int main(int argc, char *argv[]) {
 	makeFileSystem();
     initFreeInCoreINodeList();
 	initHashQueues();
-    // initialize the file table entries here
     initFileTableEntries();
 
     return fuse_main(argc, argv, &OPERATIONS, NULL);

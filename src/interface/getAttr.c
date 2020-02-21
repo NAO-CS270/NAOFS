@@ -6,6 +6,9 @@
 #include "incoreInodeOps/iput.h"
 
 #include <errno.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
 
 int attrPopulate(const char *path, struct stat *stbuf) {
 	inCoreiNode* inode = getFileINode(path, strlen(path));
@@ -16,24 +19,23 @@ int attrPopulate(const char *path, struct stat *stbuf) {
 	}
     
 	/*
-	stbuf -> st_atime = inode -> access_time;
-    stbuf -> st_mtime = inode -> modified_time;
     stbuf -> st_uid = (uid_t) inode -> owner_uid;
     stbuf -> st_gid = (gid_t) inode -> group_uid;
 	stbuf -> st_nlink = inode -> linksCount;
-	*/
-    
-	if (inode->type == T_DIRECTORY) {
-		stbuf -> st_ctime = inode -> creation_time;
-		stbuf->st_mode = S_IFDIR | 0755;
+	if (S_ISDIR(inode->file_mode)) {
 		stbuf->st_nlink = 2;
 	}
-	else if(inode->type == T_REGULAR) {
-		stbuf->st_mode = S_IFREG | 0777;
+	else {
 		stbuf->st_nlink = 1;
-		stbuf->st_size = inode->size;
 	}
+	*/
+	stbuf -> st_atime = inode -> access;
+	stbuf -> st_mtime = inode -> modification;
+	stbuf -> st_ctime = inode -> status_change;
 
+	stbuf -> st_mode = inode -> file_mode;
+	stbuf -> st_size = inode -> size;
+	
 	iput(inode);
 	return 0;
 }

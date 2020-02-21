@@ -7,8 +7,9 @@
 #include "incoreInodeOps/iput.h"
 #include "mkfs/ialloc.h"
 
-#include <sys/stat.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 inCoreiNode *getParentINode(const char *path, size_t pathLen) {
 	char *parentDirPath = (char *)malloc((pathLen + 1)*sizeof(char));
@@ -54,6 +55,7 @@ inCoreiNode *validateThenGetParentINode(iNodeType fileType, const char *path, ch
 }
 
 int createFile(const char *path, iNodeType fileType, mode_t mode) {
+	printf("Here it is, Here is everything - %d\n", mode);
 	size_t pathLen = strlen(path);
 	char *filename = (char *)malloc((pathLen + 1)*sizeof(char));
 	
@@ -62,7 +64,10 @@ int createFile(const char *path, iNodeType fileType, mode_t mode) {
 		return -1;
 	}
 
-	size_t iNodeNum = getNewINode(fileType, P_RUSR);
+	if (fileType == T_DIRECTORY) {
+		mode = S_IFDIR | mode;
+	}
+	size_t iNodeNum = getNewINode(fileType, mode);
     getAndUpdateDirectoryTable(parentINode, iNodeNum, filename);
 
     inCoreiNode *newINode = iget(iNodeNum, 0);

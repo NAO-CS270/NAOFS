@@ -3,12 +3,11 @@
 void insertDiskInodeData(iNode* disk_inode, inCoreiNode* in_core) {
 	in_core->device_number = disk_inode->device_number;
 	in_core->inode_number = disk_inode->inode_number;
-	in_core->modified_time = disk_inode->modified_time;
-	in_core->access_time = disk_inode->access_time;
-	in_core->creation_time = disk_inode->creation_time;
+	in_core->access = disk_inode->access;
+	in_core->modification = disk_inode->modification;
+	in_core->status_change = disk_inode->status_change;
 	in_core->linksCount = disk_inode->linksCount;
-	in_core->type = disk_inode->type;
-	in_core->mode = disk_inode->mode;
+	in_core->file_mode = disk_inode->file_mode;
 	in_core->owner_uid = disk_inode->owner_uid;
 	in_core->group_uid = disk_inode->group_uid;
 	in_core->size = disk_inode->size;
@@ -23,12 +22,11 @@ void insertDiskInodeData(iNode* disk_inode, inCoreiNode* in_core) {
 void getDiskINodeData(inCoreiNode* in_core, iNode* disk_inode) {
 	disk_inode->device_number = in_core->device_number;
 	disk_inode->inode_number = in_core->inode_number;
-	disk_inode->modified_time = in_core->modified_time;
-	disk_inode->access_time = in_core->access_time;
-	disk_inode->creation_time = in_core->creation_time;
+	disk_inode->access = in_core->access;
+	disk_inode->modification = in_core->modification;
+	disk_inode->status_change = in_core->status_change;
 	disk_inode->linksCount = in_core->linksCount;
-	disk_inode->type = in_core->type;
-	disk_inode->mode = in_core->mode;
+	disk_inode->file_mode = in_core->file_mode;
 	disk_inode->owner_uid = in_core->owner_uid;
 	disk_inode->group_uid = in_core->group_uid;
 	disk_inode->size = in_core->size;
@@ -39,3 +37,4 @@ void getDiskINodeData(inCoreiNode* in_core, iNode* disk_inode) {
 		index++;
 	}
 }
+

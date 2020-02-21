@@ -6,6 +6,7 @@
 #include "mkfs/metaBlocks.h"
 
 #include <time.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -152,7 +153,7 @@ void insertDataBlockInINode(inCoreiNode* iNode, size_t blockNumToAdd) {
 void updateINodeMetadata(inCoreiNode *iNode, int sizeDifference) {
 	iNode->size += sizeDifference;
 
-	iNode->modified_time = time(NULL);
+	iNode->modification = time(NULL);
 
 	iNode->file_data_changed = true;
 	iNode->inode_changed = true;

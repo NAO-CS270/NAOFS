@@ -1,15 +1,13 @@
 #ifndef INODE_H
 #define INODE_H
 
-#include <time.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stddef.h>
-
 #include "dsk/mdisk.h"
 #include "mandsk/params.h"
 
+#include <time.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <sys/types.h>
 
 #define BLOCKS_IN_INODE 13
 
@@ -20,25 +18,6 @@ enum iNodeType {
 };
 typedef enum iNodeType iNodeType;
 
-enum iNodeMode {
-    P_SUID = 04000,  // set-user-ID bit (see execve(2))
-    P_SGID = 02000,  // set-group-ID bit
-    P_SVTX = 01000,  // sticky bit
-
-    P_RUSR = 00400,  // owner has read permission
-    P_WUSR = 00200,  // owner has write permission
-    P_XUSR = 00100,  // owner has execute permission
-
-    P_RGRP = 00040,  // group has read permission
-    P_WGRP = 00020,  // group has write permission
-    P_XGRP = 00010,  // group has execute permission
-
-    P_ROTH = 00004,  // others have read permission
-    P_WOTH = 00002,  // others have write permission
-    P_XOTH = 00001,  // others have execute permission
-};
-typedef enum iNodeMode iNodeMode;
-
 // Using this struct in the project. Keeping the old for for reference.
 struct iNode {
     // device number
@@ -47,10 +26,10 @@ struct iNode {
     // inode number
 	size_t inode_number; 
 
-    // different times access, modified and created
-	time_t modified_time;
-	time_t access_time;
-	time_t creation_time;
+    // times accessed, modified and status changed
+	time_t access;
+	time_t modification;
+	time_t status_change;
 
     // link count
 	size_t linksCount;
@@ -59,7 +38,7 @@ struct iNode {
 	iNodeType type;
 
     // file permissions
-	iNodeMode mode;
+	mode_t file_mode;
 
     // id of the owner
 	size_t owner_uid;
@@ -116,10 +95,7 @@ typedef struct INode {
     // file's last modified timestamp(timestamp of a directory is changed by the creation
     // or deletion of files in that directory)
     time_t modified_time;
-
-    // permissions for the file
-    iNodeMode mode;
 } INode;
 
-
 #endif // INODE_H
+
