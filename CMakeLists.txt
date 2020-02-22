@@ -29,4 +29,5 @@ add_executable (Test ${TEST_SOURCES})
 target_link_libraries(Test NAOfs)
 
 include(CTest)
+#enable_testing()
 add_test (NAME NAOfsTest COMMAND Test)
