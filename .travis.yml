@@ -15,6 +15,7 @@ addons:
       - libgcc-8-dev
       - g++
       - pkg-config
+      - valgrind
 
 before_install:
 #  - pip install --user cpp-coveralls
