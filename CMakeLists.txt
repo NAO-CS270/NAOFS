@@ -12,7 +12,9 @@ pkg_check_modules(FUSE REQUIRED fuse)
 set(CMAKE_C_FLAGS "-D_FILE_OFFSET_BITS=64 -lulockmgr")
 
 file(GLOB_RECURSE SOURCES "src/*.c")
-add_executable(naofs ${SOURCES})
+list(REMOVE_ITEM SOURCES "main.c")
+add_library (NAOfs ${SOURCES})
+add_executable(naofs ${SOURCES} main.c)
 
 add_definitions(-rdynamic -g -ggdb)
 target_compile_options(naofs PRIVATE -D_FILE_OFFSET_BITS=64 -rdynamic -g -ggdb)
@@ -20,11 +22,11 @@ target_compile_options(naofs PRIVATE -D_FILE_OFFSET_BITS=64 -rdynamic -g -ggdb)
 target_include_directories(naofs PRIVATE ${FUSE_INCLUDE_DIR})
 target_link_libraries(naofs ${FUSE_LIBRARIES})
 
-#include(cmake/googletest.cmake)
-#fetch_googletest(
-#    ${PROJECT_SOURCE_DIR}/cmake
-#    ${PROJECT_BINARY_DIR}/googletest
-#    )
 
-enable_testing()
-#add_subdirectory(test)
+file(GLOB_RECURSE TEST_SOURCES "test/*.c")
+list(REMOVE_ITEM SOURCES "test_block_fetch.c")
+add_executable (Test ${TEST_SOURCES})
+target_link_libraries(Test NAOfs)
+
+include(CTest)
+add_test (NAME NAOfsTest COMMAND Test)

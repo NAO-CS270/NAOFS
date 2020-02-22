@@ -1,7 +1,16 @@
-#include "gtest/gtest.h"
+#include <stdio.h>
 
-int main(int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+#define CTEST_MAIN
+
+// uncomment lines below to enable/disable features. See README.md for details
+#define CTEST_SEGFAULT
+//#define CTEST_NO_COLORS
+#define CTEST_COLOR_OK
+
+#include "../include/ctest.h"
+
+int main(int argc, const char *argv[]) {
+    int result = ctest_main(argc, argv);
+
+    return result;
 }
