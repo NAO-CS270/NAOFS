@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#define CTEST_H
 #ifndef CTEST_H
 #define CTEST_H
 
