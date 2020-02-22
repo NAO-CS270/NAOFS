@@ -14,7 +14,7 @@ set(CMAKE_C_FLAGS "-D_FILE_OFFSET_BITS=64 -lulockmgr")
 file(GLOB_RECURSE SOURCES "src/*.c")
 list(REMOVE_ITEM SOURCES "main.c")
 add_library (NAOfs ${SOURCES})
-add_executable(naofs ${SOURCES} main.c)
+add_executable(naofs ${SOURCES} "src/main.c")
 
 add_definitions(-rdynamic -g -ggdb)
 target_compile_options(naofs PRIVATE -D_FILE_OFFSET_BITS=64 -rdynamic -g -ggdb)
