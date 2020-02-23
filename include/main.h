@@ -1,10 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "fileTables.h"
 #include "incoreInodeOps/bmap.h"
 #include "incoreInodeOps/freeList.h"
-#include "fileTables.h"
 #include "incoreInodeOps/bmap.h"
 #include "dsk/blkfetch.h"
 #include "dsk/free.h"

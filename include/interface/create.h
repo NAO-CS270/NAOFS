@@ -1,5 +1,5 @@
-#ifndef _MKDIR_H
-#define _MKDIR_H
+#ifndef _CREATE_H
+#define _CREATE_H
 
 #include <sys/stat.h>
 

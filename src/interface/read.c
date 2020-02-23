@@ -17,7 +17,7 @@ void fillDirectoryEntries(fuse_fill_dir_t filler, void *buffer, inCoreiNode *iNo
 	size_t entriesRead;
 	size_t counter;
 
-	directoryEn1try *entryBuffer = (directoryEntry *)malloc(entriesPerIteration * sizeof(directoryEntry));
+	directoryEntry *entryBuffer = (directoryEntry *)malloc(entriesPerIteration * sizeof(directoryEntry));
 
 	while (entriesOffset < entriesInDirectory) {
 		memset(entryBuffer, 0, entriesPerIteration * sizeof(directoryEntry));

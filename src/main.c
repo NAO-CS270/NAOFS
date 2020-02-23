@@ -17,6 +17,7 @@ static int truncateFile(inCoreiNode* inode) {
     inode -> size = 0;
 }
 
+/*
 // TODO: Update the size of the file
 static int read_callback(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
 
@@ -97,6 +98,7 @@ static int write_callback(const char* path, const char* buf, size_t size, off_t 
     iput(inode);
     return bytesWritten;
 }
+*/
 
 static int access_callback(const char* path, int mode) {
     return 0;
@@ -121,7 +123,7 @@ static int create_callback(const char *path, mode_t mode, struct fuse_file_info 
 }
 
 static int open_callback(const char *path, struct fuse_file_info *fi) {
-    struct fuse_context* fuse_context = fuse_get_context();
+    struct fuse_context *fuse_context = fuse_get_context();
     return openFile(path, fi, fuse_context);
 }
 
@@ -131,8 +133,8 @@ static struct fuse_operations OPERATIONS = {
     .mkdir = mkdir_callback,
     .readdir = readdir_callback,
 	.create = create_callback,
+    .open = open_callback,
         //.read = read_callback,
-        .open = open_callback,
         //.write = write_callback,
         //.access = access_callback,
         //.link = link_callback,
@@ -144,7 +146,6 @@ int main(int argc, char *argv[]) {
 	makeFileSystem();
     initFreeInCoreINodeList();
 	initHashQueues();
-    initFileTableEntries();
 
     return fuse_main(argc, argv, &OPERATIONS, NULL);
 }
