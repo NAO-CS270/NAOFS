@@ -7,6 +7,7 @@
 #include "interface/getAttr.h"
 #include "interface/create.h"
 #include "interface/read.h"
+#include "interface/open.h"
 #include "inode/iNode.h"
 
 #include <sys/stat.h>
@@ -14,30 +15,6 @@
 static int truncateFile(inCoreiNode* inode) {
     inodeBlocksFree(inode);
     inode -> size = 0;
-}
-
-// TODO: Update the size of the file
-// TODO: Call create here
-static int open_callback(const char *path, struct fuse_file_info *fi) {
-    if(fi -> flags & O_CREAT) {
-        return -1;//fi -> fh = create_callback(path, 0, fi);
-    }
-
-    inCoreiNode *inode;
-    inode = getFileINode(path, strlen(path));
-    size_t fd = createFileDescriptorEntry(inode, fi -> flags);
-
-    if(fd == -1) {
-        // print errors
-        return fd;
-    }
-
-    if(fi->flags & O_TRUNC) {
-        truncateFile(inode);
-    }
-    fi->fh = fd;
-    iput(inode);
-    return fd;
 }
 
 // TODO: Update the size of the file
@@ -143,13 +120,19 @@ static int create_callback(const char *path, mode_t mode, struct fuse_file_info 
 	return createFile(path, T_REGULAR, mode);
 }
 
+static int open_callback(const char *path, struct fuse_file_info *fi) {
+    struct fuse_context* fuse_context = fuse_get_context();
+    return openFile(path, fi, fuse_context);
+}
+
+
 static struct fuse_operations OPERATIONS = {
 	.getattr = getattr_callback,
     .mkdir = mkdir_callback,
     .readdir = readdir_callback,
 	.create = create_callback,
         //.read = read_callback,
-        //.open = open_callback,
+        .open = open_callback,
         //.write = write_callback,
         //.access = access_callback,
         //.link = link_callback,
