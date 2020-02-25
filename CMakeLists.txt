@@ -22,12 +22,12 @@ target_compile_options(naofs PRIVATE -D_FILE_OFFSET_BITS=64 -rdynamic -g -ggdb)
 target_include_directories(naofs PRIVATE ${FUSE_INCLUDE_DIR})
 target_link_libraries(naofs ${FUSE_LIBRARIES})
 
-include(CTest)
-#enable_testing()
-
-file(GLOB_RECURSE TEST_SOURCES "test/*.c")
-list(REMOVE_ITEM SOURCES "test_block_fetch.c")
-add_executable (Test ${TEST_SOURCES})
-target_link_libraries(Test NAOfs)
-
-add_test (NAME NAOfsTest COMMAND Test)
+#include(CTest)
+##enable_testing()
+#
+#file(GLOB_RECURSE TEST_SOURCES "test/*.c")
+#list(REMOVE_ITEM SOURCES "test_block_fetch.c")
+#add_executable (Test ${TEST_SOURCES})
+#target_link_libraries(Test NAOfs)
+#
+#add_test (NAME NAOfsTest COMMAND Test)
