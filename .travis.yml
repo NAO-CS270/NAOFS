@@ -34,7 +34,8 @@ script:
   - make
   - mkdir fsRoot
   - ./naofs fsRoot -s
-  - bash ../test/bash_tests/test.sh
+  - ls
+  - bash ./test/bash_tests/test.sh
 
 #after_success:
 #  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
