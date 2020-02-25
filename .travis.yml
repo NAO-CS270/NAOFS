@@ -34,8 +34,6 @@ script:
   - make
   - mkdir fsRoot
   - ./naofs fsRoot -s
-  - ls
-  - ls ../
   - bash ../test/bash_tests/test.sh
 
 #after_success:
