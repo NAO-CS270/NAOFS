@@ -20,7 +20,7 @@ testCreateDir() {
 
 testPresentWorkingDir() {
   pwd=$(pwd)
-  assertEquals "$pwd" "/"
+  assertEquals "$pwd" "/home/travis/build/NAO-CS270/NAOFS/build/fsRoot"
 }
 
 testListDir() {
