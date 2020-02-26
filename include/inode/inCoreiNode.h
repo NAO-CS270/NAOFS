@@ -28,6 +28,9 @@ struct inCoreiNode {
     // link count
     size_t linksCount;
 
+    // type of the file
+    iNodeType type;
+
     // File type and mode
 	mode_t file_mode;
 

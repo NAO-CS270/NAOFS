@@ -7,6 +7,7 @@ void insertDiskInodeData(iNode* disk_inode, inCoreiNode* in_core) {
 	in_core->modification = disk_inode->modification;
 	in_core->status_change = disk_inode->status_change;
 	in_core->linksCount = disk_inode->linksCount;
+	in_core->type = disk_inode->type;
 	in_core->file_mode = disk_inode->file_mode;
 	in_core->owner_uid = disk_inode->owner_uid;
 	in_core->group_uid = disk_inode->group_uid;
@@ -26,6 +27,7 @@ void getDiskINodeData(inCoreiNode* in_core, iNode* disk_inode) {
 	disk_inode->modification = in_core->modification;
 	disk_inode->status_change = in_core->status_change;
 	disk_inode->linksCount = in_core->linksCount;
+	disk_inode->type = in_core->type;
 	disk_inode->file_mode = in_core->file_mode;
 	disk_inode->owner_uid = in_core->owner_uid;
 	disk_inode->group_uid = in_core->group_uid;

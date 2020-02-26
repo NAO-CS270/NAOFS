@@ -25,6 +25,6 @@ struct fileDescriptorNode {
 typedef struct fileDescriptorNode fdNode;
 
 extern int createAndGetFileDescriptor(pid_t pid, inCoreiNode *inode, int flags, size_t offset);
-extern int getFileDescriptor(fileTableEntry *entry, pid_t pid, int fd);
+extern fileTableEntry *getFileDescriptor(pid_t pid, int fd, int *error);
 
 #endif //FILETABLES_H

@@ -1,3 +1,4 @@
+#include "interface/open.h"
 #include "fdTable/fileTables.h"
 #include "inode/inCoreiNode.h"
 #include "trav/namei.h"
@@ -11,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+//TODO: Check if O_APPEND actually sets file offset to be size. Doesn't think it does now
 size_t calculateFileOffset (inCoreiNode *iNode, int flags) {
 	size_t offset = 0;
 	if (flags && O_APPEND) {
