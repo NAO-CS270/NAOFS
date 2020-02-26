@@ -18,6 +18,11 @@ testCreateDir() {
   assertEquals "$pwd1" "$pwd2"
 }
 
+testPresentWorkingDir() {
+  pwd=$(pwd)
+  assertEquals "$pwd" "/"
+}
+
 testListDir() {
   lsResult=$(ls)
   assertEquals "$lsResult" "test"
