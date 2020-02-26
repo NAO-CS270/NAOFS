@@ -1,6 +1,7 @@
 #ifndef NAOFS_UTILS_H
 #define NAOFS_UTILS_H
 
+#include <stdio.h>
 
 #define debug_print(fmt, ...) \
         do { fprintf(stderr, "%s:%d:%s(): \n" fmt, __FILE__, \

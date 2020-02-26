@@ -4,6 +4,10 @@
 #include "mkfs/diskParams.h"
 #include "dsk/blkfetch.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+
 static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
 
 void _freeInto(int freeListBlockNumber, size_t blockNumber) {
@@ -28,7 +32,7 @@ void _freeInto(int freeListBlockNumber, size_t blockNumber) {
     free(diskBlock);
 }
 
-void diskBlockFree(size_t diskBlockNumber, size_t* leftSize, int recursionLevel) {
+void diskBlockFree(size_t diskBlockNumber, ssize_t* leftSize, int recursionLevel) {
     if (recursionLevel) {
         disk_block *blockToBeFreed = (disk_block *) malloc(sizeof(disk_block));
         blockToBeFreed = getDiskBlock(diskBlockNumber, blockToBeFreed);
@@ -45,13 +49,16 @@ void diskBlockFree(size_t diskBlockNumber, size_t* leftSize, int recursionLevel)
         *leftSize -= BLOCK_SIZE;
 
     blockFree(diskBlockNumber);
+    printf("Block Freed: %ld\n", diskBlockNumber);
 }
 
 void inodeBlocksFree(inCoreiNode *inode) {
-    size_t leftSize = inode->size;
+    ssize_t leftSize = inode->size;
     int i;
     for (i = 0; i <= DIRECT_BLOCK_LIMIT && leftSize > 0; ++i) {
+        printf("left size: %ld\n", leftSize);
         blockFree(inode->dataBlockNums[i]);
+        printf("Block Freed: %ld\n", inode->dataBlockNums[i]);
         leftSize -= BLOCK_SIZE;
     }
 

@@ -45,13 +45,13 @@ void calculateOffset(size_t offset, blkTreeOffset* blkOffset) {
 	}
 	else if (blkIndex <= DOUBLE_INDIRECT_LIMIT) {
 		size_t firstOffset = (blkIndex - SINGLE_INDIRECT_LIMIT - 1) / blkAddrNos;
-		size_t secondOffset = (blkIndex - (firstOffset * blkAddrNos)) - SINGLE_INDIRECT_LIMIT;
+		size_t secondOffset = (blkIndex - (firstOffset * blkAddrNos)) - SINGLE_INDIRECT_LIMIT - 1;
 		blkTreeOffsetConstructor(-1, firstOffset, secondOffset, -1, DOUBLE_INDIRECT, blkOffset);
 	}
 	else if (blkIndex <= TRIPLE_INDIRECT_LIMIT) {
 		size_t firstOffset = (blkIndex - DOUBLE_INDIRECT_LIMIT - 1) / (blkAddrNos * blkAddrNos);
-		size_t secondOffset = (blkIndex - (firstOffset * (blkAddrNos * blkAddrNos)) - DOUBLE_INDIRECT_LIMIT) / blkAddrNos;
-		size_t thirdOffset = blkIndex - secondOffset * blkAddrNos - firstOffset * (blkAddrNos * blkAddrNos) - DOUBLE_INDIRECT_LIMIT;
+		size_t secondOffset = (blkIndex - (firstOffset * (blkAddrNos * blkAddrNos)) - DOUBLE_INDIRECT_LIMIT - 1) / blkAddrNos;
+		size_t thirdOffset = blkIndex - secondOffset * blkAddrNos - firstOffset * (blkAddrNos * blkAddrNos) - DOUBLE_INDIRECT_LIMIT - 1;
 		blkTreeOffsetConstructor(-1, firstOffset, secondOffset, thirdOffset, TRIPLE_INDIRECT, blkOffset);
 	}
 }
@@ -64,6 +64,7 @@ size_t allocateIfNeeded(int *indirOffsets, size_t offsetsSize) {
 			shouldAdd = false;
 			break;
 		}
+		counter++;
 	}
 
 	if (shouldAdd) {
@@ -101,7 +102,7 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t toAdd, int *indirOffsets, 
 	}
 	*curBlock = toAdd;
 	writeFreeDiskListBlock(workingData, dataBlock);
-	writeDiskBlock(*curBlock, dataBlock);
+	writeDiskBlock(parentBlock, dataBlock);
 
 	free(dataBlock);
 	free(workingData);
@@ -121,11 +122,12 @@ void updateIndex(inCoreiNode* iNode, size_t blockNumToAdd, blkTreeOffset *blkOff
 
 	int *offsets = blkOffset->offsets;
 	size_t indirection = blkOffset->offsetIndirection;
-	size_t *dataBlockIndex = iNode->dataBlockNums + DIRECT_BLOCK_LIMIT + 1 + indirection;
+	size_t *dataBlockIndex = iNode->dataBlockNums + DIRECT_BLOCK_LIMIT + indirection;
 
-	allocateAllNeededBlocks(dataBlockIndex, blockNumToAdd, offsets + indirection, indirection);
+	// TODO: offsets + indirection OR offsets + 1?
+	allocateAllNeededBlocks(dataBlockIndex, blockNumToAdd, offsets + 1, indirection);
 
-	updateINodeMetadata(iNode, 0);
+	updateINodeMetadata(iNode, 0, iNode->linksCount);
 }
 
 /**
@@ -150,8 +152,9 @@ void insertDataBlockInINode(inCoreiNode* iNode, size_t blockNumToAdd) {
 	free(blkOffset);
 }
 
-void updateINodeMetadata(inCoreiNode *iNode, int sizeDifference) {
+void updateINodeMetadata(inCoreiNode *iNode, int sizeDifference, size_t linkCount) {
 	iNode->size += sizeDifference;
+	iNode->linksCount = linkCount;
 
 	iNode->modification = time(NULL);
 

@@ -5,12 +5,14 @@
 #include "inode/inCoreiNode.h"
 #include "incoreInodeOps/iget.h"
 #include "incoreInodeOps/iput.h"
+#include "interface/open.h"
 #include "mkfs/ialloc.h"
+#include "incoreInodeOps/iNodeManager.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
+// TODO: find a location for this function, same function copied in unlink
 inCoreiNode *getParentINode(const char *path, size_t pathLen) {
 	char *parentDirPath = (char *)malloc((pathLen + 1)*sizeof(char));
 
@@ -23,7 +25,7 @@ inCoreiNode *getParentINode(const char *path, size_t pathLen) {
 
 bool doesFileExistIn(char *filename, inCoreiNode *parentINode) {
 	directoryEntry *entryBuffer = (directoryEntry *)malloc(sizeof(directoryEntry));
-	int retValue = searchINodeDirectoryEntries(parentINode, filename, 0, entryBuffer, 0);
+	int retValue = searchINodeDirectoryEntries(parentINode, filename, 0, entryBuffer, 0, false);
 	free(entryBuffer);
 
 	if (retValue > 0) {
@@ -71,9 +73,13 @@ int createFile(const char *path, iNodeType fileType, mode_t mode) {
     getAndUpdateDirectoryTable(parentINode, iNodeNum, filename);
 
     inCoreiNode *newINode = iget(iNodeNum, 0);
-	if (fileType == T_DIRECTORY) {
+    if (fileType == T_REGULAR) {
+        updateINodeMetadata(newINode, 0, 1);
+    }
+
+    if (fileType == T_DIRECTORY) {
 		updateNewDirMetaData(newINode, parentINode->inode_number);
-	}
+    }
 
 	iput(parentINode);
     iput(newINode);
