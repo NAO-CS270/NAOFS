@@ -25,12 +25,16 @@ before_install:
     export PATH=${DEPS_DIR}/cmake/bin:${PATH}
   - cmake --version
 
+before_script:
+  - curl -L "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/shunit2/shunit2-2.1.6.tgz" | tar zx
+
 script:
   - cmake -Bbuild -H.
   - cd build
   - make
   - mkdir fsRoot
   - ./naofs fsRoot -s
+  - for file in ../test/bash_tests/*; do bash "$file"; done
 
 #after_success:
 #  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
