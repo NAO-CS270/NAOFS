@@ -17,7 +17,7 @@ void writeINodeToDisk (inCoreiNode* inode) {
     free(diskINode);
 }
 
-int iput(inCoreiNode* inode) {
+int iput(inCoreiNode* inode) { //do we change the write time here?
 	printf("iPut for %ld\n", inode->inode_number);
     printf("Sleeping on lock for iNode %ld\n", inode->inode_number);
     pthread_mutex_lock(&(inode->iNodeMutex));

@@ -18,50 +18,14 @@ static int truncateFile(inCoreiNode* inode) {
     inode -> size = 0;
 }
 
-/*
+
 // TODO: Update the size of the file
 
 static int write_callback(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi) {
-    if(fi->fh < 0) {
-        return -1;
-    }
-    int bytesWritten = 0;
-    int tempOffset = offset;
-
-    struct fuse_context* fuse_context = fuse_get_context();
-    inCoreiNode *inode = file_descriptor_table[fi->fh].inode;
-
-    bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
-    while(bytesWritten < size) {
-		size_t retValue = bmap(inode, tempOffset, bmapResp, APPEND_MODE);
-        if(retValue == -1) {
-            return -1;
-		}
-
-        // TODO: optimize with full block write
-        disk_block *metaBlock = (disk_block *) malloc(sizeof(disk_block));
-        metaBlock = getDiskBlock(bmapResp -> blockNumber, metaBlock);
-        unsigned char* ptrIntoBlock = metaBlock -> data + bmapResp -> byteOffsetInBlock;
-
-        size_t bytesToWrite = min(bmapResp -> bytesLeftInBlock, size - bytesWritten);
-        memcpy(ptrIntoBlock, buf, bytesToWrite);
-        writeMemoryDiskBlock(bmapResp->blockNumber, metaBlock);
-        free(metaBlock);
-        bytesWritten += bytesToWrite;
-        tempOffset += bytesToWrite;
-        inode -> size = max(inode -> size, offset + bytesWritten);
-    }
-	free(bmapResp);
-    time(&(inode -> access));
-    time(&(inode -> modification));
-
-    inode -> inode_changed = true;
-    inode -> file_data_changed = true;
-
-    iput(inode);
-    return bytesWritten;
+    struct fuse_context *fuse_context = fuse_get_context();
+    return writeToFile(path, buf, size, offset, fi, fuse_context);
 }
-*/
+
 
 static int access_callback(const char* path, int mode) {
     return 0;
@@ -143,7 +107,7 @@ static struct fuse_operations OPERATIONS = {
     .read = read_callback,
     .flush = release_callback,
     .release = release_callback,
-        //.write = write_callback,
+    .write = write_callback,
         //.access = access_callback,
         //.link = link_callback,
         //.unlink = unlink_callback,
