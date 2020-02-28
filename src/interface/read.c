@@ -5,6 +5,7 @@
 #include "incoreInodeOps/iput.h"
 #include "fdTable/fileTables.h"
 #include "incoreInodeOps/bmap.h"
+#include "interface/read.h"
 #include "dsk/blkfetch.h"
 #include "utils/utils.h"
 
