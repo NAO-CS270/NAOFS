@@ -8,6 +8,7 @@
 #include "interface/create.h"
 #include "interface/open.h"
 #include "interface/read.h"
+#include "interface/write.h"
 #include "interface/close.h"
 #include "inode/iNode.h"
 

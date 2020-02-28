@@ -11,7 +11,7 @@ int closeFile(struct fuse_file_info *fi, struct fuse_context *fuse_context) {
 	int retVal = 0;
 	fileTableEntry *file = getFileDescriptor(fuse_context->pid, fi->fh, &retVal);
 	if (retVal != 0) {
-		debug_print("Some error for fd: %d\n", fi->fh);
+		debug_print("Some error for fd: %ld\n", fi->fh);
 		return retVal;
 	}
 

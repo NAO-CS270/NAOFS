@@ -31,14 +31,14 @@ fdNode *getFdNode(pid_t pid, bool search) {
     
     while(tempHead != NULL) {
         if(tempHead->pid == pid) {
-            debug_print("found fd list node for pid: %ld\n", pid);
+            debug_print("found fd list node for pid: %d\n", pid);
             return tempHead;
         }
         tempHead = tempHead->next;
     }
 
     if (search) {
-        debug_print("FD list node not found for pid: %ld\n", pid);
+        debug_print("FD list node not found for pid: %d\n", pid);
         return NULL;
     }
     
@@ -48,11 +48,11 @@ fdNode *getFdNode(pid_t pid, bool search) {
     newFdNode->next = NULL;
 
     if (NULL == fdListHead) {
-        debug_print("fdList empty, can't find a node for pid: %ld\n", pid);
+        debug_print("fdList empty, can't find a node for pid: %d\n", pid);
         fdListHead = newFdNode;
     }
 
-    debug_print("inserted new node in the fd list for pid: %ld\n", pid);
+    debug_print("inserted new node in the fd list for pid: %d\n", pid);
     return newFdNode;
 }
 
