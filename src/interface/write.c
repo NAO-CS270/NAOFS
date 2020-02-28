@@ -1,3 +1,4 @@
+#include "incoreInodeOps/bmap.h"
 #include "interface/write.h"
 
 void writeToBlock(bmapResponse *bmapResp, char *buf, size_t size) {
@@ -10,7 +11,7 @@ void writeToBlock(bmapResponse *bmapResp, char *buf, size_t size) {
     free(blockPtr);
 }
 
-int writeToFile(const char* path, void* buf, size_t size, off_t offset, struct fuse_file_info *fi fi, struct fuse_context *fuse_context) {
+int writeToFile(const char* path, void* buf, size_t size, off_t offset, struct fuse_file_info *fi, struct fuse_context *fuse_context) {
     if(fi->fh < 0) {
         return -1;
     }
