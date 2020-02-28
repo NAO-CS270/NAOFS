@@ -1,5 +1,6 @@
 #include "incoreInodeOps/bmap.h"
 #include "interface/write.h"
+#include "utils/utils.h"
 
 void writeToBlock(bmapResponse *bmapResp, char *buf, size_t size) {
     disk_block *blockPtr = (disk_block *)malloc(sizeof(disk_block));
@@ -28,7 +29,7 @@ int writeToFile(const char* path, void* buf, size_t size, off_t offset, struct f
         }
 
         size_t bytesToWrite = min(bmapResp -> bytesLeftInBlock, size - bytesWritten);
-        writeInBlock(bmapResp, buf + bytesWritten, bytesToWrite);
+        writeToBlock(bmapResp, buf + bytesWritten, bytesToWrite);
 
         bytesWritten += bytesToWrite;
         _fileTableEntry -> offset += bytesToWrite;
