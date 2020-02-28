@@ -108,6 +108,7 @@ int searchINodeDirectoryEntries(inCoreiNode *iNodePtr, char *entryName, size_t o
 	size_t entriesReadTillNow = 0;
 
 	while (entryName != NULL || entriesReadTillNow < numOfEntries) {
+	        printf("numberOfEntries: %ld , entriesReadTillNow: %ld", numOfEntries, entriesReadTillNow);
 		retValue = bmap(iNodePtr, directoryOffset, bmapResp, READ_MODE);
 		if (retValue == -1) {
 			printf("Reached end of directory!!\n");
