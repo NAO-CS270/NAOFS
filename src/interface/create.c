@@ -5,6 +5,8 @@
 #include "inode/inCoreiNode.h"
 #include "incoreInodeOps/iget.h"
 #include "incoreInodeOps/iput.h"
+#include "fdTable/fileTables.h"
+#include "interface/open.h"
 #include "mkfs/ialloc.h"
 
 #include <stdio.h>
@@ -54,7 +56,7 @@ inCoreiNode *validateThenGetParentINode(iNodeType fileType, const char *path, ch
 	return parentINode;
 }
 
-int createFile(const char *path, iNodeType fileType, mode_t mode) {
+int createFile(const char *path, iNodeType fileType, mode_t mode,  struct fuse_file_info *fi, struct fuse_context* fuseContext) {
 	printf("Here it is, Here is everything - %d\n", mode);
 	size_t pathLen = strlen(path);
 	char *filename = (char *)malloc((pathLen + 1)*sizeof(char));
@@ -74,6 +76,11 @@ int createFile(const char *path, iNodeType fileType, mode_t mode) {
 	if (fileType == T_DIRECTORY) {
 		updateNewDirMetaData(newINode, parentINode->inode_number);
 	}
+
+    size_t offset = calculateFileOffset(newINode, fi->flags);
+    int fd = createAndGetFileDescriptor(fuseContext->pid, newINode, fi->flags, offset);
+    printf("createFile - fd: %d\n", fd);
+    fi -> fh = fd;
 
 	iput(parentINode);
     iput(newINode);
