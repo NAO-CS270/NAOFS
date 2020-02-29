@@ -23,7 +23,11 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
     int bytesWritten = 0;
     int error = 0;
     fileTableEntry* _fileTableEntry = getFileDescriptor(fuse_context -> pid, fi -> fh, &error);
-
+    if(_fileTableEntry == NULL) {
+        printf("_fileTableEntry is NULL\n");
+        //break;
+        return -1;
+    }
     bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
     while (bytesWritten < size) { // TODO: offset doesn't get updated! //BUG
         int retValue = bmap(_fileTableEntry -> inode, offset, bmapResp, APPEND_MODE);

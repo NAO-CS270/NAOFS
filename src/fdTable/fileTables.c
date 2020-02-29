@@ -96,6 +96,7 @@ int createAndGetFileDescriptor(pid_t pid, inCoreiNode *inode, int flags, size_t 
  * Gets an file descriptor table entry based on the file descriptor and pid
  */
 fileTableEntry *getFileDescriptor(pid_t pid, int fd, int *error) {
+    printf("getFileDescriptor: fd: %d\n", fd);
     fdNode* fdNode = getFdNode(pid, true);
     if (NULL == fdNode || fd >= MAX_FD) {
         *error = -EBADF;
@@ -105,6 +106,7 @@ fileTableEntry *getFileDescriptor(pid_t pid, int fd, int *error) {
     fileTableEntry *entry = (fdNode->fdTable) + fd;
     if (!entry->validEntry) {
         *error = -EBADFD;
+        printf("returning NULL -EBADFD\n");
         return NULL;
     }
 
