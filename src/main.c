@@ -47,7 +47,8 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
 }
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
-	return createFile(path, T_REGULAR, mode);
+    struct fuse_context *fuse_context = fuse_get_context();
+	return createFile(path, T_REGULAR, mode, fi, fuse_context);
 }
 
 static int open_callback(const char *path, struct fuse_file_info *fi) {
@@ -107,7 +108,7 @@ static struct fuse_operations OPERATIONS = {
     .open = open_callback,
     .read = read_callback,
     .flush = release_callback,
-    .release = release_callback,
+    //.release = release_callback,
     .write = write_callback,
         //.access = access_callback,
         //.link = link_callback,

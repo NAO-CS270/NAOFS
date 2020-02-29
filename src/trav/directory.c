@@ -106,7 +106,7 @@ int searchINodeDirectoryEntries(inCoreiNode *iNodePtr, char *entryName, size_t o
 	bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
 	size_t directoryOffset = offset*DIRECTORY_ENTRY_SIZE;
 	size_t entriesReadTillNow = 0;
-
+	// TODO: should this be '&&' condition?
 	while (entryName != NULL || entriesReadTillNow < numOfEntries) {
 	        printf("numberOfEntries: %ld , entriesReadTillNow: %ld", numOfEntries, entriesReadTillNow);
 		retValue = bmap(iNodePtr, directoryOffset, bmapResp, READ_MODE);

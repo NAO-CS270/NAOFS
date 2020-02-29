@@ -17,7 +17,7 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
 
 int writeToFile(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi, struct fuse_context *fuse_context) {
     printf("filehandler: %ld", fi->fh);
-    if(fi->fh < 0) {
+    if(fi->fh < 0) { // TODO: Do we really need this check?
         return -1;
     }
     int bytesWritten = 0;

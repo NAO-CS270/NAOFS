@@ -3,7 +3,7 @@
 
 #include <sys/stat.h>
 
-extern int createFile(const char *path, iNodeType fileType, mode_t mode);
+extern int createFile(const char *path, iNodeType fileType, mode_t mode,  struct fuse_file_info *fi, struct fuse_context *fuseContext);
 
 #endif
 
