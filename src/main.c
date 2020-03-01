@@ -13,7 +13,7 @@
 #include "inode/iNode.h"
 
 #include <sys/stat.h>
-
+//#include <fuse_lowlevel.h>
 static int truncateFile(inCoreiNode* inode) {
     inodeBlocksFree(inode);
     inode -> size = 0;
@@ -100,14 +100,39 @@ static int release_callback(const char* path, struct fuse_file_info* fi) {
     closeFile(fi, fuse_context);
 }
 
+//static void setattr_callback(fuse_req_t req, fuse_ino_t ino, struct stat *attr, int to_set, struct fuse_file_info *fi) {
+//	return;
+//}
+/** Change the size of a file */
+static int truncate_callback(const char *path, off_t size) {
+    return 0;
+}
+
+static int utimens_callback(const char *path, const struct timespec tv[2]) {
+    return 0;
+}
+
+static int chown_callback(const char *path, uid_t uid, gid_t gid) {
+    return 0;
+}
+
+static int chmod_callback(const char *path, mode_t mode) {
+    return 0;
+}
+
 static struct fuse_operations OPERATIONS = {
 	.getattr = getattr_callback,
+    //.setattr = setattr_callback,
     .mkdir = mkdir_callback,
     .readdir = readdir_callback,
 	.create = create_callback,
     .open = open_callback,
     .read = read_callback,
     .flush = release_callback,
+    .truncate = truncate_callback,
+    .utimens = utimens_callback,
+    .chown = chown_callback,
+    .chmod = chmod_callback,
     //.release = release_callback,
     .write = write_callback,
         //.access = access_callback,
