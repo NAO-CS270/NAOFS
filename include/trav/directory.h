@@ -10,7 +10,7 @@
 
 struct directoryEntry {
 	char name[FILENAME_SIZE];
-	size_t iNodeNum;
+	ssize_t iNodeNum;
 };
 typedef struct directoryEntry directoryEntry;
 

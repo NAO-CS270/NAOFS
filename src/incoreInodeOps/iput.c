@@ -5,6 +5,8 @@
 #include "inode/inCoreiNode.h"
 #include "inode/iNode.h"
 #include "mkfs/iNodeManager.h"
+#include "dsk/free.h"
+#include "mkfs/ifree.h"
 
 #include <pthread.h>
 #include <stdio.h>
@@ -35,6 +37,12 @@ int iput(inCoreiNode* inode) { //do we change the write time here?
 			inode->inode_changed = false;
 			inode->file_data_changed = false;
         }
+
+        // if (inode->linksCount == 0 && inode->inode_number != 0) {
+        //     printf ("inode link count zero for inode: %ld\n", inode->inode_number);
+        //     inodeBlocksFree(inode);
+        //     freeINode(inode->inode_number);
+        // }
 
         Node* node = hashLookup(inode->inode_number, inode->device_number);
         if(node == NULL) {

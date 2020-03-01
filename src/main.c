@@ -111,6 +111,7 @@ static struct fuse_operations OPERATIONS = {
     .chown = chown_callback,
     .chmod = chmod_callback,
     .write = write_callback,
+    .unlink = unlink_callback,
     //.flush = release_callback,
     //.release = release_callback,
     //.setattr = setattr_callback,

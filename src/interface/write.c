@@ -59,7 +59,7 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         bytesWritten += bytesToWrite;
         _fileTableEntry -> offset += bytesToWrite;
         offset += bytesToWrite;
-        updateINodeMetadata(_fileTableEntry->inode, bytesToWrite);
+        updateINodeMetadata(_fileTableEntry->inode, bytesToWrite, _fileTableEntry->inode->linksCount);
         printf("size of the file: %ld\n", _fileTableEntry->inode->size);
         printf("bytes written: %ld\n", bytesWritten);
         printf("offset: %ld\n", offset);

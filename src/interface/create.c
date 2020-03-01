@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
+// TODO: find a location for this function, same function copied in unlink
 inCoreiNode *getParentINode(const char *path, size_t pathLen) {
 	char *parentDirPath = (char *)malloc((pathLen + 1)*sizeof(char));
 
