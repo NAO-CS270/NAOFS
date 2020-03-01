@@ -32,7 +32,7 @@ void stringSplit_emptyToken() {
         ASSERT_STR(tokens[i], "");
 }
 
-void stringSplit_emptyToken() {
+void stringSplit_simple() {
     char str[] = "abc";
     char *tokens[4];
     string_split(str, tokens, "b");
@@ -47,5 +47,5 @@ void test_utils_runner() {
 //    stringSplit_emptyTokens();
 //    stringSplit_singleToken();
 //    stringSplit_singleToken();
-    stringSplit_emptyToken();
+    stringSplit_simple();
 }
