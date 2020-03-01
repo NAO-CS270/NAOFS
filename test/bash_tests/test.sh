@@ -71,19 +71,30 @@ testFileOneFullBlock() {
   echo "$content" > testFile1023
   catResult=$(cat testFile1023)
 
-  assertEquals '1K not matched' "$content" "$catResult"
+  assertEquals '1K - 1 not matched' "$content" "$catResult"
   rm testFile1023
 }
 
 testFileMoreThanOneBlock() {
-  N=1100
+  N=1024
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  echo "$content" > testFile1100
-  catResult=$(cat testFile1100)
+  echo "$content" > testFile1024
+  catResult=$(cat testFile1024)
 
-  assertEquals '1100B not matched' "$content" "$catResult"
-  rm testFile1100
+  assertEquals '1K not matched' "$content" "$catResult"
+  rm testFile1024
+}
+
+testFileFirstIndirectBlock() {
+  N=10239
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+
+  echo "$content" > testFile10239
+  catResult=$(cat testFile10239)
+
+  assertEquals '10K - 1 not matched' "$content" "$catResult"
+  rm testFile10239
 }
 
 testDownloadFileLargeFile() {
