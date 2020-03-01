@@ -6,7 +6,6 @@
 #include "inode/inCoreiNode.h"
 
 extern int createFile(const char *path, iNodeType fileType, mode_t mode);
-inCoreiNode *validateThenGetParentINode(iNodeType fileType, const char *path, char *filename);
 
 #endif
 

@@ -111,13 +111,11 @@ static struct fuse_operations OPERATIONS = {
     .chown = chown_callback,
     .chmod = chmod_callback,
     .write = write_callback,
-    .flush = release_callback,
+    //.flush = release_callback,
     //.release = release_callback,
     //.setattr = setattr_callback,
-        //.access = access_callback,
-        //
-        .link = link_callback,
-        //.unlink = unlink_callback,
+    //.access = access_callback,
+    //.link = link_callback,
 };
 
 int main(int argc, char *argv[]) {

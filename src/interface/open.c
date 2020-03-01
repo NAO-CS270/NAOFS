@@ -21,7 +21,7 @@ size_t calculateFileOffset (inCoreiNode *iNode, int flags) {
 	return offset;
 }
 
-// O_APPEND will always write at the end of the file, irrescpective of the file pointer position
+// O_APPEND will always write at the end of the file, irrespective of the file pointer position
 // Creation (O_CREAT, O_EXCL, O_NOCTTY) flags will be filtered out / handled by the kernel
 int openFile(const char* path, struct fuse_file_info *fi, struct fuse_context *fuse_context) {
 	size_t pathLen = strlen(path);
