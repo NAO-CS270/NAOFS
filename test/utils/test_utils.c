@@ -21,7 +21,7 @@ void stringSplit_singleToken() {
         ASSERT_STR(tokens[i], "");
 }
 
-void stringSplit_singleToken2() {
+void stringSplit_emptyToken() {
     char str[] = "baa";
     char *tokens[4];
     string_split(str, tokens, "b");
@@ -32,8 +32,20 @@ void stringSplit_singleToken2() {
         ASSERT_STR(tokens[i], "");
 }
 
+void stringSplit_emptyToken() {
+    char str[] = "abc";
+    char *tokens[4];
+    string_split(str, tokens, "b");
+
+    ASSERT_STR(tokens[0], "a");
+    ASSERT_STR(tokens[1], "c");
+    for (int i = 2; i < 4; ++i)
+        ASSERT_STR(tokens[i], "");
+}
+
 void test_utils_runner() {
-    stringSplit_emptyTokens();
-    stringSplit_singleToken();
-    stringSplit_singleToken2();
+//    stringSplit_emptyTokens();
+//    stringSplit_singleToken();
+//    stringSplit_singleToken();
+    stringSplit_emptyToken();
 }
