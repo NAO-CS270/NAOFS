@@ -41,6 +41,7 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         //break;
         return -1;
     }
+    pthread_mutex_lock(&(_fileTableEntry->inode->iNodeMutex));
     bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
     while (bytesWritten < size) { // TODO: offset doesn't get updated! //BUG
         int retValue = bmap(_fileTableEntry -> inode, offset, bmapResp, APPEND_MODE);
@@ -52,6 +53,7 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         _fileTableEntry -> offset += bytesToWrite;
     }
     _fileTableEntry->inode->size += bytesWritten;
+    pthread_mutex_unlock(&(_fileTableEntry->inode->iNodeMutex));
     free(bmapResp);
     return bytesWritten;
 }
