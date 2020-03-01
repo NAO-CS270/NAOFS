@@ -1,5 +1,6 @@
 //#include "ctest.h"
 #include "utils/utils.h"
+#include <stdio.h>
 
 void stringSplit_emptyTokens() {
     char str[] = "aaa";
@@ -13,6 +14,7 @@ void stringSplit_emptyTokens() {
 void stringSplit_singleToken() {
     char str[] = "aaa";
     char *tokens[4];
+    printf("TESTIIIIIIIIIIIING!");
 //    string_split(str, tokens, "b");
 
 //    ASSERT_STR(tokens[0], "aaa");
