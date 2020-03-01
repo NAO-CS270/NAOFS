@@ -20,12 +20,12 @@ testCreateDir() {
 
 testPresentWorkingDir() {
   pwd=$(pwd)
-  assertEquals "$pwd" "/home/travis/build/NAO-CS270/NAOFS/build/fsRoot"
+  assertEquals "/home/travis/build/NAO-CS270/NAOFS/build/fsRoot" "$pwd"
 }
 
 testListDir() {
   lsResult=$(ls)
-  assertEquals "$lsResult" "test"
+  assertEquals "test" "$lsResult"
 }
 
 testCdToCreatedDir() {
@@ -41,7 +41,7 @@ testWriteAndRead() {
   touch a
   echo 1 > a
   catResult=$(cat a)
-  assertEquals "$catResult" "1"
+  assertEquals "1" "$catResult"
 }
 
 testDownloadFileSmall() {
@@ -49,7 +49,7 @@ testDownloadFileSmall() {
   md5Output=$(md5sum 512)
   md5Hash=${md5Output%% *}
 
-  assertEquals "$md5Hash" "bf619eac0cdf3f68d496ea9344137e8b"
+  assertEquals "bf619eac0cdf3f68d496ea9344137e8b" "$md5Hash"
 }
 
 testDownloadFileOneFullBlock() {
@@ -57,7 +57,7 @@ testDownloadFileOneFullBlock() {
   md5Output=$(md5sum 1024)
   md5Hash=${md5Output%% *}
 
-  assertEquals "$md5Hash" "0f343b0931126a20f133d67c2b018a3b"
+  assertEquals "0f343b0931126a20f133d67c2b018a3b" "$md5Hash"
 }
 
 testDownloadFileMoreThanOneBlock() {
@@ -65,7 +65,7 @@ testDownloadFileMoreThanOneBlock() {
   md5Output=$(md5sum 1100)
   md5Hash=${md5Output%% *}
 
-  assertEquals "$md5Hash" "1f8dc9e63e9bf7f1ed20b99b444945aa"
+  assertEquals "1f8dc9e63e9bf7f1ed20b99b444945aa" "$md5Hash"
 }
 
 testDownloadFileLargeFile() {
@@ -73,7 +73,7 @@ testDownloadFileLargeFile() {
   md5Output=$(md5sum 60M)
   md5Hash=${md5Output%% *}
 
-  assertEquals "$md5Hash" "76c136bc0d680abd978d9934070c01e5"
+  assertEquals "76c136bc0d680abd978d9934070c01e5" "$md5Hash"
 }
 
 . ../shunit2-2.1.6/src/shunit2
