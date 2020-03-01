@@ -44,4 +44,36 @@ testWriteAndRead() {
   assertEquals "$catResult" "1"
 }
 
+testDownloadFileSmall() {
+  wget http://178.128.139.251:9000/512
+  md5Output=$(md5sum 512)
+  md5Hash=${md5Output%% *}
+
+  assertEquals "$md5Hash" "bf619eac0cdf3f68d496ea9344137e8b"
+}
+
+testDownloadFileOneFullBlock() {
+  wget http://178.128.139.251:9000/1024
+  md5Output=$(md5sum 1024)
+  md5Hash=${md5Output%% *}
+
+  assertEquals "$md5Hash" "0f343b0931126a20f133d67c2b018a3b"
+}
+
+testDownloadFileMoreThanOneBlock() {
+  wget http://178.128.139.251:9000/1100
+  md5Output=$(md5sum 1100)
+  md5Hash=${md5Output%% *}
+
+  assertEquals "$md5Hash" "1f8dc9e63e9bf7f1ed20b99b444945aa"
+}
+
+testDownloadFileLargeFile() {
+  wget http://178.128.139.251:9000/60M
+  md5Output=$(md5sum 60M)
+  md5Hash=${md5Output%% *}
+
+  assertEquals "$md5Hash" "76c136bc0d680abd978d9934070c01e5"
+}
+
 . ../shunit2-2.1.6/src/shunit2
