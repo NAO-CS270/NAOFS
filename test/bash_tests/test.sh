@@ -36,4 +36,12 @@ testCdToCreatedDir() {
   assertEquals "$pwd1/test" "$pwd2"
 }
 
+testWriteAndRead() {
+  pwd1=$(pwd)
+  touch a
+  echo 1 > a
+  catResult=$(cat a)
+  assertEquals "$catResult" "1\n"
+}
+
 . ../shunit2-2.1.6/src/shunit2
