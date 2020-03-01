@@ -100,6 +100,7 @@ size_t readBytes(fileTableEntry *file, char *buf, size_t size, size_t offset) {
 		bytesRead += bytesToReadFromBlock;
 		bytesLeft -= bytesToReadFromBlock;
 		file->offset += bytesToReadFromBlock;
+		offset += bytesToReadFromBlock;
 	}
 
 	free(bmapResp);
