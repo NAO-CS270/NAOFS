@@ -40,7 +40,7 @@ testWriteAndRead() {
   pwd1=$(pwd)
   echo 1 > testFile
   catResult=$(cat testFile)
-  assertEquals "1" "$catResult"
+  assertEquals "write without touch failed" "1" "$catResult"
   rm testFile
 }
 
@@ -49,7 +49,7 @@ testWriteAndReadCreatedFile() {
   touch testFile
   echo 1 > testFile
   catResult=$(cat testFile)
-  assertEquals "1" "$catResult"
+  assertEquals "write with touch failed" "1" "$catResult"
   rm testFile
 }
 
