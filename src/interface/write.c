@@ -1,5 +1,6 @@
 #include "incoreInodeOps/bmap.h"
 #include "fdTable/fileTables.h"
+#include "incoreInodeOps/iNodeManager.h"
 #include "dsk/blkfetch.h"
 #include "utils/utils.h"
 #include <string.h>
@@ -10,7 +11,7 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
     getDiskBlock(bmapResp->blockNumber, blockPtr);
     unsigned char *ptrIntoBlock = blockPtr->data;
 
-        printf("WE ARE IN WRITE!\n");
+    printf("WE ARE IN WRITE!\n");
     printf("block_number: %d\n", bmapResp->blockNumber);
     int i = 0;
     for(i=0; i < size; i++) {
@@ -55,6 +56,7 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         bytesWritten += bytesToWrite;
         _fileTableEntry -> offset += bytesToWrite;
         offset += bytesToWrite;
+        updateINodeMetadata(_fileTableEntry->inode, bytesToWrite);
     }
     _fileTableEntry->inode->size += bytesWritten;
     pthread_mutex_unlock(&(_fileTableEntry->inode->iNodeMutex));
