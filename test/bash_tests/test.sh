@@ -65,14 +65,14 @@ testDownloadFileSmall() {
 }
 
 testFileOneFullBlock() {
-  N=1024
+  N=1023
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  echo "$content" > testFile1024
-  catResult=$(cat testFile1024)
+  echo "$content" > testFile1023
+  catResult=$(cat testFile1023)
 
   assertEquals '1K not matched' "$content" "$catResult"
-  rm testFile1024
+  rm testFile1023
 }
 
 testFileMoreThanOneBlock() {
