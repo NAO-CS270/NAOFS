@@ -42,7 +42,7 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
 }
 
 static int mkdir_callback(const char* path, mode_t mode) {
-	return createFile(path, T_DIRECTORY, mode, NULL, NULL);
+	return createFile(path, T_DIRECTORY, mode);
 }
 
 static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
