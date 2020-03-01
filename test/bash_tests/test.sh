@@ -64,37 +64,37 @@ testDownloadFileSmall() {
   rm testFile
 }
 
-testFileOneFullBlock() {
-  N=1024
-  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#testFileOneFullBlock() {
+#  N=1024
+#  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#
+#  echo "$content" > testFile
+#  catResult=$(cat testFile)
+#
+#  assertEquals '1K not matched' "$content" "$catResult"
+#  rm testFile
+#}
 
-  echo "$content" > testFile
-  catResult=$(cat testFile)
+#testFileMoreThanOneBlock() {
+#  N=1100
+#  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#
+#  echo "$content" > testFile
+#  catResult=$(cat testFile)
+#
+#  assertEquals '1100B not matched' "$content" "$catResult"
+#  rm testFile
+#}
 
-  assertEquals '1K not matched' "$content" "$catResult"
-  rm testFile
-}
-
-testFileMoreThanOneBlock() {
-  N=1100
-  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
-
-  echo "$content" > testFile
-  catResult=$(cat testFile)
-
-  assertEquals '1100B not matched' "$content" "$catResult"
-  rm testFile
-}
-
-testDownloadFileLargeFile() {
-  N=61440 # 60Mb
-  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
-
-  echo "$content" > testFile
-  catResult=$(cat testFile)
-
-  assertEquals '60M not matched' "$content" "$catResult"
-  rm testFile
-}
+#testDownloadFileLargeFile() {
+#  N=61440 # 60Mb
+#  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#
+#  echo "$content" > testFile
+#  catResult=$(cat testFile)
+#
+#  assertEquals '60M not matched' "$content" "$catResult"
+#  rm testFile
+#}
 
 . ../shunit2-2.1.6/src/shunit2
