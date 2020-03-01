@@ -125,7 +125,7 @@ void updateIndex(inCoreiNode* iNode, size_t blockNumToAdd, blkTreeOffset *blkOff
 
 	allocateAllNeededBlocks(dataBlockIndex, blockNumToAdd, offsets + indirection, indirection);
 
-	updateINodeMetadata(iNode, 0);
+	updateINodeMetadata(iNode, 0, iNode->linksCount);
 }
 
 /**
@@ -150,8 +150,9 @@ void insertDataBlockInINode(inCoreiNode* iNode, size_t blockNumToAdd) {
 	free(blkOffset);
 }
 
-void updateINodeMetadata(inCoreiNode *iNode, int sizeDifference) {
+void updateINodeMetadata(inCoreiNode *iNode, int sizeDifference, size_t linkCount) {
 	iNode->size += sizeDifference;
+	iNode->linksCount = linkCount;
 
 	iNode->modification = time(NULL);
 

@@ -8,6 +8,7 @@
 #include "fdTable/fileTables.h"
 #include "interface/open.h"
 #include "mkfs/ialloc.h"
+#include "incoreInodeOps/iNodeManager.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,7 +26,7 @@ inCoreiNode *getParentINode(const char *path, size_t pathLen) {
 
 bool doesFileExistIn(char *filename, inCoreiNode *parentINode) {
 	directoryEntry *entryBuffer = (directoryEntry *)malloc(sizeof(directoryEntry));
-	int retValue = searchINodeDirectoryEntries(parentINode, filename, 0, entryBuffer, 0);
+	int retValue = searchINodeDirectoryEntries(parentINode, filename, 0, entryBuffer, 0, false);
 	free(entryBuffer);
 
 	if (retValue > 0) {
@@ -73,9 +74,13 @@ int createFile(const char *path, iNodeType fileType, mode_t mode,  struct fuse_f
     getAndUpdateDirectoryTable(parentINode, iNodeNum, filename);
 
     inCoreiNode *newINode = iget(iNodeNum, 0);
-	if (fileType == T_DIRECTORY) {
+    if (fileType == T_REGULAR) {
+        updateINodeMetadata(newINode, 0, 1);
+    }
+
+    if (fileType == T_DIRECTORY) {
 		updateNewDirMetaData(newINode, parentINode->inode_number);
-	}
+    }
 
 /**	if (fi != NULL) {
         size_t offset = calculateFileOffset(newINode, fi->flags);

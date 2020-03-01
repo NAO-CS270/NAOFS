@@ -11,6 +11,9 @@
 #include "interface/write.h"
 #include "interface/close.h"
 #include "inode/iNode.h"
+#include "interface/link.h"
+#include "interface/unlink.h"
+
 
 #include <sys/stat.h>
 //#include <fuse_lowlevel.h>
@@ -88,6 +91,16 @@ static int chmod_callback(const char *path, mode_t mode) {
     return 0;
 }
 
+static int link_callback(const char* source, const char* target) {
+    struct fuse_context *fuseContext = fuse_get_context();
+    return linkFiles(source, target, fuseContext);
+}
+
+static int unlink_callback(const char* file) {
+    struct fuse_context* fuseContext = fuse_get_context();
+    return unlinkFile(file, fuseContext);
+}
+
 static struct fuse_operations OPERATIONS = {
 	.getattr = getattr_callback,
     .mkdir = mkdir_callback,
@@ -104,7 +117,8 @@ static struct fuse_operations OPERATIONS = {
     //.release = release_callback,
     //.setattr = setattr_callback,
         //.access = access_callback,
-        //.link = link_callback,
+        //
+        .link = link_callback,
         //.unlink = unlink_callback,
 };
 

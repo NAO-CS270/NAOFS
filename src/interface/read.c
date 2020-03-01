@@ -27,7 +27,7 @@ void fillDirectoryEntries(fuse_fill_dir_t filler, void *buffer, inCoreiNode *iNo
 
 	while (entriesOffset < entriesInDirectory) {
 		memset(entryBuffer, 0, entriesPerIteration * sizeof(directoryEntry));
-		entriesRead = searchINodeDirectoryEntries(iNodePtr, NULL, entriesOffset, entryBuffer, entriesPerIteration);
+		entriesRead = searchINodeDirectoryEntries(iNodePtr, NULL, entriesOffset, entryBuffer, entriesPerIteration, false);
 
 		counter = 0;
 		while (counter < entriesRead) {

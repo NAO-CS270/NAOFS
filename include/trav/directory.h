@@ -6,6 +6,8 @@
 #include "inode/iNode.h"
 #include "inode/inCoreiNode.h"
 
+#include <stdbool.h>
+
 struct directoryEntry {
 	char name[FILENAME_SIZE];
 	size_t iNodeNum;
@@ -18,10 +20,11 @@ struct directoryTable {
 typedef struct directoryTable directoryTable;
 
 extern directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBlock);
-extern int searchINodeDirectoryEntries(inCoreiNode *iNodePtr, char *entryName, size_t offset, directoryEntry *entryBuffer, size_t numOfEntries);
+extern int searchINodeDirectoryEntries(inCoreiNode *iNodePtr, char *entryName, size_t offset, directoryEntry *entryBuffer, size_t numOfEntries, bool forUnlink);
 
 extern int getAndUpdateDirectoryTable(inCoreiNode* inode, size_t newInodeNumber, char* filename);
 extern int updateNewDirMetaData(inCoreiNode* inode, size_t parentInodeNumber);
+extern void removeDirectoryEntry(size_t blockNum, size_t blockOffset, const char* filename, size_t iNodeNum);
 
 extern directoryTable* getDirectoryEntries(inCoreiNode* inode);
 
