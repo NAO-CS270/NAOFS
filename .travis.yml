@@ -32,6 +32,7 @@ script:
   - cmake -Bbuild -H.
   - cd build
   - make
+  - ./naoTest
   - mkdir fsRoot
   - ./naofs fsRoot -s
   - for file in ../test/bash_tests/*; do bash "$file"; done

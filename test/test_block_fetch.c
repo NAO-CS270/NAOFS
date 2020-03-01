@@ -27,9 +27,9 @@ void testMKFS() {
 	printf("MKFS runs. Need not be correctly.\n");
 }
 
-int main() {
-	testBlockFetch();
-	testMKFS();
-
-	return 0;
-}
+//int main() {
+//	testBlockFetch();
+//	testMKFS();
+//
+//	return 0;
+//}
