@@ -38,42 +38,63 @@ testCdToCreatedDir() {
 
 testWriteAndRead() {
   pwd1=$(pwd)
-  touch a
-  echo 1 > a
-  catResult=$(cat a)
+  echo 1 > testFile
+  catResult=$(cat testFile)
   assertEquals "1" "$catResult"
+  rm testFile
+}
+
+testWriteAndReadCreatedFile() {
+  pwd1=$(pwd)
+  touch testFile
+  echo 1 > testFile
+  catResult=$(cat testFile)
+  assertEquals "1" "$catResult"
+  rm testFile
 }
 
 testDownloadFileSmall() {
-  wget http://178.128.139.251:9000/512
-  md5Output=$(md5sum 512)
-  md5Hash=${md5Output%% *}
+  N=512
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  assertEquals "bf619eac0cdf3f68d496ea9344137e8b" "$md5Hash"
+  wget http://178.128.139.251:9000/512 -O testFile
+  catResult=$(cat testFile)
+
+  assertEquals "$content" "$catResult"
+  rm testFile
 }
 
-testDownloadFileOneFullBlock() {
-  wget http://178.128.139.251:9000/1024
-  md5Output=$(md5sum 1024)
-  md5Hash=${md5Output%% *}
+testFileOneFullBlock() {
+  N=1024
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  assertEquals "0f343b0931126a20f133d67c2b018a3b" "$md5Hash"
+  echo "$content" > testFile
+  catResult=$(cat testFile)
+
+  assertEquals "$content" "$catResult"
+  rm testFile
 }
 
-testDownloadFileMoreThanOneBlock() {
-  wget http://178.128.139.251:9000/1100
-  md5Output=$(md5sum 1100)
-  md5Hash=${md5Output%% *}
+testFileMoreThanOneBlock() {
+  N=1100
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  assertEquals "1f8dc9e63e9bf7f1ed20b99b444945aa" "$md5Hash"
+  echo "$content" > testFile
+  catResult=$(cat testFile)
+
+  assertEquals "$content" "$catResult"
+  rm testFile
 }
 
 testDownloadFileLargeFile() {
-  wget http://178.128.139.251:9000/60M
-  md5Output=$(md5sum 60M)
-  md5Hash=${md5Output%% *}
+  N=61440 # 60Mb
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  assertEquals "76c136bc0d680abd978d9934070c01e5" "$md5Hash"
+  echo "$content" > testFile
+  catResult=$(cat testFile)
+
+  assertEquals "$content" "$catResult"
+  rm testFile
 }
 
 . ../shunit2-2.1.6/src/shunit2
