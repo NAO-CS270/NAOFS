@@ -87,7 +87,7 @@ size_t readBytes(fileTableEntry *file, char *buf, size_t size, size_t offset) {
 
 	bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
 	
-	while (bytesLeft > 0) { // TODO: offset doesn't get updated! //BUG
+	while (bytesLeft > 0) {
 		int retValue = bmap(fileINode, offset, bmapResp, READ_MODE);
 		if (retValue == -1) {
 			printf("Reached end of file!!\n");
