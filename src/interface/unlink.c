@@ -7,9 +7,10 @@
 #include "trav/directory.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 int unlinkFile(const char* file, struct fuse_context* fuseContext) {
-    char *filename = (char *)malloc((pathLen + 1)*sizeof(char));
+    char *filename = (char *)malloc((strlen(file) + 1)*sizeof(char));
     inCoreiNode* parentInode = validateThenGetParentINode(T_REGULAR, file, filename);
 
     /**
@@ -28,8 +29,6 @@ int unlinkFile(const char* file, struct fuse_context* fuseContext) {
 
 
     //write parent directory: zero inode number of unlinked file; release inode parent directory (algorithm iput);
-
-    inode->linksCount--;
-    iput(inode);
+    //iput(inode);
     iput(parentInode);
 }
