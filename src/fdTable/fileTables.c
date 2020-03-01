@@ -105,7 +105,7 @@ fileTableEntry *getFileDescriptor(pid_t pid, int fd, int *error) {
 
     fileTableEntry *entry = (fdNode->fdTable) + fd;
     if (!entry->validEntry) {
-        *error = -EBADFD;
+        *error = -EBADF;
         printf("returning NULL -EBADFD\n");
         return NULL;
     }
