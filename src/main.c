@@ -39,7 +39,7 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
 }
 
 static int mkdir_callback(const char* path, mode_t mode) {
-	return createFile(path, T_DIRECTORY, mode, NULL, NULL);
+	return createFile(path, T_DIRECTORY, mode);
 }
 
 static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
@@ -48,7 +48,11 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
     struct fuse_context *fuse_context = fuse_get_context();
-	return createFile(path, T_REGULAR, mode, fi, fuse_context);
+    int retVal = createFile(path, T_REGULAR, mode);
+    if (retVal != 0) {
+        return retVal;
+    }
+    return openFile(path, fi, fuse_context);
 }
 
 static int open_callback(const char *path, struct fuse_file_info *fi) {
@@ -98,11 +102,12 @@ static struct fuse_operations OPERATIONS = {
     .utimens = utimens_callback,
     .chown = chown_callback,
     .chmod = chmod_callback,
-    //.release = release_callback,
     .write = write_callback,
-        //.access = access_callback,
-        //.link = link_callback,
-        //.unlink = unlink_callback,
+    //.flush = release_callback,
+    //.release = release_callback,
+    //.setattr = setattr_callback,
+    //.access = access_callback,
+    //.link = link_callback,
 };
 
 int main(int argc, char *argv[]) {
