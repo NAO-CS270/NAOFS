@@ -41,5 +41,5 @@ int openFile(const char* path, struct fuse_file_info *fi, struct fuse_context *f
 
 	pthread_mutex_unlock(&(fileINode->iNodeMutex));
 	printf("Released lock for inode %ld\n", fileINode->inode_number);
-	return fd;
+	return 0;
 }

@@ -77,12 +77,12 @@ int createFile(const char *path, iNodeType fileType, mode_t mode,  struct fuse_f
 		updateNewDirMetaData(newINode, parentINode->inode_number);
 	}
 
-	if (fi != NULL) {
+/**	if (fi != NULL) {
         size_t offset = calculateFileOffset(newINode, fi->flags);
         int fd = createAndGetFileDescriptor(fuseContext->pid, newINode, fi->flags, offset);
         printf("createFile - fd: %d\n", fd);
         fi->fh = fd;
-    }
+    }*/
 
 	iput(parentINode);
     iput(newINode);

@@ -10,8 +10,20 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
     getDiskBlock(bmapResp->blockNumber, blockPtr);
     unsigned char *ptrIntoBlock = blockPtr->data;
 
+        printf("WE ARE IN WRITE!\n");
+    printf("block_number: %d\n", bmapResp->blockNumber);
+    int i = 0;
+    for(i=0; i < size; i++) {
+        printf("%c", buf[i]);
+    }
+    printf("\n");
     memcpy(ptrIntoBlock + bmapResp->byteOffsetInBlock, buf, size);
-
+    
+    for(i=0; i < size; i++) {
+        printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
+    }
+    printf("\n");
+    writeDiskBlock(bmapResp->blockNumber, blockPtr);
     free(blockPtr);
 }
 
@@ -39,7 +51,7 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         bytesWritten += bytesToWrite;
         _fileTableEntry -> offset += bytesToWrite;
     }
-
-	free(bmapResp);
+    _fileTableEntry->inode->size += bytesWritten;
+    free(bmapResp);
     return bytesWritten;
 }

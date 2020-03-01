@@ -41,7 +41,7 @@ testWriteAndRead() {
   touch a
   echo 1 > a
   catResult=$(cat a)
-  assertEquals "$catResult" "1\n"
+  assertEquals "$catResult" "1"
 }
 
 . ../shunit2-2.1.6/src/shunit2
