@@ -135,3 +135,36 @@ fileTableEntry *getFileDescriptor(pid_t pid, int fd, int *error) {
     *error = 0;
     return entry;
 }
+
+void removeNode(fdNode *node) {
+    if (node != fdListHead) {
+        node->prev->next = node->next;
+    }
+    if (NULL != node->next) {
+        node->next->prev = node->prev;
+    }
+    if (node == fdListHead) {
+        fdListHead = node->next;
+    }
+}
+
+void removeNodeIfEmpty(pid_t pid) {
+    fdNode* fdNode = getFdNode(pid, true);
+    if (NULL == fdNode) {
+        return;
+    }
+
+    int counter = 0;
+    bool empty = true;
+    while (counter < MAX_FD) {
+        if ((fdNode->fdTable)[counter].validEntry) {
+            empty = false;
+            break;
+        }
+        counter++;
+    }
+    if (empty) {
+        removeNode(fdNode);
+        free(fdNode);
+    }
+}

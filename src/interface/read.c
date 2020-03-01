@@ -57,6 +57,7 @@ int validateFile(fileTableEntry *file, struct fuse_context *fuse_context) {
 	if (file->inode->type == T_DIRECTORY) {
 		return -EISDIR;
 	}
+	debug_print("flag: %x, O_RDONLY: %x, O_WRONLY: %x, O_RDWR: %x\n", file->flags, O_RDONLY, O_WRONLY, O_RDWR);
 	if (file->flags && O_RDONLY) {
 		return 0;
 	}
@@ -67,8 +68,8 @@ void readInBlock(bmapResponse *bmapResp, char *buf, size_t size) {
 	disk_block *blockPtr = (disk_block *)malloc(sizeof(disk_block));
 	getDiskBlock(bmapResp->blockNumber, blockPtr);
 	unsigned char *ptrIntoBlock = blockPtr->data;
-        printf("WE ARE IN READ!\n");
-        printf("block_number: %d\n", bmapResp->blockNumber);
+    printf("WE ARE IN READ!\n");
+    printf("block_number: %d\n", bmapResp->blockNumber);
     int i = 0;
     for(i=0; i < size; i++) {
         printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
@@ -121,7 +122,7 @@ int readFile(char *buf, size_t size, off_t offset, struct fuse_file_info *fi, st
 	pthread_mutex_lock(&(fileINode->iNodeMutex));
 	debug_print("Acquired lock for iNode %ld\n", fileINode->inode_number);
 
-	// retVal = validateFile(file, fuse_context);
+	retVal = validateFile(file, fuse_context);
 	// if (retVal != 0) {
 	// 	debug_print("Some error for fd: %d\n", fi->fh);
 	// 	pthread_mutex_unlock(&(fileINode->iNodeMutex));

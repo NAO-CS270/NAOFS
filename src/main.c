@@ -49,6 +49,12 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
     struct fuse_context *fuse_context = fuse_get_context();
 	return createFile(path, T_REGULAR, mode, fi, fuse_context);
+	// int retVal = createFile(path, T_REGULAR, mode);
+ //    if (retVal != 0) {
+ //        return retVal;
+ //    }
+ //    struct fuse_context *fuse_context = fuse_get_context();
+ //    return openFile(path, fi, fuse_context);
 }
 
 static int open_callback(const char *path, struct fuse_file_info *fi) {
@@ -65,9 +71,6 @@ static int release_callback(const char* path, struct fuse_file_info* fi) {
     closeFile(fi, fuse_context);
 }
 
-//static void setattr_callback(fuse_req_t req, fuse_ino_t ino, struct stat *attr, int to_set, struct fuse_file_info *fi) {
-//	return;
-//}
 /** Change the size of a file */
 static int truncate_callback(const char *path, off_t size) {
     return 0;
@@ -87,19 +90,19 @@ static int chmod_callback(const char *path, mode_t mode) {
 
 static struct fuse_operations OPERATIONS = {
 	.getattr = getattr_callback,
-    //.setattr = setattr_callback,
     .mkdir = mkdir_callback,
     .readdir = readdir_callback,
 	.create = create_callback,
     .open = open_callback,
     .read = read_callback,
-//    .flush = release_callback,
     .truncate = truncate_callback,
     .utimens = utimens_callback,
     .chown = chown_callback,
     .chmod = chmod_callback,
-    //.release = release_callback,
     .write = write_callback,
+    .flush = release_callback,
+    //.release = release_callback,
+    //.setattr = setattr_callback,
         //.access = access_callback,
         //.link = link_callback,
         //.unlink = unlink_callback,
