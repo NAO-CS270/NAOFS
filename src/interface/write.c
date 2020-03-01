@@ -51,6 +51,7 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
 
         bytesWritten += bytesToWrite;
         _fileTableEntry -> offset += bytesToWrite;
+        offset += bytesToWrite;
     }
     _fileTableEntry->inode->size += bytesWritten;
     pthread_mutex_unlock(&(_fileTableEntry->inode->iNodeMutex));
