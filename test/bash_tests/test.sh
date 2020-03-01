@@ -60,7 +60,7 @@ testDownloadFileSmall() {
   wget http://178.128.139.251:9000/512 -O testFile
   catResult=$(cat testFile)
 
-  assertEquals "$content" "$catResult"
+  assertEquals "512B not matched" "$content" "$catResult"
   rm testFile
 }
 
@@ -71,7 +71,7 @@ testFileOneFullBlock() {
   echo "$content" > testFile
   catResult=$(cat testFile)
 
-  assertEquals "$content" "$catResult"
+  assertEquals "1K not matched" "$content" "$catResult"
   rm testFile
 }
 
@@ -82,7 +82,7 @@ testFileMoreThanOneBlock() {
   echo "$content" > testFile
   catResult=$(cat testFile)
 
-  assertEquals "$content" "$catResult"
+  assertEquals "1100B not matched" "$content" "$catResult"
   rm testFile
 }
 
@@ -93,7 +93,7 @@ testDownloadFileLargeFile() {
   echo "$content" > testFile
   catResult=$(cat testFile)
 
-  assertEquals "$content" "$catResult"
+  assertEquals "60M not matched" "$content" "$catResult"
   rm testFile
 }
 
