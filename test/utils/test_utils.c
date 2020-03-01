@@ -1,6 +1,7 @@
 //#include "ctest.h"
 #include "utils/utils.h"
 #include <stdio.h>
+#include <assert.h>
 
 void stringSplit_emptyTokens() {
     char str[] = "aaa";
@@ -15,6 +16,8 @@ void stringSplit_singleToken() {
     char str[] = "aaa";
     char *tokens[4];
     printf("TESTIIIIIIIIIIIING!");
+    int a = 0;
+    assert(a == 8);
 //    string_split(str, tokens, "b");
 
 //    ASSERT_STR(tokens[0], "aaa");
