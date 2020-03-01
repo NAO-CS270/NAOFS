@@ -26,7 +26,7 @@ target_link_libraries(naofs ${FUSE_LIBRARIES})
 enable_testing()
 #
 file(GLOB_RECURSE TEST_SOURCES "test/*.c")
-list(REMOVE_ITEM SOURCES "test_block_fetch.c")
+list(REMOVE_ITEM SOURCES "test/test_block_fetch.c")
 add_executable (Test ${TEST_SOURCES})
 target_link_libraries(Test NAOfs)
 #
