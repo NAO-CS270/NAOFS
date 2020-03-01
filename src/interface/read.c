@@ -67,7 +67,13 @@ void readInBlock(bmapResponse *bmapResp, char *buf, size_t size) {
 	disk_block *blockPtr = (disk_block *)malloc(sizeof(disk_block));
 	getDiskBlock(bmapResp->blockNumber, blockPtr);
 	unsigned char *ptrIntoBlock = blockPtr->data;
-
+        printf("WE ARE IN READ!\n");
+        printf("block_number: %d\n", bmapResp->blockNumber);
+    int i = 0;
+    for(i=0; i < size; i++) {
+        printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
+    }
+    printf("\n");
 	memcpy(buf, ptrIntoBlock + bmapResp->byteOffsetInBlock, size);
 
 	free(blockPtr);
