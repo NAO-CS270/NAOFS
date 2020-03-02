@@ -30,6 +30,8 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
 
 int writeToFile(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi, struct fuse_context *fuse_context) {
     printf("filehandler: %ld", fi->fh);
+    printf("\nBEGINNING OF WRITE_TO_FILE\n");
+    printf("Size: %ld, offset: %ld\n", size, offset);
     if(fi->fh < 0) { // TODO: Do we really need this check?
         return -1;
     }
@@ -45,6 +47,7 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
     pthread_mutex_lock(&(_fileTableEntry->inode->iNodeMutex));
     bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
     while (bytesWritten < size) {
+
         int retValue = bmap(_fileTableEntry -> inode, offset, bmapResp, APPEND_MODE);
         if (retValue < 0) {
             printf("[writeToFile] Error returned from bmap: %d!\n", retValue);
@@ -57,8 +60,10 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         _fileTableEntry -> offset += bytesToWrite;
         offset += bytesToWrite;
         updateINodeMetadata(_fileTableEntry->inode, bytesToWrite);
+                printf("size of the file: %ld\n", _fileTableEntry->inode->size);
+                printf("bytes written: %ld\n", bytesWritten);
+                printf("offset: %ld\n", offset);
     }
-    _fileTableEntry->inode->size += bytesWritten;
     pthread_mutex_unlock(&(_fileTableEntry->inode->iNodeMutex));
     free(bmapResp);
     return bytesWritten;
