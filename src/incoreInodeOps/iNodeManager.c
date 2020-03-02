@@ -102,7 +102,7 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t toAdd, int *indirOffsets, 
 	}
 	*curBlock = toAdd;
 	writeFreeDiskListBlock(workingData, dataBlock);
-	writeDiskBlock(*curBlock, dataBlock);
+	writeDiskBlock(parentBlock, dataBlock);
 
 	free(dataBlock);
 	free(workingData);
@@ -124,7 +124,8 @@ void updateIndex(inCoreiNode* iNode, size_t blockNumToAdd, blkTreeOffset *blkOff
 	size_t indirection = blkOffset->offsetIndirection;
 	size_t *dataBlockIndex = iNode->dataBlockNums + DIRECT_BLOCK_LIMIT + indirection;
 
-	allocateAllNeededBlocks(dataBlockIndex, blockNumToAdd, offsets + indirection, indirection);
+	// TODO: offsets + indirection OR offsets + 1?
+	allocateAllNeededBlocks(dataBlockIndex, blockNumToAdd, offsets + 1, indirection);
 
 	updateINodeMetadata(iNode, 0, iNode->linksCount);
 }

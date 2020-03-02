@@ -60,9 +60,9 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         _fileTableEntry -> offset += bytesToWrite;
         offset += bytesToWrite;
         updateINodeMetadata(_fileTableEntry->inode, bytesToWrite);
-                printf("size of the file: %ld\n", _fileTableEntry->inode->size);
-                printf("bytes written: %ld\n", bytesWritten);
-                printf("offset: %ld\n", offset);
+        printf("size of the file: %ld\n", _fileTableEntry->inode->size);
+        printf("bytes written: %ld\n", bytesWritten);
+        printf("offset: %ld\n", offset);
     }
     pthread_mutex_unlock(&(_fileTableEntry->inode->iNodeMutex));
     free(bmapResp);
