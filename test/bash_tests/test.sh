@@ -41,7 +41,7 @@ testWriteAndRead() {
   echo 1 > testFile
   catResult=$(cat testFile)
   assertEquals 'write without touch failed' "1" "$catResult"
-  rm testFile
+#  rm testFile
 }
 
 testWriteAndReadCreatedFile() {
@@ -50,7 +50,7 @@ testWriteAndReadCreatedFile() {
   echo 1 > testFile2
   catResult=$(cat testFile2)
   assertEquals 'write with touch failed' "1" "$catResult"
-  rm testFile2
+#  rm testFile2
 }
 
 testDownloadFile() {
@@ -58,7 +58,7 @@ testDownloadFile() {
   md5Result=$(md5sum testDownload | awk '{print $1;}')
 
   assertEquals 'Downloaded File not matched' "d798d33d3961f3d8fe0410ede7e6dc77\n" "$md5Result"
-  rm testDownload
+#  rm testDownload
 }
 
 testFileOneFullBlock() {
@@ -69,7 +69,7 @@ testFileOneFullBlock() {
   catResult=$(cat testFile1023)
 
   assertEquals '1K - 1 not matched' "$content" "$catResult"
-  rm testFile1023
+#  rm testFile1023
 }
 
 testFileMoreThanOneBlock() {
@@ -80,7 +80,7 @@ testFileMoreThanOneBlock() {
   catResult=$(cat testFile1024)
 
   assertEquals '1K not matched' "$content" "$catResult"
-  rm testFile1024
+#  rm testFile1024
 }
 
 testFileFirstIndirectBlock() {
@@ -91,7 +91,7 @@ testFileFirstIndirectBlock() {
   catResult=$(cat testFile10239)
 
   assertEquals '10K - 1 not matched' "$content" "$catResult"
-  rm testFile10239
+#  rm testFile10239
 }
 
 testDownloadFileLargeFile() {
@@ -102,7 +102,7 @@ testDownloadFileLargeFile() {
   catResult=$(cat testFile60M)
 
   assertEquals '60M not matched' "$content" "$catResult"
-  rm testFile60M
+#  rm testFile60M
 }
 
 . ../shunit2-2.1.6/src/shunit2
