@@ -52,9 +52,11 @@ int bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response, bmapMode mod
 		insertDataBlockInINode(iNode, newBlock);
 
 		int counter = 0;
+		printf("\n");
 		while (counter < BLOCKS_IN_INODE) {
-			printf("%ld", iNode -> dataBlockNums[counter++]);
+			printf("%ld ", iNode -> dataBlockNums[counter++]);
 		}
+		printf("\n");
 		disk_block* dataBlock = (disk_block*)malloc(BLOCK_SIZE);
 		getDiskBlock(iNode -> dataBlockNums[SINGLE_INDIRECT_BLOCK], dataBlock);
 		counter = 0;

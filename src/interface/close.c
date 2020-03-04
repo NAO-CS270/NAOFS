@@ -1,5 +1,5 @@
 #include "interface/close.h"
-#include "fdTable/fileTables.h"
+#include "fdTable/globalFileTable.h"
 #include "inode/inCoreiNode.h"
 #include "incoreInodeOps/iput.h"
 #include "utils/utils.h"
@@ -17,6 +17,6 @@ int closeFile(struct fuse_file_info *fi, struct fuse_context *fuse_context) {
 	}
 
 	file->validEntry = false;
-	removeNodeIfEmpty(fuse_context->pid);
+	// removeNodeIfEmpty(fuse_context->pid);
 	return iput(file->inode);
 }

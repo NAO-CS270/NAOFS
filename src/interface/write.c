@@ -1,5 +1,5 @@
 #include "incoreInodeOps/bmap.h"
-#include "fdTable/fileTables.h"
+#include "fdTable/globalFileTable.h"
 #include "incoreInodeOps/iNodeManager.h"
 #include "dsk/blkfetch.h"
 #include "utils/utils.h"

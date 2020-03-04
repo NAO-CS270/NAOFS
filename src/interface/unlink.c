@@ -37,12 +37,14 @@ int unlinkFile(const char* path, struct fuse_context* fuseContext) {
 
     inCoreiNode *deletedFile = iget(entry->iNodeNum, 0);
     pthread_mutex_lock(&(deletedFile->iNodeMutex));
+    printf ("In unlink, linksCount: %ld\n", deletedFile->linksCount);
     deletedFile->linksCount -= 1;
     updateINodeMetadata(deletedFile, 0, deletedFile->linksCount);
+    printf ("In unlink, linksCount: %ld\n", deletedFile->linksCount);
     pthread_mutex_unlock(&(deletedFile->iNodeMutex));
-
     iput(deletedFile);
     pthread_mutex_unlock(&(parentINode->iNodeMutex));
+    iput(parentINode);
     return 0;
     // inCoreiNode* parentInode = validateThenGetParentINode(T_REGULAR, file, filename);
 

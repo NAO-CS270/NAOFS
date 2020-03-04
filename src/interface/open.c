@@ -1,5 +1,5 @@
 #include "interface/open.h"
-#include "fdTable/fileTables.h"
+#include "fdTable/globalFileTable.h"
 #include "inode/inCoreiNode.h"
 #include "trav/namei.h"
 #include "utils/utils.h"

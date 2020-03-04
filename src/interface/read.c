@@ -3,7 +3,7 @@
 #include "trav/directory.h"
 #include "trav/namei.h"
 #include "incoreInodeOps/iput.h"
-#include "fdTable/fileTables.h"
+#include "fdTable/globalFileTable.h"
 #include "incoreInodeOps/bmap.h"
 #include "interface/read.h"
 #include "dsk/blkfetch.h"

@@ -13,6 +13,7 @@
 #include "inode/iNode.h"
 #include "interface/link.h"
 #include "interface/unlink.h"
+#include "fdTable/globalFileTable.h"
 
 
 #include <sys/stat.h>
@@ -113,7 +114,7 @@ static struct fuse_operations OPERATIONS = {
     .write = write_callback,
     .unlink = unlink_callback,
     //.flush = release_callback,
-    //.release = release_callback,
+    .release = release_callback,
     //.setattr = setattr_callback,
     //.access = access_callback,
     //.link = link_callback,
@@ -124,6 +125,7 @@ int main(int argc, char *argv[]) {
 	makeFileSystem();
     initFreeInCoreINodeList();
 	initHashQueues();
+    initGlobalFileTable();
 
     return fuse_main(argc, argv, &OPERATIONS, NULL);
 }
