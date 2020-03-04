@@ -57,7 +57,7 @@ testDownloadFile() {
   wget https://s.yimg.com/rz/p/yahoo_frontpage_en-US_s_f_p_205x58_frontpage_2x.png -O testDownload
   md5Result=$(md5sum testDownload | awk '{print $1;}')
 
-  assertEquals 'Downloaded File not matched' "d798d33d3961f3d8fe0410ede7e6dc77\n" "$md5Result"
+  assertEquals 'Downloaded File not matched' "d798d33d3961f3d8fe0410ede7e6dc77" "$md5Result"
 #  rm testDownload
 }
 
