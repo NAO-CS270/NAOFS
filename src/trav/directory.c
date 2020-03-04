@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <stdbool.h>
 
 /* Sets data of `blockPtr` in `theBlock` appropriately. */
 directoryTable *makeDirectoryTable(disk_block *blockPtr, directoryTable *theBlock) {
@@ -51,7 +52,7 @@ int validateSearch(inCoreiNode *iNodePtr) {
  * it's searching for, if found to `entryBuffer`. In collect mode, it adds all directory entries to `entryBuffer`.
  * Return value is the number of elements added to `entryBuffer`.
  */
-size_t searchBlockDirectoryEntries(disk_block *blockPtr, char *entryName, size_t offset, directoryEntry *entryBuffer, size_t numOfEntries) {
+size_t searchBlockDirectoryEntries(disk_block *blockPtr, char *entryName, size_t offset, directoryEntry *entryBuffer, size_t numOfEntries, directoryEntry *lastEntry) {
 	size_t found = 0;
 
 	size_t counter = 0;
@@ -63,6 +64,12 @@ size_t searchBlockDirectoryEntries(disk_block *blockPtr, char *entryName, size_t
 			memcpy(entryBuffer->name, ptrIntoBlock, FILENAME_SIZE);
 			memcpy(&(entryBuffer->iNodeNum), ptrIntoBlock+FILENAME_SIZE, INODE_ADDRESS_SIZE);
 			found = 1;
+
+			if(NULL != lastEntry && lastEntry->iNodeNum != -1) {
+				memcpy(ptrIntoBlock, lastEntry->name, FILENAME_SIZE);
+				memcpy(ptrIntoBlock + FILENAME_SIZE, &(lastEntry->iNodeNum), INODE_ADDRESS_SIZE);
+			}
+
 			break;
 		}
 		else if (entryName == NULL) {
@@ -77,7 +84,7 @@ size_t searchBlockDirectoryEntries(disk_block *blockPtr, char *entryName, size_t
 	return (entryName==NULL) ? counter : found;
 }
 
-size_t checkInBlock(size_t tillEndOfFile, bmapResponse *bmapResp, char *entryName, directoryEntry *entryBuffer) {
+size_t checkInBlock(size_t tillEndOfFile, bmapResponse *bmapResp, char *entryName, directoryEntry *entryBuffer, directoryEntry* lastEntry) {
 	disk_block *blockPtr = (disk_block *)malloc(sizeof(disk_block));
 	getDiskBlock(bmapResp->blockNumber, blockPtr);
 		
@@ -86,9 +93,30 @@ size_t checkInBlock(size_t tillEndOfFile, bmapResponse *bmapResp, char *entryNam
 		entriesInBlock = tillEndOfFile / DIRECTORY_ENTRY_SIZE;
 	}
 
-	size_t retValue = searchBlockDirectoryEntries(blockPtr, entryName, bmapResp->byteOffsetInBlock, entryBuffer, entriesInBlock);
+	size_t retValue = searchBlockDirectoryEntries(blockPtr, entryName, bmapResp->byteOffsetInBlock, entryBuffer, entriesInBlock, lastEntry);
+
+	if (NULL != lastEntry && lastEntry->iNodeNum != -1 && retValue == 1) {
+		writeDiskBlock(bmapResp->blockNumber, blockPtr);
+	}
 	free(blockPtr);
 	return retValue;
+}
+
+void getLastEntry(inCoreiNode *iNodePtr, directoryEntry* entry) {
+	if (iNodePtr->size <= 3*DIRECTORY_ENTRY_SIZE) {
+		memset(entry, 0, sizeof(directoryEntry));
+		entry->iNodeNum = -1;
+	}
+	bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
+	bmap(iNodePtr, iNodePtr->size - DIRECTORY_ENTRY_SIZE, bmapResp, READ_MODE);
+	disk_block *data_block = (disk_block*)malloc(sizeof(disk_block));
+	getDiskBlock(bmapResp->blockNumber, data_block);
+	unsigned char *ptrIntoBlock = data_block->data;
+	ptrIntoBlock += bmapResp->byteOffsetInBlock;
+	memcpy(entry->name, ptrIntoBlock, FILENAME_SIZE);
+	memcpy(&(entry->iNodeNum), ptrIntoBlock + FILENAME_SIZE, INODE_ADDRESS_SIZE);
+	free(data_block);
+	free(bmapResp);
 }
 
 /* Considering passed `iNodePtr` as corresponding to a directory, it fetches the disk blocks starting after `offset` entries.
@@ -96,25 +124,32 @@ size_t checkInBlock(size_t tillEndOfFile, bmapResponse *bmapResp, char *entryNam
  * only the directory entry it's searching for, if found to `entryBuffer`. In collect mode, it adds atmost `numOfEntries`.
  * Return value is the number of elements added to `entryBuffer`.
  */
-int searchINodeDirectoryEntries(inCoreiNode *iNodePtr, char *entryName, size_t offset, directoryEntry *entryBuffer, size_t numOfEntries) {
+int searchINodeDirectoryEntries(inCoreiNode *iNodePtr, char *entryName, size_t offset, directoryEntry *entryBuffer, size_t numOfEntries, bool forUnlink) {
 	int retValue = validateSearch(iNodePtr);
 	if (retValue == -1) {
 		printf("Not permitted to read directory!!\n");
 		return -1;
 	}
 
+	directoryEntry *lastEntry = NULL;
+	if (forUnlink) {
+		lastEntry = (directoryEntry*)malloc(sizeof(directoryEntry));
+		getLastEntry(iNodePtr, lastEntry);
+	}
+
 	bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
 	size_t directoryOffset = offset*DIRECTORY_ENTRY_SIZE;
 	size_t entriesReadTillNow = 0;
-
+	// TODO: should this be '&&' condition?
 	while (entryName != NULL || entriesReadTillNow < numOfEntries) {
+	        printf("numberOfEntries: %ld , entriesReadTillNow: %ld", numOfEntries, entriesReadTillNow);
 		retValue = bmap(iNodePtr, directoryOffset, bmapResp, READ_MODE);
 		if (retValue == -1) {
 			printf("Reached end of directory!!\n");
 			break;
 		}
 
-		size_t entriesRead = checkInBlock(iNodePtr->size - directoryOffset, bmapResp, entryName, entryBuffer + entriesReadTillNow);
+		size_t entriesRead = checkInBlock(iNodePtr->size - directoryOffset, bmapResp, entryName, entryBuffer + entriesReadTillNow, lastEntry);
 		entriesReadTillNow += entriesRead;
 		
 		if (entryName != NULL && entriesRead == 1) {
@@ -123,6 +158,13 @@ int searchINodeDirectoryEntries(inCoreiNode *iNodePtr, char *entryName, size_t o
 		directoryOffset += (DIRECTORY_ENTRIES_IN_BLOCK*DIRECTORY_ENTRY_SIZE);
 	}
 
+	if (forUnlink) {
+		if (entriesReadTillNow == 1) {
+			updateINodeMetadata(iNodePtr, -DIRECTORY_ENTRY_SIZE, iNodePtr->linksCount);
+			// TODO: call truncate
+		}
+		free(lastEntry);
+	}
 	free(bmapResp);
 	return entriesReadTillNow;
 }
@@ -159,7 +201,7 @@ int getAndUpdateDirectoryTable(inCoreiNode* parentINode, size_t newInodeNumber, 
 	}
     
 	addDirectoryEntry(bmapResp->blockNumber, bmapResp->byteOffsetInBlock, filename, newInodeNumber);
-	updateINodeMetadata(parentINode, DIRECTORY_ENTRY_SIZE);
+	updateINodeMetadata(parentINode, DIRECTORY_ENTRY_SIZE, parentINode->linksCount);
 
 	free(bmapResp);
 }
@@ -176,7 +218,7 @@ int updateNewDirMetaData(inCoreiNode* iNode, size_t parentINodeNumber) {
 
 	addDirectoryEntry(bmapResp->blockNumber, bmapResp->byteOffsetInBlock, ".", iNode->inode_number);
 	addDirectoryEntry(bmapResp->blockNumber, (bmapResp->byteOffsetInBlock) + DIRECTORY_ENTRY_SIZE, "..", parentINodeNumber);
-	updateINodeMetadata(iNode, 2*DIRECTORY_ENTRY_SIZE);
+	updateINodeMetadata(iNode, 2*DIRECTORY_ENTRY_SIZE, 2);
 
 	free(bmapResp);
 }

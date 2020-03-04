@@ -42,7 +42,7 @@ inCoreiNode *operate(const char *path, size_t bufLen, inCoreiNode *workingINode)
 	memset(entryBuffer, 0, sizeof(directoryEntry));
 
 	printf("Searching iNode %ld for %s\n", workingINode->inode_number, workingBuffer);
-    size_t retValue = searchINodeDirectoryEntries(workingINode, workingBuffer, 0, entryBuffer, 0);
+    size_t retValue = searchINodeDirectoryEntries(workingINode, workingBuffer, 0, entryBuffer, 0, false);
 	size_t iNodeNum = entryBuffer->iNodeNum;
 
 	free(entryBuffer);

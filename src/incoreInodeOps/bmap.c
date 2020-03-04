@@ -24,7 +24,6 @@ size_t processAndGetDiskBlock(blkTreeOffset *indirectionOffsets, size_t startBlo
 		counter++;
 	}
 
-	free(indirectionOffsets);
 	free(dataBlock);
 	free(workingData);
 
@@ -46,10 +45,28 @@ int bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response, bmapMode mod
             return -1;
         }
 	}
+	printf("pass first error check");
 	if (offset == fileSize && (offset%BLOCK_SIZE) == 0 && mode == APPEND_MODE) {
 		size_t newBlock = blockAlloc();
 		printf("Allocated new block in bmap - %ld\n", newBlock);
 		insertDataBlockInINode(iNode, newBlock);
+
+		int counter = 0;
+		printf("\n");
+		while (counter < BLOCKS_IN_INODE) {
+			printf("%ld ", iNode -> dataBlockNums[counter++]);
+		}
+		printf("\n");
+		disk_block* dataBlock = (disk_block*)malloc(BLOCK_SIZE);
+		getDiskBlock(iNode -> dataBlockNums[SINGLE_INDIRECT_BLOCK], dataBlock);
+		counter = 0;
+		printf("data in indirect block\n");
+		while (counter < 32) {
+			printf("%c", dataBlock -> data[counter++]);
+		}
+		printf("\n");
+		free(dataBlock);
+
 		createBMapResponse(newBlock, 0, response);
 		return 0;
 	}
