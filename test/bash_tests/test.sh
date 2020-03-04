@@ -20,12 +20,12 @@ testCreateDir() {
 
 testPresentWorkingDir() {
   pwd=$(pwd)
-  assertEquals "$pwd" "/home/travis/build/NAO-CS270/NAOFS/build/fsRoot"
+  assertEquals "/home/travis/build/NAO-CS270/NAOFS/build/fsRoot" "$pwd"
 }
 
 testListDir() {
   lsResult=$(ls)
-  assertEquals "$lsResult" "test"
+  assertEquals "test" "$lsResult"
 }
 
 testCdToCreatedDir() {
@@ -38,10 +38,71 @@ testCdToCreatedDir() {
 
 testWriteAndRead() {
   pwd1=$(pwd)
-  touch a
-  echo 1 > a
-  catResult=$(cat a)
-  assertEquals "$catResult" "1"
+  echo 1 > testFile
+  catResult=$(cat testFile)
+  assertEquals 'write without touch failed' "1" "$catResult"
+#  rm testFile
+}
+
+testWriteAndReadCreatedFile() {
+  pwd1=$(pwd)
+  touch testFile2
+  echo 1 > testFile2
+  catResult=$(cat testFile2)
+  assertEquals 'write with touch failed' "1" "$catResult"
+#  rm testFile2
+}
+
+testDownloadFile() {
+  wget https://s.yimg.com/rz/p/yahoo_frontpage_en-US_s_f_p_205x58_frontpage_2x.png -O testDownload
+  md5Result=$(md5sum testDownload | awk '{print $1;}')
+
+  assertEquals 'Downloaded File not matched' "d798d33d3961f3d8fe0410ede7e6dc77" "$md5Result"
+#  rm testDownload
+}
+
+testFileOneFullBlock() {
+  N=1023
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+
+  echo "$content" > testFile1023
+  catResult=$(cat testFile1023)
+
+  assertEquals '1K - 1 not matched' "$content" "$catResult"
+#  rm testFile1023
+}
+
+testFileMoreThanOneBlock() {
+  N=1024
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+
+  echo "$content" > testFile1024
+  catResult=$(cat testFile1024)
+
+  assertEquals '1K not matched' "$content" "$catResult"
+#  rm testFile1024
+}
+
+testFileFirstIndirectBlock() {
+  N=10239
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+
+  echo "$content" > testFile10239
+  catResult=$(cat testFile10239)
+
+  assertEquals '10K - 1 not matched' "$content" "$catResult"
+#  rm testFile10239
+}
+
+testDownloadFileLargeFile() {
+  N=61440 # 60Mb
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+
+  echo "$content" > testFile60M
+  catResult=$(cat testFile60M)
+
+  assertEquals '60M not matched' "$content" "$catResult"
+#  rm testFile60M
 }
 
 . ../shunit2-2.1.6/src/shunit2

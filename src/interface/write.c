@@ -1,5 +1,6 @@
 #include "incoreInodeOps/bmap.h"
-#include "fdTable/fileTables.h"
+#include "fdTable/globalFileTable.h"
+#include "incoreInodeOps/iNodeManager.h"
 #include "dsk/blkfetch.h"
 #include "utils/utils.h"
 #include <string.h>
@@ -10,7 +11,7 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
     getDiskBlock(bmapResp->blockNumber, blockPtr);
     unsigned char *ptrIntoBlock = blockPtr->data;
 
-        printf("WE ARE IN WRITE!\n");
+    printf("WE ARE IN WRITE!\n");
     printf("block_number: %d\n", bmapResp->blockNumber);
     int i = 0;
     for(i=0; i < size; i++) {
@@ -29,6 +30,8 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
 
 int writeToFile(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi, struct fuse_context *fuse_context) {
     printf("filehandler: %ld", fi->fh);
+    printf("\nBEGINNING OF WRITE_TO_FILE\n");
+    printf("Size: %ld, offset: %ld\n", size, offset);
     if(fi->fh < 0) { // TODO: Do we really need this check?
         return -1;
     }
@@ -41,17 +44,27 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         //break;
         return -1;
     }
+    pthread_mutex_lock(&(_fileTableEntry->inode->iNodeMutex));
     bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
-    while (bytesWritten < size) { // TODO: offset doesn't get updated! //BUG
-        int retValue = bmap(_fileTableEntry -> inode, offset, bmapResp, APPEND_MODE);
+    while (bytesWritten < size) {
 
+        int retValue = bmap(_fileTableEntry -> inode, offset, bmapResp, APPEND_MODE);
+        if (retValue < 0) {
+            printf("[writeToFile] Error returned from bmap: %d!\n", retValue);
+            break;
+        }
         size_t bytesToWrite = min(bmapResp -> bytesLeftInBlock, size - bytesWritten);
         writeToBlock(bmapResp, buf + bytesWritten, bytesToWrite);
 
         bytesWritten += bytesToWrite;
         _fileTableEntry -> offset += bytesToWrite;
+        offset += bytesToWrite;
+        updateINodeMetadata(_fileTableEntry->inode, bytesToWrite, _fileTableEntry->inode->linksCount);
+        printf("size of the file: %ld\n", _fileTableEntry->inode->size);
+        printf("bytes written: %ld\n", bytesWritten);
+        printf("offset: %ld\n", offset);
     }
-    _fileTableEntry->inode->size += bytesWritten;
+    pthread_mutex_unlock(&(_fileTableEntry->inode->iNodeMutex));
     free(bmapResp);
     return bytesWritten;
 }

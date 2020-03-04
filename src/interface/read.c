@@ -3,7 +3,7 @@
 #include "trav/directory.h"
 #include "trav/namei.h"
 #include "incoreInodeOps/iput.h"
-#include "fdTable/fileTables.h"
+#include "fdTable/globalFileTable.h"
 #include "incoreInodeOps/bmap.h"
 #include "interface/read.h"
 #include "dsk/blkfetch.h"
@@ -88,7 +88,7 @@ size_t readBytes(fileTableEntry *file, char *buf, size_t size, size_t offset) {
 
 	bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
 	
-	while (bytesLeft > 0) { // TODO: offset doesn't get updated! //BUG
+	while (bytesLeft > 0) {
 		int retValue = bmap(fileINode, offset, bmapResp, READ_MODE);
 		if (retValue == -1) {
 			printf("Reached end of file!!\n");
@@ -101,6 +101,7 @@ size_t readBytes(fileTableEntry *file, char *buf, size_t size, size_t offset) {
 		bytesRead += bytesToReadFromBlock;
 		bytesLeft -= bytesToReadFromBlock;
 		file->offset += bytesToReadFromBlock;
+		offset += bytesToReadFromBlock;
 	}
 
 	free(bmapResp);

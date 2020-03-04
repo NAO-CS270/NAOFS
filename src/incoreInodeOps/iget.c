@@ -16,14 +16,16 @@ void fetchInodeFromDisk(size_t iNodeNumber, inCoreiNode* inode) {
 inCoreiNode *updateAndGetINode(Node *coreNode) {
 	inCoreiNode *iNodeToReturn = coreNode->inode;
 
-	(iNodeToReturn->reference_count)++;
+	printf("Ref count before increment %ld, iNodeNum: %ld\n", iNodeToReturn->reference_count, iNodeToReturn->inode_number);
+	(iNodeToReturn->reference_count) += 1;
+	printf("Ref count before increment %ld, iNodeNum: %ld\n", iNodeToReturn->reference_count, iNodeToReturn->inode_number);
 	pthread_mutex_unlock(&(iNodeToReturn->iNodeMutex));
 	printf("Released lock for inode %ld\n", iNodeToReturn->inode_number);
 	return iNodeToReturn;
 }
 
 inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
-	printf("iGet iNode %ld\n", iNodeNumber);
+	printf("\n------------------------\niGet iNode %ld\n\n", iNodeNumber);
     Node* node = hashLookup(iNodeNumber, deviceNumber);
 
     if(node == NULL) {
