@@ -116,7 +116,7 @@ testFileFirstDoubleIndirectBlock() {
 #  rm testFileFirstDoubleIndirect
 }
 
-testDownloadFileLargeFile() {
+testLargeFile() {
   N=$((60*1024)) # 60Mb
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
