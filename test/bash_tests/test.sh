@@ -84,7 +84,7 @@ testFileMoreThanOneBlock() {
 }
 
 testFileFirstIndirectBlock() {
-  N=10239
+  N=$((10*1024 - 1))
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
   echo "$content" > testFile10239
@@ -94,8 +94,19 @@ testFileFirstIndirectBlock() {
 #  rm testFile10239
 }
 
+testFileFirstDoubleIndirectBlock() {
+  N=$((522*1024 - 1))
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+
+  echo "$content" > testFile10239
+  catResult=$(cat testFile10239)
+
+  assertEquals '522K - 1 not matched' "$content" "$catResult"
+#  rm testFile10239
+}
+
 testDownloadFileLargeFile() {
-  N=61440 # 60Mb
+  N=$((60*1024)) # 60Mb
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
   echo "$content" > testFile60M
