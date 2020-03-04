@@ -57,9 +57,9 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         writeToBlock(bmapResp, buf + bytesWritten, bytesToWrite);
 
         bytesWritten += bytesToWrite;
-        _fileTableEntry -> offset += bytesToWrite;
+        _fileTableEntry -> offset += bytesToWrite; //TODO: Why is it necessary?
         offset += bytesToWrite;
-        updateINodeMetadata(_fileTableEntry->inode, bytesToWrite, _fileTableEntry->inode->linksCount);
+        updateINodeMetadata(_fileTableEntry->inode, max(0, offset - _fileTableEntry -> inode -> size), _fileTableEntry->inode->linksCount);
         printf("size of the file: %ld\n", _fileTableEntry->inode->size);
         printf("bytes written: %ld\n", bytesWritten);
         printf("offset: %ld\n", offset);
