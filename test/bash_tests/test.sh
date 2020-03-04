@@ -90,7 +90,7 @@ testFileFirstIndirectBlock() {
   echo "$content" > testFileFirstIndirect
   catResult=$(cat testFileFirstIndirect)
 
-  assertEquals '10K - 1 not matched' "$content" "$catResult"
+  assertEquals 'First indirect block not matched' "$content" "$catResult"
 #  rm testFileFirstIndirect
 }
 
@@ -101,7 +101,7 @@ testFileFirstIndirectBlock() {
   echo "$content" > testFileLastIndirect
   catResult=$(cat testFileLastIndirect)
 
-  assertEquals '10K - 1 not matched' "$content" "$catResult"
+  assertEquals 'Last indirect block not matched' "$content" "$catResult"
 #  rm testFileLastIndirect
 }
 
@@ -112,7 +112,7 @@ testFileFirstDoubleIndirectBlock() {
   echo "$content" > testFileFirstDoubleIndirect
   catResult=$(cat testFileFirstDoubleIndirect)
 
-  assertEquals '522K - 1 not matched' "$content" "$catResult"
+  assertEquals 'First double-indirect block not matched' "$content" "$catResult"
 #  rm testFileFirstDoubleIndirect
 }
 
