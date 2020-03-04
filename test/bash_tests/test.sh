@@ -87,22 +87,33 @@ testFileFirstIndirectBlock() {
   N=$((10*1024 - 1))
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  echo "$content" > testFile10239
-  catResult=$(cat testFile10239)
+  echo "$content" > testFileFirstIndirect
+  catResult=$(cat testFileFirstIndirect)
 
   assertEquals '10K - 1 not matched' "$content" "$catResult"
-#  rm testFile10239
+#  rm testFileFirstIndirect
+}
+
+testFileFirstIndirectBlock() {
+  N=$((522*1024 - 2))
+  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+
+  echo "$content" > testFileLastIndirect
+  catResult=$(cat testFileLastIndirect)
+
+  assertEquals '10K - 1 not matched' "$content" "$catResult"
+#  rm testFileLastIndirect
 }
 
 testFileFirstDoubleIndirectBlock() {
   N=$((522*1024 - 1))
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  echo "$content" > testFile10239
-  catResult=$(cat testFile10239)
+  echo "$content" > testFileFirstDoubleIndirect
+  catResult=$(cat testFileFirstDoubleIndirect)
 
   assertEquals '522K - 1 not matched' "$content" "$catResult"
-#  rm testFile10239
+#  rm testFileFirstDoubleIndirect
 }
 
 testDownloadFileLargeFile() {
