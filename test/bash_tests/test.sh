@@ -53,15 +53,12 @@ testWriteAndReadCreatedFile() {
   rm testFile2
 }
 
-testDownloadFileSmall() {
-  N=512
-  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+testDownloadFile() {
+  wget https://s.yimg.com/rz/p/yahoo_frontpage_en-US_s_f_p_205x58_frontpage_2x.png -O testDownload
+  md5Result=$(md5sum testDownload | awk '{print $1;}')
 
-  wget http://178.128.139.251:9000/512 -O testFile512
-  catResult=$(cat testFile512)
-
-  assertEquals '512B not matched' "$content" "$catResult"
-  rm testFile512
+  assertEquals 'Downloaded File not matched' "d798d33d3961f3d8fe0410ede7e6dc77\n" "$md5Result"
+  rm testDownload
 }
 
 testFileOneFullBlock() {
