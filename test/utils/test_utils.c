@@ -1,5 +1,6 @@
 #include "utils/utils.h"
 #include "naotest.h"
+#include <stdio.h>
 
 void stringSplit_emptyTokens() {
     char str[] = "aaa";

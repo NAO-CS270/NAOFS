@@ -7,7 +7,6 @@
 
 #include <assert.h>
 #include <string.h>
-#include <stdio.h>
 
 #define ASSERT_STR(a, b) assert(strcmp(a, b) == 0)
 #define ASSERT(a, b) assert(a == b)

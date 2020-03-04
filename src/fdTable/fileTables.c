@@ -34,7 +34,7 @@ void printFdList() {
  * checks if a node corresponding to a pid already exists, if not, creates a new node and
  * returns it
  */
-fdNode *getFdNode(pid_t pid, bool searchMode) {
+fdNode *getFdNode(pid_t pid, bool search) {
     fdNode* tempHead = fdListHead;
     fdNode* prevNode = fdListHead;
     while(tempHead != NULL) {
@@ -48,7 +48,7 @@ fdNode *getFdNode(pid_t pid, bool searchMode) {
         }
     }
 
-    if (searchMode) {
+    if (search) {
         debug_print("FD list node not found for pid: %d\n", pid);
         return NULL;
     }
