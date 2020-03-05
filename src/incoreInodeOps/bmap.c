@@ -17,14 +17,13 @@ size_t processAndGetDiskBlock(blkTreeOffset *indirectionOffsets, size_t startBlo
 
 	size_t counter = 0;
 	while(counter < indirectionOffsets->offsetIndirection) {
-		printf("indirectBlockIndex: %d\n", indirectBlockIndex);
 		getDiskBlock(indirectBlockIndex, dataBlock);
 		makeFreeDiskListBlock(dataBlock, workingData);
 
 		indirectBlockIndex = (workingData->blkNos)[indirectionOffsets->offsets[counter + 1]];
 		counter++;
 	}
-	printf("final block: %d\n", indirectBlockIndex);
+
 	free(dataBlock);
 	free(workingData);
 
@@ -65,7 +64,6 @@ int bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response, bmapMode mod
 	
 	blkTreeOffset *indirectionOffsets = (blkTreeOffset *)malloc(sizeof(blkTreeOffset));
 	calculateOffset(offset, indirectionOffsets);
-	printf("calculated block offsets as %d %d %d %d and indir level %d\n", indirectionOffsets -> offsets[0], indirectionOffsets -> offsets[1], indirectionOffsets -> offsets[2], indirectionOffsets -> offsets[3], indirectionOffsets -> offsetIndirection);
 
 	size_t dataBlockNum;
 	if (indirectionOffsets->offsetIndirection == DIRECT) {
@@ -75,9 +73,9 @@ int bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response, bmapMode mod
 		size_t iNodeBlockIndex = DIRECT_BLOCK_LIMIT + indirectionOffsets->offsetIndirection;
 		dataBlockNum = processAndGetDiskBlock(indirectionOffsets, iNode->dataBlockNums[iNodeBlockIndex]);
 	}
-	
+
 	createBMapResponse(dataBlockNum, offset%BLOCK_SIZE, response);
-	printf("dataBlockNum, bmapRes->blkNum: %d %d\n", dataBlockNum, response -> blockNumber);
+
 	free(indirectionOffsets);
 	return 0;
 }

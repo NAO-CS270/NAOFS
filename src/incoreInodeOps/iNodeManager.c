@@ -68,7 +68,6 @@ size_t allocateIfNeeded(int *indirOffsets, size_t offsetsSize) {
 	}
 
 	if (shouldAdd) {
-		printf("block alloc needed\n");
 		return blockAlloc();
 	}
 	return ERROR_BLOCK;
@@ -81,9 +80,7 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 	
 	disk_block* dataBlock = (disk_block*)malloc(BLOCK_SIZE);
 	indirectBlock* workingData = (indirectBlock*)malloc(sizeof(indirectBlock));
-	
-	printf("allocating needed blocks with buffer: %d %d %d and buffer size %d\n", indirOffsets[0], indirOffsets[1], indirOffsets[2], offsetsSize);
-	printf("initial blk %d toBeAdded block %d\n", *curBlock, blockNumToAdd);
+
 	while (counter < offsetsSize) {
 		newAllocBlock = allocateIfNeeded(indirOffsets + counter, offsetsSize - counter);
 		
@@ -93,7 +90,6 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 			if (counter != 0) {
 				writeFreeDiskListBlock(workingData, dataBlock);
 				writeDiskBlock(parentBlock, dataBlock);
-				printf("inside nested if with blkNum %d & curBlock %d\n", parentBlock, *curBlock);
 			}
 		}
 		size_t tmp = *curBlock;
@@ -101,7 +97,6 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 		makeFreeDiskListBlock(dataBlock, workingData);
 
 		parentBlock = tmp;
-		printf("parentBlock set to %d\n", parentBlock);
 		curBlock = (workingData->blkNos) + indirOffsets[counter];
 		
 		counter ++;
@@ -109,7 +104,6 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 	*curBlock = blockNumToAdd;
 	writeFreeDiskListBlock(workingData, dataBlock);
 	writeDiskBlock(parentBlock, dataBlock);
-	printf("at the end blkNum %d\n", parentBlock);
 
 	free(dataBlock);
 	free(workingData);
@@ -130,7 +124,7 @@ void updateIndex(inCoreiNode* iNode, size_t blockNumToAdd, blkTreeOffset *blkOff
 	int *offsets = blkOffset->offsets;
 	size_t indirection = blkOffset->offsetIndirection;
 	size_t *dataBlockIndex = iNode->dataBlockNums + DIRECT_BLOCK_LIMIT + indirection;
-	
+
 	allocateAllNeededBlocks(dataBlockIndex, blockNumToAdd, offsets + 1, indirection);
 
 	updateINodeMetadata(iNode, 0, iNode->linksCount);
