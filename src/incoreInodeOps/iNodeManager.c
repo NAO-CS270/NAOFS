@@ -90,7 +90,6 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 		if (ERROR_BLOCK != newAllocBlock) {
 			*curBlock = newAllocBlock;
 
-			printf("newAllocBlock %d curBlock %d\n", newAllocBlock, *curBlock);
 			if (counter != 0) {
 				writeFreeDiskListBlock(workingData, dataBlock);
 				writeDiskBlock(parentBlock, dataBlock);
@@ -98,11 +97,8 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 			}
 		}
 		size_t tmp = *curBlock;
-		printf("*curBlock %d\n", *curBlock);
 		getDiskBlock(*curBlock, dataBlock);
-		printf("*curBlock %d\n", *curBlock);
 		makeFreeDiskListBlock(dataBlock, workingData);
-		printf("*curBlock %d\n", *curBlock);
 
 		parentBlock = tmp;
 		printf("parentBlock set to %d\n", parentBlock);
