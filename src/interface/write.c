@@ -21,15 +21,21 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
     printf("\n");
     printf("block data: \n");
     for(i=0; i < BLOCK_SIZE; ++i) {
-        printf("%c", ptrIntoBlock[i]);
+        printf("%d,", ptrIntoBlock[i]);
     }
     printf("\n");
     memcpy(ptrIntoBlock + bmapResp->byteOffsetInBlock, buf, size);
     
-    for(i=0; i < size; i++) {
-        printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
+    printf("after write data: \n");
+    for(i=0; i < BLOCK_SIZE; i++) {
+        printf("%c", ptrIntoBlock[i]);
     }
     printf("\n");
+    for(i=0; i < BLOCK_SIZE; i++) {
+        printf("%d,", ptrIntoBlock[i]);
+    }
+    printf("\n");
+    printf("bmapResp->byteOffsetInBlock: %d", bmapResp->byteOffsetInBlock);
     writeDiskBlock(bmapResp->blockNumber, blockPtr);
     free(blockPtr);
 }

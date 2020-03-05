@@ -68,6 +68,7 @@ size_t allocateIfNeeded(int *indirOffsets, size_t offsetsSize) {
 	}
 
 	if (shouldAdd) {
+		printf("block alloc needed\n");
 		return blockAlloc();
 	}
 	return ERROR_BLOCK;
@@ -80,7 +81,9 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t toAdd, int *indirOffsets, 
 	
 	disk_block* dataBlock = (disk_block*)malloc(BLOCK_SIZE);
 	indirectBlock* workingData = (indirectBlock*)malloc(sizeof(indirectBlock));
-
+	
+	printf("allocating needed blocks with buffer: %d %d %d and buffer size %d\n", indirOffsets[0], indirOffsets[1], indirOffsets[2], offsetsSize);
+	printf("initial blk %d toBeAdded block %d\n", *curBlock, toAdd);
 	while (counter < offsetsSize) {
 		newAllocBlock = allocateIfNeeded(indirOffsets + counter, offsetsSize - counter);
 		
@@ -90,12 +93,14 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t toAdd, int *indirOffsets, 
 			if (counter != 0) {
 				writeFreeDiskListBlock(workingData, dataBlock);
 				writeDiskBlock(parentBlock, dataBlock);
+				printf("inside nested if with blkNum %d\n", parentBlock);
 			}
 		}
 		getDiskBlock(*curBlock, dataBlock);
 		makeFreeDiskListBlock(dataBlock, workingData);
 
 		parentBlock = *curBlock;
+		printf("parentBlock set to %d\n", parentBlock);
 		curBlock = (workingData->blkNos) + indirOffsets[counter];
 		
 		counter ++;
@@ -103,6 +108,7 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t toAdd, int *indirOffsets, 
 	*curBlock = toAdd;
 	writeFreeDiskListBlock(workingData, dataBlock);
 	writeDiskBlock(parentBlock, dataBlock);
+	printf("at the end blkNum %d\n", parentBlock);
 
 	free(dataBlock);
 	free(workingData);
