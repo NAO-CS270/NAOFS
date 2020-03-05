@@ -49,6 +49,9 @@ inCoreiNode* iget(size_t iNodeNumber, size_t deviceNumber) {
 			printf("Removing iNode %ld from free list\n", node->inode->inode_number);
 			freeListRemove(node);
 		}
+		if (node->inode->linksCount == 0) {
+			fetchInodeFromDisk(iNodeNumber, node->inode);
+		}
 	}
 
 	return updateAndGetINode(node);

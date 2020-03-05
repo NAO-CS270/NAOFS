@@ -36,7 +36,7 @@ void initFdTableEntry (fileTableEntry* entry, inCoreiNode *inode, pid_t pid, int
 int createAndGetFileDescriptor (pid_t pid, inCoreiNode *inode, int flags, size_t offset) {
     int counter = 0;
 
-    while (counter < MAX_FD) {
+    while (counter < MAX_FILE_DESCRIPTORS) {
         if (!fileTable[counter].validEntry) {
             initFdTableEntry(fileTable + counter, inode, pid, flags, offset);
             return counter;
@@ -57,13 +57,8 @@ fileTableEntry *getFileDescriptor(pid_t pid, int fd, int *error) {
         *error = -EBADF;
         return NULL;
     }
-    int counter = 0;
-    while (counter < MAX_FD) { //TODO: shouldn't MAX_FD be equal to MAX_FILE_DESCRIPTORS? What is MAX_FD?
-        printf("validity of fdTable[Counter: %d]: %d ", counter, fileTable[counter].validEntry);
-        counter++;
-    }
-    printf("\n");
-    fileTableEntry *entry = fileTable + fd;
+
+	fileTableEntry *entry = fileTable + fd;
     if (!entry->validEntry) {
         *error = -EBADF;
         printf("returning NULL -EBADF\n");
