@@ -57,7 +57,7 @@ fileTableEntry *getFileDescriptor(pid_t pid, int fd, int *error) {
         *error = -EBADF;
         return NULL;
     }
-
+    
     // int counter = 0;
     // while (counter < MAX_FILE_DESCRIPTORS) {
     //     printf("validity of fdTable[Counter: %d]: %d ", counter, fileTable[counter].validEntry);
