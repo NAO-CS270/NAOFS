@@ -97,13 +97,14 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 				printf("inside nested if with blkNum %d & curBlock %d\n", parentBlock, *curBlock);
 			}
 		}
+		size_t tmp = *curBlock;
 		printf("*curBlock %d\n", *curBlock);
 		getDiskBlock(*curBlock, dataBlock);
 		printf("*curBlock %d\n", *curBlock);
 		makeFreeDiskListBlock(dataBlock, workingData);
 		printf("*curBlock %d\n", *curBlock);
 
-		parentBlock = *curBlock;
+		parentBlock = tmp;
 		printf("parentBlock set to %d\n", parentBlock);
 		curBlock = (workingData->blkNos) + indirOffsets[counter];
 		
