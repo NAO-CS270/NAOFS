@@ -116,15 +116,15 @@ testFileFirstDoubleIndirectBlock() {
 #  rm testFile534527
 }
 
-testLargeFile() {
-  N=62914560 # 60Mb
-  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
-
-  echo "$content" > testFile60M
-  catResult=$(cat testFile60M)
-
-  assertEquals '60M not matched' "$content" "$catResult"
-#  rm testFile60M
-}
+#testLargeFile() {
+#  N=62914560 # 60Mb
+#  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#
+#  echo "$content" > testFile60M
+#  catResult=$(cat testFile60M)
+#
+#  assertEquals '60M not matched' "$content" "$catResult"
+##  rm testFile60M
+#}
 
 . ../shunit2-2.1.6/src/shunit2
