@@ -83,7 +83,7 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 	indirectBlock* workingData = (indirectBlock*)malloc(sizeof(indirectBlock));
 	
 	printf("allocating needed blocks with buffer: %d %d %d and buffer size %d\n", indirOffsets[0], indirOffsets[1], indirOffsets[2], offsetsSize);
-	printf("initial blk %d toBeAdded block %d\n", *curBlock, toAdd);
+	printf("initial blk %d toBeAdded block %d\n", *curBlock, blockNumToAdd);
 	while (counter < offsetsSize) {
 		newAllocBlock = allocateIfNeeded(indirOffsets + counter, offsetsSize - counter);
 		
