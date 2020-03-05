@@ -87,37 +87,37 @@ testFileFirstIndirectBlock() {
   N=10239 # 10*1024 - 1
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  echo "$content" > testFileFirstIndirect
-  catResult=$(cat testFileFirstIndirect)
+  echo "$content" > testFile10239
+  catResult=$(cat testFile10239)
 
   assertEquals 'First indirect block not matched' "$content" "$catResult"
-#  rm testFileFirstIndirect
+#  rm testFile10239
 }
 
 testFileLastIndirectBlock() {
   N=534526 # 522*1024 - 2
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  echo "$content" > testFileLastIndirect
-  catResult=$(cat testFileLastIndirect)
+  echo "$content" > testFile534526
+  catResult=$(cat testFile534526)
 
   assertEquals 'Last indirect block not matched' "$content" "$catResult"
-#  rm testFileLastIndirect
+#  rm testFile534526
 }
 
 testFileFirstDoubleIndirectBlock() {
   N=534527 # 522*1024 - 1
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
-  echo "$content" > testFileFirstDoubleIndirect
-  catResult=$(cat testFileFirstDoubleIndirect)
+  echo "$content" > testFile534527
+  catResult=$(cat testFile534527)
 
   assertEquals 'First double-indirect block not matched' "$content" "$catResult"
-#  rm testFileFirstDoubleIndirect
+#  rm testFile534527
 }
 
 testLargeFile() {
-  N=61440 # 60Mb
+  N=62914560 # 60Mb
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
   echo "$content" > testFile60M
