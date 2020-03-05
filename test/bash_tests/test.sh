@@ -94,27 +94,27 @@ testFileFirstIndirectBlock() {
 #  rm testFile10239
 }
 
-testFileLastIndirectBlock() {
-  N=534526 # 522*1024 - 2
-  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
-
-  wget https://github.com/NAO-CS270/NAOFS/raw/master/test/testFiles/testFile534526
-  catResult=$(cat testFile534526)
-
-  assertEquals 'Last indirect block not matched' "$content" "$catResult"
-#  rm testFile534526
-}
-
-testFileFirstDoubleIndirectBlock() {
-  N=534527 # 522*1024 - 1
-  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
-
-  wget https://github.com/NAO-CS270/NAOFS/raw/master/test/testFiles/testFile534527
-  catResult=$(cat testFile534527)
-
-  assertEquals 'First double-indirect block not matched' "$content" "$catResult"
-#  rm testFile534527
-}
+#testFileLastIndirectBlock() {
+#  N=534526 # 522*1024 - 2
+#  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#
+#  echo "$content" > testFile534526
+#  catResult=$(cat testFile534526)
+#
+#  assertEquals 'Last indirect block not matched' "$content" "$catResult"
+##  rm testFile534526
+#}
+#
+#testFileFirstDoubleIndirectBlock() {
+#  N=534527 # 522*1024 - 1
+#  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#
+#  echo "$content" > testFile534527
+#  catResult=$(cat testFile534527)
+#
+#  assertEquals 'First double-indirect block not matched' "$content" "$catResult"
+##  rm testFile534527
+#}
 
 #testLargeFile() {
 #  N=62914560 # 60Mb
