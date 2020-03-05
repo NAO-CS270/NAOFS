@@ -84,25 +84,47 @@ testFileMoreThanOneBlock() {
 }
 
 testFileFirstIndirectBlock() {
-  N=10239
+  N=10239 # 10*1024 - 1
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
   echo "$content" > testFile10239
   catResult=$(cat testFile10239)
 
-  assertEquals '10K - 1 not matched' "$content" "$catResult"
+  assertEquals 'First indirect block not matched' "$content" "$catResult"
 #  rm testFile10239
 }
 
-testDownloadFileLargeFile() {
-  N=61440 # 60Mb
-  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#testFileLastIndirectBlock() {
+#  N=534526 # 522*1024 - 2
+#  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#
+#  echo "$content" > testFile534526
+#  catResult=$(cat testFile534526)
+#
+#  assertEquals 'Last indirect block not matched' "$content" "$catResult"
+##  rm testFile534526
+#}
+#
+#testFileFirstDoubleIndirectBlock() {
+#  N=534527 # 522*1024 - 1
+#  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#
+#  echo "$content" > testFile534527
+#  catResult=$(cat testFile534527)
+#
+#  assertEquals 'First double-indirect block not matched' "$content" "$catResult"
+##  rm testFile534527
+#}
 
-  echo "$content" > testFile60M
-  catResult=$(cat testFile60M)
-
-  assertEquals '60M not matched' "$content" "$catResult"
-#  rm testFile60M
-}
+#testLargeFile() {
+#  N=62914560 # 60Mb
+#  content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
+#
+#  echo "$content" > testFile60M
+#  catResult=$(cat testFile60M)
+#
+#  assertEquals '60M not matched' "$content" "$catResult"
+##  rm testFile60M
+#}
 
 . ../shunit2-2.1.6/src/shunit2

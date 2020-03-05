@@ -57,15 +57,6 @@ int bmap(inCoreiNode* iNode, size_t offset, bmapResponse *response, bmapMode mod
 			printf("%ld ", iNode -> dataBlockNums[counter++]);
 		}
 		printf("\n");
-		disk_block* dataBlock = (disk_block*)malloc(BLOCK_SIZE);
-		getDiskBlock(iNode -> dataBlockNums[SINGLE_INDIRECT_BLOCK], dataBlock);
-		counter = 0;
-		printf("data in indirect block\n");
-		while (counter < 32) {
-			printf("%c", dataBlock -> data[counter++]);
-		}
-		printf("\n");
-		free(dataBlock);
 
 		createBMapResponse(newBlock, 0, response);
 		return 0;
