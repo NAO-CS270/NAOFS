@@ -48,7 +48,7 @@ int createAndGetFileDescriptor (pid_t pid, inCoreiNode *inode, int flags, size_t
 }
 
 /**
- * Gets an file descriptor table entry based on the file descriptor and pid
+ * Gets a file descriptor table entry based on the file descriptor and pid
  */
 fileTableEntry *getFileDescriptor(pid_t pid, int fd, int *error) {
     printf("fd list: \n");
@@ -57,12 +57,14 @@ fileTableEntry *getFileDescriptor(pid_t pid, int fd, int *error) {
         *error = -EBADF;
         return NULL;
     }
+
     // int counter = 0;
     // while (counter < MAX_FILE_DESCRIPTORS) {
     //     printf("validity of fdTable[Counter: %d]: %d ", counter, fileTable[counter].validEntry);
     //     counter++;
     // }
     // printf("\n");
+
     fileTableEntry *entry = fileTable + fd;
     if (!entry->validEntry) {
         *error = -EBADF;
