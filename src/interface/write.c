@@ -1,6 +1,7 @@
 #include "incoreInodeOps/bmap.h"
 #include "fdTable/globalFileTable.h"
 #include "incoreInodeOps/iNodeManager.h"
+#include "mandsk/params.h"
 #include "dsk/blkfetch.h"
 #include "utils/utils.h"
 #include <string.h>
@@ -16,6 +17,11 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
     int i = 0;
     for(i=0; i < size; i++) {
         printf("%c", buf[i]);
+    }
+    printf("\n");
+    printf("block data: \n");
+    for(i=0; i < BLOCK_SIZE; ++i) {
+        printf("%c", ptrIntoBlock[i]);
     }
     printf("\n");
     memcpy(ptrIntoBlock + bmapResp->byteOffsetInBlock, buf, size);
