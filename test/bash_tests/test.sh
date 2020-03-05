@@ -94,7 +94,7 @@ testFileFirstIndirectBlock() {
 #  rm testFileFirstIndirect
 }
 
-testFileFirstIndirectBlock() {
+testFileLastIndirectBlock() {
   N=$((522*1024 - 2))
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
