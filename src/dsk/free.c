@@ -10,15 +10,23 @@
 
 static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
 
-void _freeInto(int freeListBlockNumber, size_t blockNumber) {
+void _freeInto(size_t freeListBlockNumber, size_t blockNumber) {
     disk_block* freeListBlock = (disk_block*)malloc(sizeof(disk_block));
     freeListBlock = getDiskBlock(freeListBlockNumber, freeListBlock);
     freeDiskListBlock* diskBlock = (freeDiskListBlock*)malloc(sizeof(freeDiskListBlock));
     diskBlock = makeFreeDiskListBlock (freeListBlock, diskBlock);
 
     if (diskBlock -> blkNos[0]) {
-        _freeInto(diskBlock -> blkNos[BLOCK_ADDRESSES_PER_BLOCK - 1], blockNumber);
+        // _freeInto(diskBlock -> blkNos[BLOCK_ADDRESSES_PER_BLOCK - 1], blockNumber);
+        writeDiskBlock(blockNumber, freeListBlock);
+        diskBlock->blkNos[BLOCK_ADDRESSES_PER_BLOCK - 1] = blockNumber;
+        int counter = 0;
+        while (counter < (BLOCK_ADDRESSES_PER_BLOCK - 1)) {
+            diskBlock->blkNos[counter] = 0;
+            counter++;
+        }
     } else {
+        printf("Disk Block First entry zero\n");
         int i;
         for (i = BLOCK_ADDRESSES_PER_BLOCK - 1; i > -1; --i) {
             if (diskBlock -> blkNos[i] == 0) {
@@ -27,6 +35,9 @@ void _freeInto(int freeListBlockNumber, size_t blockNumber) {
             }
         }
     }
+
+    writeFreeDiskListBlock(diskBlock, freeListBlock);
+    writeDiskBlock(freeListBlockNumber, freeListBlock);
 
     free(freeListBlock);
     free(diskBlock);
@@ -57,8 +68,9 @@ void inodeBlocksFree(inCoreiNode *inode) {
     int i;
     for (i = 0; i <= DIRECT_BLOCK_LIMIT && leftSize > 0; ++i) {
         printf("left size: %ld\n", leftSize);
+        printf("Block to be Freed: %ld\n", inode->dataBlockNums[i]);
         blockFree(inode->dataBlockNums[i]);
-        printf("Block Freed: %ld\n", inode->dataBlockNums[i]);
+        inode->dataBlockNums[i] = 0;
         leftSize -= BLOCK_SIZE;
     }
 
@@ -66,6 +78,7 @@ void inodeBlocksFree(inCoreiNode *inode) {
     i = 0;
     while (leftSize > 0) {
         diskBlockFree(inode->dataBlockNums[indirectBlocks[i]], &leftSize, i + 1);
+        inode->dataBlockNums[indirectBlocks[i]] = 0;
         ++i;
     }
 }

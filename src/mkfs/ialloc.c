@@ -7,6 +7,7 @@
 
 #include <pthread.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static const size_t iNodeNumsPerBlock = BLOCK_SIZE/INODE_ADDRESS_SIZE;
 
@@ -58,6 +59,14 @@ size_t getNewINode(iNodeType fileType, mode_t fileMode) {
 	iNodeListBlock *iNodeList = (iNodeListBlock *)malloc(sizeof(iNodeListBlock));
 	makeINodeListBlock(iNodeListData, iNodeList);
 
+	// printf("\nINODE LIST BEFORE NEW ALLOC\n");
+	// int counter = 0;
+	// while (counter < INODE_NOS_PER_BLOCK) {
+	// 	printf("%ld  ", iNodeList->iNodeNos[counter]);
+	// 	counter++;
+	// }
+	// printf("\n");
+
 	size_t freeINode = checkAndGetFreeINode(iNodeList);
 
 	if (freeINode == 0) {
@@ -65,7 +74,15 @@ size_t getNewINode(iNodeType fileType, mode_t fileMode) {
 		freeINode = checkAndGetFreeINode(iNodeList);
 	}
 
-	updateINodeData(freeINode, fileType, fileMode, 0, 0);
+	// printf("\nINODE LIST AFTER NEW ALLOC\n");
+	// counter = 0;
+	// while (counter < INODE_NOS_PER_BLOCK) {
+	// 	printf("%ld  ", iNodeList->iNodeNos[counter]);
+	// 	counter++;
+	// }
+	// printf("\n");
+
+	updateINodeData(freeINode, fileType, fileMode, 0, 0, 0, 0);
 	writeINodeListBlock(iNodeList, iNodeListData);
 	writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
 	free(iNodeListData);

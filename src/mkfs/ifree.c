@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 static const size_t iNodeNumsPerBlock = BLOCK_SIZE/INODE_ADDRESS_SIZE;
 
@@ -25,7 +26,7 @@ bool saveInListIfPossible(size_t iNodeNum, iNodeListBlock *iNodeList) {
 
 		if (ptrINodeNum != 0) {
 			if (counter > 0) {
-				(iNodeList ->iNodeNos)[counter-1] = ptrINodeNum;
+				(iNodeList ->iNodeNos)[counter-1] = iNodeNum;
 			}
 			break;
 		}
@@ -59,7 +60,7 @@ void rememberIfNeeded(size_t iNodeNum, iNodeListBlock *iNodeList) {
 void freeINode(size_t iNodeNum) {
 	pthread_mutex_lock(&iNodeListMutex);
 
-	updateINodeData(iNodeNum, 0, 0, 0, 0);
+	updateINodeData(iNodeNum, 0, 0, 0, 0, 0, 0);
 
 	disk_block *iNodeListData = (disk_block *)malloc(BLOCK_SIZE);
 	getDiskBlock(INODE_LIST_BLOCK, iNodeListData);
@@ -67,7 +68,16 @@ void freeINode(size_t iNodeNum) {
 	iNodeListBlock *iNodeList = (iNodeListBlock *)malloc(sizeof(iNodeListBlock));
 	makeINodeListBlock(iNodeListData, iNodeList);
 
+	// printf("\nINODE NUM TO BE FREED: %ld\n", iNodeNum);
+	// int counter = 0;
+	// while (counter < INODE_NOS_PER_BLOCK) {
+	// 	printf("%ld  ", iNodeList->iNodeNos[counter]);
+	// 	counter++;
+	// }
+	// printf("\n");
+
 	bool isSavedInList = saveInListIfPossible(iNodeNum, iNodeList);
+	// printf("Saved in list: %d\n", (int)isSavedInList);
 	if (!isSavedInList) {
 		rememberIfNeeded(iNodeNum, iNodeList);
 		free(iNodeListData);
