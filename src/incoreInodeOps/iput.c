@@ -43,7 +43,7 @@ int iput(inCoreiNode* inode) { //do we change the write time here?
 
         if (inode->linksCount == 0 && inode->inode_number != 0) {
             printf ("inode link count zero for inode: %ld\n", inode->inode_number);
-            inodeBlocksFree(inode);
+            // inodeBlocksFree(inode);
             freeINode(inode->inode_number);
         }
 

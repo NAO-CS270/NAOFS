@@ -115,7 +115,7 @@ int accessINodeAndItsBlock(size_t iNodeNum, iNode *inode, disk_block *blockPtr, 
 }
 
 /* Modifies iNode with iNode number `iNodeNum` to given parameters.*/
-void updateINodeData(size_t iNodeNum, iNodeType iType, mode_t mode, size_t o_uid, size_t g_uid) {
+void updateINodeData(size_t iNodeNum, iNodeType iType, mode_t mode, size_t o_uid, size_t g_uid, size_t size, size_t linksCount) {
 	iNode *inode = (iNode *)malloc(sizeof(iNode));
 
 	accessINodeAndItsBlock(iNodeNum, inode, NULL, INODE_READ);
@@ -124,6 +124,8 @@ void updateINodeData(size_t iNodeNum, iNodeType iType, mode_t mode, size_t o_uid
 	inode->file_mode = mode;
 	inode->owner_uid = o_uid;
 	inode->group_uid = g_uid;
+	inode->size = size;
+	inode->linksCount = linksCount;
 
 	accessINodeAndItsBlock(iNodeNum, inode, NULL, INODE_WRITE);
 	free(inode);

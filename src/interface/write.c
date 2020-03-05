@@ -45,6 +45,10 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         return -1;
     }
     pthread_mutex_lock(&(_fileTableEntry->inode->iNodeMutex));
+    if (offset > _fileTableEntry->inode->size) {
+        printf ("Offset past end of file.\n");
+        return -1;
+    }
     bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
     while (bytesWritten < size) {
 
@@ -56,10 +60,17 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         size_t bytesToWrite = min(bmapResp -> bytesLeftInBlock, size - bytesWritten);
         writeToBlock(bmapResp, buf + bytesWritten, bytesToWrite);
 
+        if (offset == _fileTableEntry->inode->size) {
+            updateINodeMetadata(_fileTableEntry->inode, bytesToWrite, _fileTableEntry->inode->linksCount);
+        }
+        else if ((_fileTableEntry->inode->size - bytesWritten) < (size - bytesWritten)) {
+            updateINodeMetadata(_fileTableEntry->inode, bytesToWrite - _fileTableEntry->inode->size, _fileTableEntry->inode->linksCount);
+        }
+
         bytesWritten += bytesToWrite;
         _fileTableEntry -> offset += bytesToWrite;
         offset += bytesToWrite;
-        updateINodeMetadata(_fileTableEntry->inode, bytesToWrite, _fileTableEntry->inode->linksCount);
+
         printf("size of the file: %ld\n", _fileTableEntry->inode->size);
         printf("bytes written: %ld\n", bytesWritten);
         printf("offset: %ld\n", offset);
