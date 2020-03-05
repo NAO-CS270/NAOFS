@@ -84,7 +84,7 @@ testFileMoreThanOneBlock() {
 }
 
 testFileFirstIndirectBlock() {
-  N=$((10*1024 - 1))
+  N=10239 # 10*1024 - 1
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
   echo "$content" > testFileFirstIndirect
@@ -95,7 +95,7 @@ testFileFirstIndirectBlock() {
 }
 
 testFileLastIndirectBlock() {
-  N=$((522*1024 - 2))
+  N=534526 # 522*1024 - 2
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
   echo "$content" > testFileLastIndirect
@@ -106,7 +106,7 @@ testFileLastIndirectBlock() {
 }
 
 testFileFirstDoubleIndirectBlock() {
-  N=$((522*1024 - 1))
+  N=534527 # 522*1024 - 1
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
   echo "$content" > testFileFirstDoubleIndirect
@@ -117,7 +117,7 @@ testFileFirstDoubleIndirectBlock() {
 }
 
 testLargeFile() {
-  N=$((60*1024)) # 60Mb
+  N=61440 # 60Mb
   content=$(seq 1 $N | sed 's/.*/./' | tr -d '\n')
 
   echo "$content" > testFile60M
