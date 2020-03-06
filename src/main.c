@@ -122,8 +122,35 @@ static struct fuse_operations OPERATIONS = {
     //.link = link_callback,
 };
 
+int parseCmdArg(int argc, char *argv[], char *buf) {
+	int i;
+	char *patPtr;
+	for (i=0 ; i<argc ; i++) {
+		patPtr = strstr(argv[i], "fsname");
+		if (patPtr == argv[i]) {
+			patPtr = patPtr + 7;
+			strcpy(buf, patPtr);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void checkDevMode(int argc, char *argv[]) {
+	char *devName = (char *)malloc(20 * sizeof(char));
+	int retValue = parseCmdArg(argc, argv, devName);
+	if (retValue == 1) {
+		printf("Setting up disk %s\n", devName);
+		setupDisk(devName);
+	}
+	free(devName);
+}
+
 int main(int argc, char *argv[]) {
     //TODO: create directory table for /
+
+	checkDevMode(argc, argv);
+
 	makeFileSystem();
     initFreeInCoreINodeList();
 	initHashQueues();

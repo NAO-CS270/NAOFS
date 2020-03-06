@@ -3,9 +3,11 @@
 
 #include "dsk/mdisk.h"
 
-extern disk_block* getDiskBlock(size_t blockNumber, disk_block *blockData);
+extern int setupDisk(const char *inputDev);
 
-extern void writeDiskBlock(size_t blockNumber, disk_block* blockData);
+extern int getDiskBlock(size_t blockNumber, disk_block *blockData);
+
+extern int writeDiskBlock(size_t blockNumber, disk_block* blockData);
 
 #endif
 

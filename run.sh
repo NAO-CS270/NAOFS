@@ -1,6 +1,7 @@
 #! /bin/sh
 
-fusermount -u /NAOFS/build/fsRoot
+BASEDIR=$(dirname $0)
+fusermount -u $BASEDIR/build/fsRoot
 rm -rf build
 cmake -Bbuild -H.
 cd build
