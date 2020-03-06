@@ -70,11 +70,11 @@ void readInBlock(bmapResponse *bmapResp, char *buf, size_t size) {
 	unsigned char *ptrIntoBlock = blockPtr->data;
     printf("WE ARE IN READ!\n");
     printf("block_number: %d\n", bmapResp->blockNumber);
-    int i = 0;
-    for(i=0; i < size; i++) {
-        printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
-    }
-    printf("\n");
+//    int i = 0;
+//    for(i=0; i < size; i++) {
+//        printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
+//    }
+//    printf("\n");
 	memcpy(buf, ptrIntoBlock + bmapResp->byteOffsetInBlock, size);
 
 	free(blockPtr);

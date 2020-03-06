@@ -14,27 +14,28 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
 
     printf("WE ARE IN WRITE!\n");
     printf("block_number: %d\n", bmapResp->blockNumber);
-    int i = 0;
-    for(i=0; i < size; i++) {
-        printf("%c", buf[i]);
-    }
-    printf("\n");
-    printf("block data: \n");
-    for(i=0; i < BLOCK_SIZE; ++i) {
-        printf("%d,", ptrIntoBlock[i]);
-    }
-    printf("\n");
+//    int i = 0;
+//    for(i=0; i < size; i++) {
+//        printf("%c", buf[i]);
+//    }
+//    printf("\n");
+//    printf("block data: \n");
+//    for(i=0; i < BLOCK_SIZE; ++i) {
+//        printf("%d,", ptrIntoBlock[i]);
+//    }
+//    printf("\n");
     memcpy(ptrIntoBlock + bmapResp->byteOffsetInBlock, buf, size);
     
-    printf("after write data: \n");
-    for(i=0; i < BLOCK_SIZE; i++) {
-        printf("%c", ptrIntoBlock[i]);
-    }
-    printf("\n");
-    for(i=0; i < BLOCK_SIZE; i++) {
-        printf("%d,", ptrIntoBlock[i]);
-    }
-    printf("\n");
+//    printf("after write data: \n");
+//    for(i=0; i < BLOCK_SIZE; i++) {
+//        printf("%c", ptrIntoBlock[i]);
+//    }
+//    printf("\n");
+//    for(i=0; i < BLOCK_SIZE; i++) {
+//        printf("%d,", ptrIntoBlock[i]);
+//    }
+//    printf("\n");
+
     printf("bmapResp->byteOffsetInBlock: %d", bmapResp->byteOffsetInBlock);
     writeDiskBlock(bmapResp->blockNumber, blockPtr);
     free(blockPtr);
