@@ -1,26 +1,23 @@
 #include "dsk/mdisk.h"
 #include "mandsk/params.h"
 
-static disk_block mem_disk[DISK_SIZE];
+static disk_block mem_disk[NUM_OF_BLOCKS];
 
-disk_block* fetchMemoryDiskBlock(size_t blockNumber, disk_block *blockData) {
-	if (blockNumber > DISK_SIZE) {
-		// Throw appropriate exception
-		*blockData = mem_disk[0];
-	}
-	else {
-		*blockData = mem_disk[blockNumber];
+int fetchMemoryDiskBlock(size_t blockNumber, disk_block *blockData) {
+	if (blockNumber >= NUM_OF_BLOCKS) {
+		return -1;
 	}
 
-	return blockData;
+	*blockData = mem_disk[blockNumber];
+	return 0;
 }
 
-void writeMemoryDiskBlock(size_t blockNumber, disk_block* blockData) {
-	if (blockNumber >= DISK_SIZE) {
-		// Throw appropriate exception
+int writeMemoryDiskBlock(size_t blockNumber, disk_block* blockData) {
+	if (blockNumber >= NUM_OF_BLOCKS) {
+		return -1;
 	}
-	else {
-		mem_disk[blockNumber] = *blockData;
-	}
+
+	mem_disk[blockNumber] = *blockData;
+	return 0;
 }
 

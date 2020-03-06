@@ -13,7 +13,7 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
     unsigned char *ptrIntoBlock = blockPtr->data;
 
     printf("WE ARE IN WRITE!\n");
-    printf("block_number: %d\n", bmapResp->blockNumber);
+    printf("block_number: %ld\n", bmapResp->blockNumber);
     int i = 0;
     for(i=0; i < size; i++) {
         printf("%c", buf[i]);
@@ -78,7 +78,7 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
         offset += bytesToWrite;
 
         printf("size of the file: %ld\n", _fileTableEntry->inode->size);
-        printf("bytes written: %ld\n", bytesWritten);
+        printf("bytes written: %d\n", bytesWritten);
         printf("offset: %ld\n", offset);
     }
     pthread_mutex_unlock(&(_fileTableEntry->inode->iNodeMutex));

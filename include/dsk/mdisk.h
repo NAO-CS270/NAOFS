@@ -10,9 +10,9 @@ struct disk_block {
 };
 typedef struct disk_block disk_block;
 
-extern disk_block* fetchMemoryDiskBlock(size_t blockNumber, disk_block* blockData);
+extern int fetchMemoryDiskBlock(size_t blockNumber, disk_block* blockData);
 
-extern void writeMemoryDiskBlock(size_t blockNumber, disk_block* blockData);
+extern int writeMemoryDiskBlock(size_t blockNumber, disk_block* blockData);
 
 #endif
 

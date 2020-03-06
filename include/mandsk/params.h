@@ -6,8 +6,7 @@
 
 #include <stddef.h>
 
-#define DISK_SIZE 1310720ll
-#define BLOCK_ADDRESS_SIZE 4ll
+#define BLOCK_ADDRESS_SIZE 2ll
 #define NUM_OF_BLOCKS (1ll<<(BLOCK_ADDRESS_SIZE*8ll)) // Prefer using this instead of ^^
 
 #define BLOCK_SIZE 1024ll

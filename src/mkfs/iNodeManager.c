@@ -71,7 +71,7 @@ size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums) {
 		if (blockCounter >= endOfINodeBlocks) {
 			break;
 		}
-		iNodesData = getDiskBlock(blockCounter, iNodesData);
+		getDiskBlock(blockCounter, iNodesData);
 		makeINodesBlock(iNodesData, iNodesList);
 
 		freeINodeCounter += getFromBlock(iNodesList, (iNodeNums->iNodeNos) + freeINodeCounter);

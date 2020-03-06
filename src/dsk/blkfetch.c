@@ -1,14 +1,37 @@
-#include "dsk/blkfetch.h"
+#include "dsk/mdisk.h"
+#include "dsk/diskAccess.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 
-disk_block* getDiskBlock(size_t blockNumber, disk_block *blockData) {
-	//printf("Got a read request for block number %ld\n", blockNumber);
+static bool isDiskAvailable = false;
+
+int setupDisk(const char *inputDev) {
+	if (isDiskAvailable) {
+		printf("Uhh Ohh!! You opened the disk already. Don't be nasty!!\n");
+		return -1;
+	}
+
+	int retValue = initDeviceAccessor(inputDev);
+	if (retValue == 0) {
+		isDiskAvailable = true;
+	}
+	return retValue;
+}
+
+int getDiskBlock(size_t blockNumber, disk_block *blockData) {
+	if (isDiskAvailable) {
+		return fetchDeviceDiskBlock(blockNumber, blockData);
+	}
+
 	return fetchMemoryDiskBlock(blockNumber, blockData);
 }
 
-void writeDiskBlock(size_t blockNumber, disk_block* blockData) {
-	//printf("Got a write request for block number %ld\n", blockNumber);
-	writeMemoryDiskBlock(blockNumber, blockData);
+int writeDiskBlock(size_t blockNumber, disk_block* blockData) {
+	if (isDiskAvailable) {
+		return writeDeviceDiskBlock(blockNumber, blockData);
+	}
+
+	return writeMemoryDiskBlock(blockNumber, blockData);
 }
 

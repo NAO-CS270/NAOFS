@@ -12,7 +12,7 @@ static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
 
 void _freeInto(size_t freeListBlockNumber, size_t blockNumber) {
     disk_block* freeListBlock = (disk_block*)malloc(sizeof(disk_block));
-    freeListBlock = getDiskBlock(freeListBlockNumber, freeListBlock);
+    getDiskBlock(freeListBlockNumber, freeListBlock);
     freeDiskListBlock* diskBlock = (freeDiskListBlock*)malloc(sizeof(freeDiskListBlock));
     diskBlock = makeFreeDiskListBlock (freeListBlock, diskBlock);
 
@@ -63,7 +63,7 @@ void _freeInto(size_t freeListBlockNumber, size_t blockNumber) {
 void diskBlockFree(size_t diskBlockNumber, ssize_t* leftSize, int recursionLevel) {
     if (recursionLevel) {
         disk_block *blockToBeFreed = (disk_block *) malloc(sizeof(disk_block));
-        blockToBeFreed = getDiskBlock(diskBlockNumber, blockToBeFreed);
+        getDiskBlock(diskBlockNumber, blockToBeFreed);
         freeDiskListBlock* diskBlocks = (freeDiskListBlock*)malloc(sizeof(freeDiskListBlock));
         diskBlocks = makeFreeDiskListBlock (blockToBeFreed, diskBlocks);
 

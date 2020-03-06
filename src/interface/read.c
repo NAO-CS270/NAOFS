@@ -69,7 +69,7 @@ void readInBlock(bmapResponse *bmapResp, char *buf, size_t size) {
 	getDiskBlock(bmapResp->blockNumber, blockPtr);
 	unsigned char *ptrIntoBlock = blockPtr->data;
     printf("WE ARE IN READ!\n");
-    printf("block_number: %d\n", bmapResp->blockNumber);
+    printf("block_number: %ld\n", bmapResp->blockNumber);
     int i = 0;
     for(i=0; i < size; i++) {
         printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
