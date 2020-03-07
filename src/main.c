@@ -10,6 +10,7 @@
 #include "interface/read.h"
 #include "interface/write.h"
 #include "interface/close.h"
+#include "interface/truncate.h"
 #include "inode/iNode.h"
 #include "interface/link.h"
 #include "interface/unlink.h"
@@ -18,10 +19,10 @@
 
 #include <sys/stat.h>
 //#include <fuse_lowlevel.h>
-static int truncateFile(inCoreiNode* inode) {
-    inodeBlocksFree(inode);
-    inode -> size = 0;
-}
+// static int truncateFile(inCoreiNode* inode) {
+//     inodeBlocksFree(inode);
+//     inode -> size = 0;
+// }
 
 
 // TODO: Update the size of the file
@@ -75,7 +76,8 @@ static int release_callback(const char* path, struct fuse_file_info* fi) {
 
 /** Change the size of a file */
 static int truncate_callback(const char *path, off_t size) {
-    return 0;
+    struct fuse_context *fuse_context = fuse_get_context();
+    return truncateFile (path, size, fuse_context);
 }
 
 static int utimens_callback(const char *path, const struct timespec tv[2]) {

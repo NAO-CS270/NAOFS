@@ -5,6 +5,8 @@
 #include "incoreInodeOps/iNodeManager.h"
 #include "inode/inCoreiNode.h"
 #include "interface/create.h"
+#include "interface/truncate.h"
+#include "mandsk/params.h"
 #include "trav/namei.h"
 #include "trav/directory.h"
 #include "utils/utils.h"
@@ -37,14 +39,22 @@ int unlinkFile(const char* path, struct fuse_context* fuseContext) {
 
     inCoreiNode *deletedFile = iget(entry->iNodeNum, 0);
     pthread_mutex_lock(&(deletedFile->iNodeMutex));
+
     printf ("In unlink, linksCount: %ld\n", deletedFile->linksCount);
     deletedFile->linksCount -= 1;
     updateINodeMetadata(deletedFile, 0, deletedFile->linksCount);
     printf ("In unlink, linksCount: %ld\n", deletedFile->linksCount);
+    
     pthread_mutex_unlock(&(deletedFile->iNodeMutex));
     iput(deletedFile);
+
+    truncateINode (parentINode, parentINode->size - DIRECTORY_ENTRY_SIZE);
+
     pthread_mutex_unlock(&(parentINode->iNodeMutex));
     iput(parentINode);
+
+    free(filename);
+    free(entry);
     return 0;
     // inCoreiNode* parentInode = validateThenGetParentINode(T_REGULAR, file, filename);
 

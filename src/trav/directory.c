@@ -159,10 +159,10 @@ int searchINodeDirectoryEntries(inCoreiNode *iNodePtr, char *entryName, size_t o
 	}
 
 	if (forUnlink) {
-		if (entriesReadTillNow == 1) {
-			updateINodeMetadata(iNodePtr, -DIRECTORY_ENTRY_SIZE, iNodePtr->linksCount);
-			// TODO: call truncate
-		}
+		// if (entriesReadTillNow == 1) {
+		// 	updateINodeMetadata(iNodePtr, -DIRECTORY_ENTRY_SIZE, iNodePtr->linksCount);
+		// 	// TODO: call truncate
+		// }
 		free(lastEntry);
 	}
 	free(bmapResp);

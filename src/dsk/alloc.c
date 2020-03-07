@@ -5,6 +5,7 @@
 #include "dsk/blkfetch.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -16,6 +17,14 @@ size_t blockAlloc() {
 
     getDiskBlock(FREE_LIST_BLOCK, freeListBlock);
     makeFreeDiskListBlock (freeListBlock, diskBlock);
+
+    printf("\nIN BLOCK ALLOC BEFORE ALLOC\n");
+    int i = 0;
+    while (i < BLOCK_ADDRESSES_PER_BLOCK) {
+        printf("%ld  ", diskBlock->blkNos[i]);
+        i++;
+    }
+    printf("\n");
 
     size_t new_block = 0;
     size_t counter;
