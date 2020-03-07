@@ -2,6 +2,7 @@
 
 #include "dsk/blkfetch.h"
 #include "dsk/alloc.h"
+#include "dsk/free.h"
 #include "mandsk/params.h"
 #include "mkfs/metaBlocks.h"
 
@@ -138,7 +139,7 @@ void updateIndex(inCoreiNode* iNode, size_t blockNumToAdd, blkTreeOffset *blkOff
  *	blockNumToAdd: block to address to add
  */
 void insertDataBlockInINode(inCoreiNode* iNode, size_t blockNumToAdd) {
-	printf("Adding block %ld in iNode %ld", blockNumToAdd, iNode->inode_number);
+	printf("\n\nAdding block %ld in iNode %ld\n\n", blockNumToAdd, iNode->inode_number);
 	size_t size = iNode->size;
 	if (size % BLOCK_SIZE != 0) {
 		// TODO: handle error
@@ -149,6 +150,76 @@ void insertDataBlockInINode(inCoreiNode* iNode, size_t blockNumToAdd) {
 	calculateOffset(size, blkOffset);
 
 	updateIndex(iNode, blockNumToAdd, blkOffset);
+	free(blkOffset);
+}
+
+bool freeNeeded(int *indirOffsets, size_t offsetsSize) {
+	size_t counter = 0;
+	bool shouldFree = true;
+	while (counter < offsetsSize) {
+		if (indirOffsets[counter] != 0) {
+			shouldFree = false;
+			break;
+		}
+		counter++;
+	}
+
+	return shouldFree;
+}
+
+void freeNeededBlocks(inCoreiNode* iNode, size_t blockNumToRemove, blkTreeOffset *blkOffset) {
+	blockFree(blockNumToRemove);
+
+	if (blkOffset->offsetIndirection == DIRECT) {
+		return ;
+	}
+
+	size_t indirection = blkOffset->offsetIndirection;
+	int *offsets = blkOffset->offsets + 1;
+	size_t *blockIndex = iNode->dataBlockNums + DIRECT_BLOCK_LIMIT + indirection;
+	size_t blocksToBeFreed[indirection];
+
+	disk_block *dataBlock = (disk_block*)malloc(BLOCK_SIZE);
+	indirectBlock* workingData = (indirectBlock*)malloc(sizeof(indirectBlock));
+
+	int counter = 0;
+	int blockFreeCounter = 0;
+	while (counter < indirection) {
+		if (freeNeeded(offsets + counter, indirection - counter)) {
+			blocksToBeFreed[blockFreeCounter] = *blockIndex;
+			blockFreeCounter++;
+		}
+		getDiskBlock(*blockIndex, dataBlock);
+		makeFreeDiskListBlock(dataBlock, workingData);
+		blockIndex = workingData->blkNos + offsets[counter];
+		counter++;
+	}
+
+	counter = 0;
+	while (counter < blockFreeCounter) {
+		blockFree(blocksToBeFreed[counter]);
+		counter++;
+	}
+
+	free(dataBlock);
+	free(workingData);
+}
+
+void freeDataBlockInINode(inCoreiNode* iNode, size_t blockNumToRemove) {
+	printf("\n\nRemoving block %ld in iNode %ld\n\n", blockNumToRemove, iNode->inode_number);
+
+	size_t size = iNode->size;
+
+	blkTreeOffset * blkOffset = (blkTreeOffset *)malloc(sizeof(blkTreeOffset));
+	calculateOffset(size, blkOffset);
+//	printf("\n");
+//    int i = 0;
+//    while(i<4) {
+//        printf("%ld ", blkOffset->offsets[i]);
+//        i++;
+//    }
+//    printf("\n");
+	freeNeededBlocks(iNode, blockNumToRemove, blkOffset);
 	free(blkOffset);
 }
 
