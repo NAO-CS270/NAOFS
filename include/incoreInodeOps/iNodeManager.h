@@ -33,3 +33,5 @@ extern void insertDataBlockInINode (inCoreiNode* inode, size_t blockNumToAdd);
 extern void calculateOffset(size_t offset, blkTreeOffset* blkOffset);
 
 extern void updateINodeMetadata(inCoreiNode *iNode, int sizeDifference, size_t linkCount);
+
+extern void freeDataBlockInINode(inCoreiNode* iNode, size_t blockNumToRemove);

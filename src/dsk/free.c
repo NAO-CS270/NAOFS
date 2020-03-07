@@ -16,6 +16,15 @@ void _freeInto(size_t freeListBlockNumber, size_t blockNumber) {
     freeDiskListBlock* diskBlock = (freeDiskListBlock*)malloc(sizeof(freeDiskListBlock));
     diskBlock = makeFreeDiskListBlock (freeListBlock, diskBlock);
 
+    printf("\nIN BLOCK FREE BEFORE FREE\n");
+    int i = 0;
+    while (i < BLOCK_ADDRESSES_PER_BLOCK) {
+        printf("%ld  ", diskBlock->blkNos[i]);
+        i++;
+    }
+    printf("\n");
+
+
     if (diskBlock -> blkNos[0]) {
         // _freeInto(diskBlock -> blkNos[BLOCK_ADDRESSES_PER_BLOCK - 1], blockNumber);
         writeDiskBlock(blockNumber, freeListBlock);
@@ -35,6 +44,14 @@ void _freeInto(size_t freeListBlockNumber, size_t blockNumber) {
             }
         }
     }
+
+    printf("\nIN BLOCK FREE AFTER FREE\n");
+    i = 0;
+    while (i < BLOCK_ADDRESSES_PER_BLOCK) {
+        printf("%ld  ", diskBlock->blkNos[i]);
+        i++;
+    }
+    printf("\n");
 
     writeFreeDiskListBlock(diskBlock, freeListBlock);
     writeDiskBlock(freeListBlockNumber, freeListBlock);
