@@ -34,6 +34,12 @@ int unlinkFile(const char* path, struct fuse_context* fuseContext) {
     int retVal = searchINodeDirectoryEntries(parentINode, filename, 0, entry, 0, true);
     if (retVal != 1) {
         printf("Could not remove the file");
+
+        pthread_mutex_unlock(&(parentINode->iNodeMutex));
+        iput(parentINode);
+        free(filename);
+        free(entry);
+
         return -1;
     }
 

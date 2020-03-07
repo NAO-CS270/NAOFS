@@ -9,6 +9,7 @@
 #include "interface/read.h"
 #include "interface/write.h"
 #include "interface/close.h"
+#include "interface/rename.h"
 #include "interface/truncate.h"
 #include "inode/iNode.h"
 #include "interface/link.h"
@@ -103,6 +104,11 @@ static int unlink_callback(const char* file) {
     return unlinkFile(file, fuseContext);
 }
 
+static int rename_callback (const char* from, const char* to) {
+    struct fuse_context* fuseContext = fuse_get_context();
+    return renameFile(from, to, fuseContext);
+}
+
 static struct fuse_operations OPERATIONS = {
 	.getattr = getattr_callback,
     .mkdir = mkdir_callback,
@@ -118,6 +124,7 @@ static struct fuse_operations OPERATIONS = {
     .unlink = unlink_callback,
     //.flush = release_callback,
     .release = release_callback,
+    .rename = rename_callback,
     //.setattr = setattr_callback,
     //.access = access_callback,
     //.link = link_callback,
