@@ -227,9 +227,11 @@ void updateINodeMetadata(inCoreiNode *iNode, int sizeDifference, size_t linkCoun
 	iNode->size += sizeDifference;
 	iNode->linksCount = linkCount;
 
-	iNode->modification = time(NULL);
-
-	iNode->file_data_changed = true;
+	if (sizeDifference != 0) {
+		iNode->modification = time(NULL);
+		iNode->file_data_changed = true;
+	}
+	
 	iNode->inode_changed = true;
 }
 
