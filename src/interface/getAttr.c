@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 
 int attrPopulate(const char *path, struct stat *stbuf) {
@@ -40,3 +41,21 @@ int attrPopulate(const char *path, struct stat *stbuf) {
 	return 0;
 }
 
+int changeMode(const char* path, mode_t mode) {
+    inCoreiNode* inode = getFileINode(path, strlen(path));
+    if (inode == NULL) {
+        printf("[changeMode] File not found !!\n");
+        return -ENOENT;
+    }
+
+    pthread_mutex_lock(&(inode->iNodeMutex));
+    if (inode->type == T_DIRECTORY) {
+        mode = S_IFDIR | mode;
+    }
+    inode -> file_mode = mode;
+    inode -> inode_changed = true;
+    pthread_mutex_unlock(&(inode->iNodeMutex));
+    iput(inode);
+
+    return 0;
+}

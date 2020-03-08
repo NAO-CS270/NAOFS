@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+
+
 // TODO: find a location for this function, same function copied in unlink
 inCoreiNode *getParentINode(const char *path, size_t pathLen) {
 	char *parentDirPath = (char *)malloc((pathLen + 1)*sizeof(char));
@@ -56,7 +58,7 @@ inCoreiNode *validateThenGetParentINode(iNodeType fileType, const char *path, ch
 	return parentINode;
 }
 
-int createFile(const char *path, iNodeType fileType, mode_t mode) {
+int createFile(const char *path, iNodeType fileType, mode_t mode, struct fuse_context *fuse_context) {
 	printf("Here it is, Here is everything - %d\n", mode);
 	size_t pathLen = strlen(path);
 	char *filename = (char *)malloc((pathLen + 1)*sizeof(char));
@@ -69,7 +71,8 @@ int createFile(const char *path, iNodeType fileType, mode_t mode) {
 	if (fileType == T_DIRECTORY) {
 		mode = S_IFDIR | mode;
 	}
-	size_t iNodeNum = getNewINode(fileType, mode);
+	printf("fuse context UID: %d, GID: %d\n\n", fuse_context->uid, fuse_context->gid);
+	size_t iNodeNum = getNewINode(fileType, mode, fuse_context->uid, fuse_context->gid);
     getAndUpdateDirectoryTable(parentINode, iNodeNum, filename);
 
     inCoreiNode *newINode = iget(iNodeNum, 0);

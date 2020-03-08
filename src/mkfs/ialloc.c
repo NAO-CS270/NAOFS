@@ -49,7 +49,7 @@ void fetchFreeINodes(iNodeListBlock *iNodeList) {
 	free(theSuperBlock);
 }
 
-size_t getNewINode(iNodeType fileType, mode_t fileMode) {
+size_t getNewINode(iNodeType fileType, mode_t fileMode, uid_t uid, gid_t gid) {
 	pthread_mutex_lock(&iNodeListMutex);
 
 	disk_block *iNodeListData = (disk_block *)malloc(BLOCK_SIZE);
@@ -65,7 +65,7 @@ size_t getNewINode(iNodeType fileType, mode_t fileMode) {
 		freeINode = checkAndGetFreeINode(iNodeList);
 	}
 
-	updateINodeData(freeINode, fileType, fileMode, 0, 0, 0, 0);
+	updateINodeData(freeINode, fileType, fileMode, uid, gid, 0, 0);
 	writeINodeListBlock(iNodeList, iNodeListData);
 	writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
 	free(iNodeListData);

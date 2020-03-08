@@ -41,10 +41,10 @@ struct iNode {
 	mode_t file_mode;
 
     // id of the owner
-	size_t owner_uid;
+	uid_t owner_uid;
 
     // if of the group
-	size_t group_uid;
+	gid_t group_uid;
 
 	size_t dataBlockNums[BLOCKS_IN_INODE]; // same as the data block defined above, must remove one of them
 
