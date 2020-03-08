@@ -58,13 +58,6 @@ int renameFile(const char* from, const char* to, struct fuse_context* fuseContex
         return -ENOENT;
     }
 
-    // TODO: Remove this once unlink directory is implemented
-    // if (fileINode->type == T_DIRECTORY) {
-    //     printf("MOVING DIRECTORY NOT YET IMPLEMENTED!!\n");
-    //     iput(fileINode);
-    //     return -1;
-    // }
-
     pathLen = strlen(to);
     char *newFilename = (char *)malloc((pathLen + 1)*sizeof(char));
 
@@ -128,7 +121,6 @@ int renameFile(const char* from, const char* to, struct fuse_context* fuseContex
 
     free(newFilename);
 
-    // TODO: Add unlink dir if file type is directory
     pthread_mutex_unlock(&(fileINode->iNodeMutex));
     iput(fileINode);
     retVal = unlinkFile(from, fuseContext);

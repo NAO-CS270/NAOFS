@@ -19,7 +19,7 @@ void assignRootData() {
 	getDiskInode(rootINodeNum, rootINode);
 	size_t blockNum = blockAlloc();
 	rootINode->type = T_DIRECTORY;
-	rootINode->file_mode = S_IFDIR | S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
+	rootINode->file_mode = S_IFDIR | S_IRWXU | S_IRGRP | S_IXGRP | S_IWGRP | S_IROTH | S_IXOTH | S_IWOTH;
 	rootINode->dataBlockNums[0] = blockNum;
 	writeDiskInode(rootINodeNum, rootINode);
 	free(rootINode);
