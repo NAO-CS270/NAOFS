@@ -103,7 +103,7 @@ size_t checkInBlock(size_t tillEndOfFile, bmapResponse *bmapResp, char *entryNam
 }
 
 void getLastEntry(inCoreiNode *iNodePtr, directoryEntry* entry) {
-	if (iNodePtr->size <= 3*DIRECTORY_ENTRY_SIZE) {
+	if (iNodePtr->size <= 2*DIRECTORY_ENTRY_SIZE) {
 		memset(entry, 0, sizeof(directoryEntry));
 		entry->iNodeNum = -1;
 	}

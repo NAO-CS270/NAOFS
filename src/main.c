@@ -104,6 +104,11 @@ static int unlink_callback(const char* file) {
     return unlinkFile(file, fuseContext);
 }
 
+static int unlink_dir_callback(const char* file) {
+    struct fuse_context* fuseContext = fuse_get_context();
+    return unlinkDir(file, fuseContext, false);
+}
+
 static int rename_callback (const char* from, const char* to) {
     struct fuse_context* fuseContext = fuse_get_context();
     return renameFile(from, to, fuseContext);
@@ -125,6 +130,7 @@ static struct fuse_operations OPERATIONS = {
     //.flush = release_callback,
     .release = release_callback,
     .rename = rename_callback,
+    .rmdir = unlink_dir_callback,
     //.setattr = setattr_callback,
     //.access = access_callback,
     //.link = link_callback,
