@@ -36,7 +36,9 @@ int attrPopulate(const char *path, struct stat *stbuf) {
 
 	stbuf -> st_mode = inode -> file_mode;
 	stbuf -> st_size = inode -> size;
-	
+    stbuf -> st_uid = inode -> owner_uid;
+    stbuf -> st_gid = inode -> group_uid;
+
 	iput(inode);
 	return 0;
 }
