@@ -36,3 +36,7 @@ ctest  // or ./bin/unit_tests
 ### Clean
 `make clean`
 
+
+
+./naofs -f -s -d -o allow_other,default_permissions fsRoot
+

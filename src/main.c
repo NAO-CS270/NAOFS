@@ -45,7 +45,8 @@ static int getattr_callback(const char *path, struct stat *stbuf) {
 }
 
 static int mkdir_callback(const char* path, mode_t mode) {
-	return createFile(path, T_DIRECTORY, mode);
+    struct fuse_context *fuse_context = fuse_get_context();
+	return createFile(path, T_DIRECTORY, mode, fuse_context);
 }
 
 static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
@@ -54,7 +55,7 @@ static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler,
 
 static int create_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
     struct fuse_context *fuse_context = fuse_get_context();
-	 int retVal = createFile(path, T_REGULAR, mode);
+	 int retVal = createFile(path, T_REGULAR, mode, fuse_context);
      if (retVal != 0) {
          return retVal;
      }
@@ -90,6 +91,7 @@ static int chown_callback(const char *path, uid_t uid, gid_t gid) {
 }
 
 static int chmod_callback(const char *path, mode_t mode) {
+    changeMode(path, mode);
     return 0;
 }
 
