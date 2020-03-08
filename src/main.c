@@ -1,7 +1,6 @@
 #include "main.h"
 #include "trav/namei.h"
 #include "utils/utils.h"
-#include "mkfs/mkfs.h"
 #include "incoreInodeOps/hashQ.h"
 #include "mkfs/iNodeManager.h"
 #include "interface/getAttr.h"
@@ -15,7 +14,9 @@
 #include "interface/link.h"
 #include "interface/unlink.h"
 #include "fdTable/globalFileTable.h"
-
+#include "mandsk/params.h"
+#include "mkfs/mkfs.h"
+#include "mandsk/params.h"
 
 #include <sys/stat.h>
 //#include <fuse_lowlevel.h>
@@ -136,23 +137,34 @@ int parseCmdArg(int argc, char *argv[], char *buf) {
 	return 0;
 }
 
-void checkDevMode(int argc, char *argv[]) {
+int checkDevMode(int argc, char *argv[]) {
 	char *devName = (char *)malloc(20 * sizeof(char));
-	int retValue = parseCmdArg(argc, argv, devName);
-	if (retValue == 1) {
+	int retValue;
+	if (parseCmdArg(argc, argv, devName) == 1) {
 		printf("Setting up disk %s\n", devName);
-		setupDisk(devName);
+		if (setupDisk(devName) == -1) {
+			retValue = -1;
+		}
+		else {
+			retValue = 0;
+		}
+	}
+	else {
+		makeFileSystem();
+		retValue = 0;
 	}
 	free(devName);
+	return retValue;
 }
 
 int main(int argc, char *argv[]) {
-    //TODO: create directory table for /
+	if (checkDevMode(argc, argv) == -1) {
+		printf("Error in setting up Disk\n");
+		return 0;
+	}
 
-	checkDevMode(argc, argv);
-
-	makeFileSystem();
-    initFreeInCoreINodeList();
+	initializeINodeParams();
+	initFreeInCoreINodeList();
 	initHashQueues();
     initGlobalFileTable();
 

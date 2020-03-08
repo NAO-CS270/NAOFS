@@ -23,7 +23,7 @@ add_subdirectory(src/utils)
 
 add_executable(naofs "src/main.c")
 target_include_directories(naofs PUBLIC ${PROJECT_INCLUDE_DIRECTORY})
-target_link_libraries(naofs PUBLIC fuse diskAccess incoreInodeOps inode interface mandsk mkfs trav utils)
+target_link_libraries(naofs PUBLIC fuse diskAccess incoreInodeOps inode interface mandsk diskStruct trav utils)
 
 #target_compile_options(naofs PUBLIC -D_FILE_OFFSET_BITS=64)
 #add_library (NAOfs ${SOURCES})
@@ -33,5 +33,5 @@ target_link_libraries(naofs PUBLIC fuse diskAccess incoreInodeOps inode interfac
 include(CTest)
 enable_testing()
 add_executable(naoTest "test/runner.c" "test/utils/test_utils.c")
-target_link_libraries(naoTest PUBLIC fuse diskAccess incoreInodeOps inode interface mandsk mkfs trav utils)
+target_link_libraries(naoTest PUBLIC fuse diskAccess incoreInodeOps inode interface mandsk diskStruct trav utils)
 add_test (NAME NAOfsTest COMMAND naoTest)

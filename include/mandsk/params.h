@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 #define BLOCK_ADDRESS_SIZE 2ll
-#define NUM_OF_BLOCKS (1ll<<(BLOCK_ADDRESS_SIZE*8ll)) // Prefer using this instead of ^^
+#define NUM_OF_BLOCKS (1ll<<(BLOCK_ADDRESS_SIZE*8ll))
 
 #define BLOCK_SIZE 1024ll
 

@@ -8,16 +8,15 @@
 #include "dsk/mdisk.h"
 #include "inode/inCoreiNode.h"
 
-// TODO: initialize the superblock as part of mkfs.
 struct superBlock {
-    size_t file_system_size;
+    //size_t file_system_size;
 
-    size_t num_free_inodes;
-    size_t* free_inode_list;
-    size_t next_free_inode;
-    size_t remembered_inode;
+    //size_t num_free_inodes;
+    //size_t* free_inode_list;
+    //size_t next_free_inode;
+	size_t rememberedINode;
 
-    bool dirty_bit;
+    //bool dirty_bit;
 };
 typedef struct superBlock superBlock;
 

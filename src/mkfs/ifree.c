@@ -8,7 +8,6 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 static const size_t iNodeNumsPerBlock = BLOCK_SIZE/INODE_ADDRESS_SIZE;
 
@@ -49,7 +48,7 @@ void rememberIfNeeded(size_t iNodeNum, iNodeListBlock *iNodeList) {
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
 	makeSuperBlock(superBlockData, theSuperBlock);
 
-	(theSuperBlock->remembered_inode) = iNodeNum;
+	(theSuperBlock->rememberedINode) = iNodeNum;
 
 	writeSuperBlock(theSuperBlock, superBlockData);
 	writeDiskBlock(SUPER_BLOCK, superBlockData);
@@ -68,16 +67,7 @@ void freeINode(size_t iNodeNum) {
 	iNodeListBlock *iNodeList = (iNodeListBlock *)malloc(sizeof(iNodeListBlock));
 	makeINodeListBlock(iNodeListData, iNodeList);
 
-	// printf("\nINODE NUM TO BE FREED: %ld\n", iNodeNum);
-	// int counter = 0;
-	// while (counter < INODE_NOS_PER_BLOCK) {
-	// 	printf("%ld  ", iNodeList->iNodeNos[counter]);
-	// 	counter++;
-	// }
-	// printf("\n");
-
 	bool isSavedInList = saveInListIfPossible(iNodeNum, iNodeList);
-	// printf("Saved in list: %d\n", (int)isSavedInList);
 	if (!isSavedInList) {
 		rememberIfNeeded(iNodeNum, iNodeList);
 		free(iNodeListData);
