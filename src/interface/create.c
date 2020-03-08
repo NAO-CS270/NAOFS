@@ -71,7 +71,6 @@ int createFile(const char *path, iNodeType fileType, mode_t mode, struct fuse_co
 	if (fileType == T_DIRECTORY) {
 		mode = S_IFDIR | mode;
 	}
-	printf("fuse context UID: %d, GID: %d\n\n", fuse_context->uid, fuse_context->gid);
 	size_t iNodeNum = getNewINode(fileType, mode, fuse_context->uid, fuse_context->gid);
     getAndUpdateDirectoryTable(parentINode, iNodeNum, filename);
 
