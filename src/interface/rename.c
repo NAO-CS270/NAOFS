@@ -1,5 +1,6 @@
 #include "interface/rename.h"
 
+#include "incoreInodeOps/iget.h"
 #include "incoreInodeOps/iput.h"
 #include "incoreInodeOps/iNodeManager.h"
 #include "inode/inCoreiNode.h"
@@ -12,8 +13,39 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <pthread.h>
+
+int removeDestinationIfExists (inCoreiNode* parentINode, char* filename) {
+    directoryEntry *entry = (directoryEntry*)malloc(sizeof(directoryEntry));
+
+    int retVal = searchINodeDirectoryEntries(parentINode, filename, 0, entry, 0, false);
+    if (retVal == 1) {
+        printf("\nDestination file exists, unlinking it\n");
+        inCoreiNode* destination = iget(entry->iNodeNum, 0);
+
+        pthread_mutex_lock(&(destination->iNodeMutex));
+        if (destination->type == T_DIRECTORY) {
+            retVal = validateAndEmptyDirectoryIfNeeded(destination, true);
+            if (retVal < 0) {
+                pthread_mutex_unlock(&(destination->iNodeMutex));
+                iput(destination);
+
+                free(entry);
+                return retVal;
+            }
+        }
+        pthread_mutex_unlock(&(destination->iNodeMutex));
+        iput(destination);
+        retVal = unlinkFileFromINode(parentINode, entry->name);
+        if (retVal < 0) {
+            free(entry);
+            return retVal;
+        }
+    }
+    return 0;
+}
 
 // FUSE does a lot of error checking before even calling this function
 // So no need to check a lot of stuff :)
@@ -27,11 +59,11 @@ int renameFile(const char* from, const char* to, struct fuse_context* fuseContex
     }
 
     // TODO: Remove this once unlink directory is implemented
-    if (fileINode->type == T_DIRECTORY) {
-        printf("MOVING DIRECTORY NOT YET IMPLEMENTED!!\n");
-        iput(fileINode);
-        return -1;
-    }
+    // if (fileINode->type == T_DIRECTORY) {
+    //     printf("MOVING DIRECTORY NOT YET IMPLEMENTED!!\n");
+    //     iput(fileINode);
+    //     return -1;
+    // }
 
     pathLen = strlen(to);
     char *newFilename = (char *)malloc((pathLen + 1)*sizeof(char));
@@ -45,25 +77,46 @@ int renameFile(const char* from, const char* to, struct fuse_context* fuseContex
 
     getFilenameFromPath(to, newFilename);
 
-    directoryEntry *entry = (directoryEntry*)malloc(sizeof(directoryEntry));
+    int retVal = removeDestinationIfExists(toParentINode, newFilename);
+    if (retVal < 0) {
+        iput(fileINode);
 
-    int retVal = searchINodeDirectoryEntries(toParentINode, newFilename, 0, entry, 0, false);
-    if (retVal == 1) {
-        printf("Destination file exists, unlinking it\n");
-        retVal = unlinkFile(to, fuseContext);
+        pthread_mutex_unlock(&(toParentINode->iNodeMutex));
+        iput(toParentINode);
 
-        if (retVal != 0) {
-            printf("Could not rename\n");
+        free(newFilename);
+        return retVal;
+    }    
+    //     pthread_mutex_unlock(&(destination->iNodeMutex));
+    //     if (destination->type == T_DIRECTORY) {
+    //         pthread_mutex_unlock(&(destination->iNodeMutex));
+    //         iput(destination);
 
-            pthread_mutex_unlock(&(toParentINode->iNodeMutex));
-            iput(toParentINode);
-            iput(fileINode);
-            free(newFilename);
-            free(entry);
+    //         pthread_mutex_unlock(&(toParentINode->iNodeMutex));
+    //         retVal = unlinkDir(to, fuseContext, true);
+    //         pthread_mutex_lock(&(toParentINode->iNodeMutex));
+    //     }
+    //     else if (destination->type == T_REGULAR) {
+    //         pthread_mutex_unlock(&(destination->iNodeMutex));
+    //         iput(destination);
 
-            return -1;
-        }
-    }
+    //         pthread_mutex_unlock(&(toParentINode->iNodeMutex));
+    //         retVal = unlinkFile(to, fuseContext);
+    //         pthread_mutex_lock(&(toParentINode->iNodeMutex));            
+    //     }
+
+    //     if (retVal != 0) {
+    //         printf("Could not rename\n");
+
+    //         pthread_mutex_unlock(&(toParentINode->iNodeMutex));
+    //         iput(toParentINode);
+    //         iput(fileINode);
+    //         free(newFilename);
+    //         free(entry);
+
+    //         return -1;
+    //     }
+    // }
 
     pthread_mutex_lock(&(fileINode->iNodeMutex));
 
@@ -74,14 +127,11 @@ int renameFile(const char* from, const char* to, struct fuse_context* fuseContex
     iput(toParentINode);
 
     free(newFilename);
-    free(entry);
 
     // TODO: Add unlink dir if file type is directory
-    if (fileINode->type == T_REGULAR) {
-        pthread_mutex_unlock(&(fileINode->iNodeMutex));
-        iput(fileINode);
-        retVal = unlinkFile(from, fuseContext);
-    }
+    pthread_mutex_unlock(&(fileINode->iNodeMutex));
+    iput(fileINode);
+    retVal = unlinkFile(from, fuseContext);
     if (retVal != 0) {
         printf("Could not rename\n");
         return -1;

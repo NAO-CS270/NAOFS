@@ -28,6 +28,8 @@ extern void removeDirectoryEntry(size_t blockNum, size_t blockOffset, const char
 
 extern directoryTable* getDirectoryEntries(inCoreiNode* inode);
 
+extern void getLastEntry(inCoreiNode *iNodePtr, directoryEntry* entry);
+
 /*
 union directoryData {
 	disk_block dataBlock;
