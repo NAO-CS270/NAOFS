@@ -4,7 +4,7 @@
 #include "mandsk/params.h"
 #include "mkfs/freeBlockList.h"
 #include "mkfs/metaBlocks.h"
-#include "dsk/alloc.h"
+#include "mkfs/alloc.h"
 #include "mkfs/iNodeManager.h"
 #include "mkfs/ialloc.h"
 

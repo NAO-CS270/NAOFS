@@ -1,8 +1,8 @@
 #include "incoreInodeOps/iNodeManager.h"
 
 #include "dsk/blkfetch.h"
-#include "dsk/alloc.h"
-#include "dsk/free.h"
+#include "mkfs/alloc.h"
+#include "mkfs/free.h"
 #include "mandsk/params.h"
 #include "mkfs/metaBlocks.h"
 

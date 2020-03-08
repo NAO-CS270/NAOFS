@@ -5,7 +5,7 @@
 #include "incoreInodeOps/freeList.h"
 #include "incoreInodeOps/bmap.h"
 #include "dsk/blkfetch.h"
-#include "dsk/free.h"
+#include "mkfs/free.h"
 #include "utils/utils.h"
 #include "incoreInodeOps/iput.h"
 #include "incoreInodeOps/iget.h"

@@ -1,4 +1,3 @@
-#include "dsk/alloc.h"
 #include "dsk/mdisk.h"
 #include "mkfs/metaBlocks.h"
 #include "mkfs/diskParams.h"

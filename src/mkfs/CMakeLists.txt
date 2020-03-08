@@ -1,4 +1,4 @@
-add_library(diskStruct STATIC "mkfs.c" "iNodeManager.c" "freeBlockList.c" "ialloc.c" "ifree.c" "metaBlocks.c")
+add_library(diskStruct STATIC "mkfs.c" "iNodeManager.c" "freeBlockList.c" "ialloc.c" "ifree.c" "alloc.c" "free.c" "metaBlocks.c")
 
 target_include_directories(diskStruct PUBLIC ${PROJECT_INCLUDE_DIRECTORY})
 

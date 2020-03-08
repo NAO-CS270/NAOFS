@@ -5,7 +5,7 @@
 #include "inode/inCoreiNode.h"
 #include "inode/iNode.h"
 #include "mkfs/iNodeManager.h"
-#include "dsk/free.h"
+#include "mkfs/free.h"
 #include "mkfs/ifree.h"
 
 #include <pthread.h>

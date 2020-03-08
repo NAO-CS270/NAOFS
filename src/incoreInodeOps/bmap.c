@@ -3,7 +3,7 @@
 #include "incoreInodeOps/bmap.h"
 #include "mandsk/params.h"
 #include "mkfs/metaBlocks.h"
-#include "dsk/alloc.h"
+#include "mkfs/alloc.h"
 
 #include <stdio.h>
 #include <stdlib.h>
