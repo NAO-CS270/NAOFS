@@ -2,4 +2,4 @@ add_library(incoreInodeOps STATIC "bmap.c" "freeList.c" "hashQ.c" "iNodeManager.
 
 target_include_directories(incoreInodeOps PUBLIC ${PROJECT_INCLUDE_DIRECTORY})
 
-target_link_libraries(incoreInodeOps PUBLIC diskAccess inode mkfs)
+target_link_libraries(incoreInodeOps PUBLIC diskAccess inode diskStruct)

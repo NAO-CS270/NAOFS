@@ -1,4 +1,5 @@
-#include "mkfs/freeBlockList.h"
+#include "dsk/mdisk.h"
+#include "mandsk/params.h"
 
 #include <stddef.h>
 #include <stdlib.h>

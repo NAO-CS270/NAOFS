@@ -2,7 +2,6 @@
 #define _FREE_BLOCK_LIST_H
 
 #include "dsk/mdisk.h"
-#include "mandsk/params.h"
 
 #include <stddef.h>
 
