@@ -7,6 +7,7 @@ include(FindPkgConfig)
 pkg_check_modules(FUSE REQUIRED fuse)
 
 #set(CMAKE_C_FLAGS "-pg -D_FILE_OFFSET_BITS=64 -lulockmgr")
+#set(CMAKE_C_FLAGS "-mcmodel=large")
 
 set(PROJECT_SOURCE_DIRECTORY "${CMAKE_SOURCE_DIR}/src")
 set(PROJECT_INCLUDE_DIRECTORY "${CMAKE_SOURCE_DIR}/include")
