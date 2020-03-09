@@ -86,7 +86,7 @@ static int utimens_callback(const char *path, const struct timespec tv[2]) {
     return 0;
 }
 
-static int chown_callback(const char *path, uid_t uid, gid_t gid, struct fuse_file_info* fi) {
+static int chown_callback(const char *path, uid_t uid, gid_t gid) {
     changeOwner(path, uid, gid);
     return 0;
 }

@@ -7,6 +7,7 @@ include(FindPkgConfig)
 pkg_check_modules(FUSE REQUIRED fuse)
 
 #set(CMAKE_C_FLAGS "-pg -D_FILE_OFFSET_BITS=64 -lulockmgr")
+#set(CMAKE_C_FLAGS "-mcmodel=large")
 
 pkg_check_modules(FUSE REQUIRED fuse)
 # find_package(FUSE REQUIRED)

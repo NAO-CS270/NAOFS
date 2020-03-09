@@ -1,10 +1,11 @@
 #include "dsk/mdisk.h"
 #include "mandsk/params.h"
 
-static disk_block mem_disk[NUM_OF_BLOCKS];
+#define NUM_OF_BLOCKS_IN_MEM 65536
+static disk_block mem_disk[NUM_OF_BLOCKS_IN_MEM];
 
 int fetchMemoryDiskBlock(size_t blockNumber, disk_block *blockData) {
-	if (blockNumber >= NUM_OF_BLOCKS) {
+	if (blockNumber >= NUM_OF_BLOCKS_IN_MEM) {
 		return -1;
 	}
 
@@ -13,7 +14,7 @@ int fetchMemoryDiskBlock(size_t blockNumber, disk_block *blockData) {
 }
 
 int writeMemoryDiskBlock(size_t blockNumber, disk_block* blockData) {
-	if (blockNumber >= NUM_OF_BLOCKS) {
+	if (blockNumber >= NUM_OF_BLOCKS_IN_MEM) {
 		return -1;
 	}
 
