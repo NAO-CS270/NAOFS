@@ -59,6 +59,7 @@ size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums) {
 		return 0;
 	}
 
+	cacheNode *diskBlockNode;
 	iNode *listOfINodes = (iNode *)malloc(INODES_PER_BLOCK * sizeof(iNode));
 	iNodesBlock *iNodesList = (iNodesBlock *)malloc(sizeof(iNodesBlock));
 	iNodesList->iNodesList = listOfINodes;
@@ -67,35 +68,31 @@ size_t searchINodes(size_t startINodeNum, iNodeListBlock *iNodeNums) {
 	size_t freeINodeCounter = 0;
 
 	while (freeINodeCounter < iNodeNumsInABlock) {
-        disk_block *iNodesData = (disk_block*)malloc(sizeof(disk_block));
 		if (blockCounter >= endOfINodeBlocks) {
 			break;
 		}
-		getDiskBlock(blockCounter, iNodesData);
-		makeINodesBlock(iNodesData, iNodesList);
+		diskBlockNode = getDiskBlockNode(blockCounter, 0);
+		makeINodesBlock(diskBlockNode->dataBlock, iNodesList);
+
+		writeDiskBlockNode(diskBlockNode);
 
 		freeINodeCounter += getFromBlock(iNodesList, (iNodeNums->iNodeNos) + freeINodeCounter);
 		blockCounter++;
-		// TODO: free iNodesData?
 	}
 	free(listOfINodes);
 	free(iNodesList);
 	return getReturnValue(iNodeNums, freeINodeCounter);
 }
 
-int accessINodeAndItsBlock(size_t iNodeNum, iNode *inode, disk_block *blockPtr, iNodeAccessType accessType) {
+int accessINodeAndItsBlock(size_t iNodeNum, iNode *inode, iNodeAccessType accessType) {
 	if (iNodeNum >= NUM_OF_INODES) {
 		return -1;
 	}
 
-	disk_block *metaBlock = blockPtr;
-	if (blockPtr == NULL) {
-		metaBlock = (disk_block *)malloc(BLOCK_SIZE);
-	}
-
 	size_t blockNum = (iNodeNum/INODES_PER_BLOCK) + INODE_BLOCKS_HEAD;
-	getDiskBlock(blockNum, metaBlock);
-	unsigned char *ptrIntoBlock = metaBlock->data;
+
+	cacheNode *metaBlockNode = getDiskBlockNode(blockNum, 0);
+	unsigned char *ptrIntoBlock = metaBlockNode->dataBlock->data;
 
 	size_t index = iNodeNum % INODES_PER_BLOCK;
 	if (accessType == INODE_READ) {
@@ -104,13 +101,10 @@ int accessINodeAndItsBlock(size_t iNodeNum, iNode *inode, disk_block *blockPtr, 
 	else {
 		memset(ptrIntoBlock + (index * INODE_SIZE), 0, INODE_SIZE);
 		memcpy(ptrIntoBlock + (index * INODE_SIZE), inode, sizeof(iNode));
-		writeDiskBlock(blockNum, metaBlock);
+		metaBlockNode->header->delayedWrite = true;
 	}
 
-	if (blockPtr == NULL) {
-		free(metaBlock);
-	}
-
+	writeDiskBlockNode(metaBlockNode);
 	return 0;
 }
 
@@ -118,7 +112,7 @@ int accessINodeAndItsBlock(size_t iNodeNum, iNode *inode, disk_block *blockPtr, 
 void updateINodeData(size_t iNodeNum, iNodeType iType, mode_t mode, uid_t o_uid, gid_t g_uid, size_t size, size_t linksCount) {
 	iNode *inode = (iNode *)malloc(sizeof(iNode));
 
-	accessINodeAndItsBlock(iNodeNum, inode, NULL, INODE_READ);
+	accessINodeAndItsBlock(iNodeNum, inode, INODE_READ);
 	inode->status_change = time(NULL);
 	inode->type = iType;
 	inode->file_mode = mode;
@@ -127,15 +121,15 @@ void updateINodeData(size_t iNodeNum, iNodeType iType, mode_t mode, uid_t o_uid,
 	inode->size = size;
 	inode->linksCount = linksCount;
 
-	accessINodeAndItsBlock(iNodeNum, inode, NULL, INODE_WRITE);
+	accessINodeAndItsBlock(iNodeNum, inode, INODE_WRITE);
 	free(inode);
 }
 
 int getDiskInode(size_t iNodeNum, iNode* inode) {
-	return accessINodeAndItsBlock(iNodeNum, inode, NULL, INODE_READ);
+	return accessINodeAndItsBlock(iNodeNum, inode, INODE_READ);
 }
 
 int writeDiskInode(size_t iNodeNum, iNode* inode) {
-	return accessINodeAndItsBlock(iNodeNum, inode, NULL, INODE_WRITE);
+	return accessINodeAndItsBlock(iNodeNum, inode, INODE_WRITE);
 }
 

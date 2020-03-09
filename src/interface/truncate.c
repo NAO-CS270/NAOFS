@@ -14,15 +14,13 @@
 #include <string.h>
 
 void writeNullBytes(size_t blockNumber, size_t offset, size_t bytesToWrite) {
-	disk_block *blockPtr = (disk_block *)malloc(sizeof(disk_block));
-	getDiskBlock(blockNumber, blockPtr);
+	cacheNode *dataBlockNode = getDiskBlockNode(blockNumber, 0);
+    unsigned char *ptrIntoBlock = dataBlockNode->dataBlock->data;
 
-	unsigned char *ptrIntoBlk = blockPtr->data;
-	memset(ptrIntoBlk + offset, 0, bytesToWrite);
-
-	writeDiskBlock(blockNumber, blockPtr);
-
-	free(blockPtr);
+	memset(ptrIntoBlock + offset, 0, bytesToWrite);
+	dataBlockNode->header->delayedWrite = true;
+    
+    writeDiskBlockNode(dataBlockNode);
 }
 
 void increaseFileSizeBy (inCoreiNode* iNode, size_t size) {

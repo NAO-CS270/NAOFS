@@ -1,3 +1,4 @@
+#include "dsk/node.h"
 #include "incoreInodeOps/bmap.h"
 #include "fdTable/globalFileTable.h"
 #include "incoreInodeOps/iNodeManager.h"
@@ -8,30 +9,13 @@
 #include <fuse.h>
 
 void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
-    disk_block *blockPtr = (disk_block *)malloc(sizeof(disk_block));
-    getDiskBlock(bmapResp->blockNumber, blockPtr);
-    unsigned char *ptrIntoBlock = blockPtr->data;
+	cacheNode *dataBlockNode = getDiskBlockNode(bmapResp->blockNumber, 0);
+    unsigned char *ptrIntoBlock = dataBlockNode->dataBlock->data;
 
-    printf("WE ARE IN WRITE!\n");
-    printf("block_number: %ld\n", bmapResp->blockNumber);
-//    int i = 0;
-//    for(i=0; i < size; i++) {
-//        printf("%c", buf[i]);
-//    }
-//    printf("\n");
-//    printf("block data: \n");
-//    for(i=0; i < BLOCK_SIZE; ++i) {
-//        printf("%c", ptrIntoBlock[i]);
-//    }
-//    printf("\n");
     memcpy(ptrIntoBlock + bmapResp->byteOffsetInBlock, buf, size);
+	dataBlockNode->header->delayedWrite = true;
     
-//    for(i=0; i < size; i++) {
-//        printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
-//    }
-//    printf("\n");
-    writeDiskBlock(bmapResp->blockNumber, blockPtr);
-    free(blockPtr);
+    writeDiskBlockNode(dataBlockNode);
 }
 
 int writeToFile(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi, struct fuse_context *fuse_context) {

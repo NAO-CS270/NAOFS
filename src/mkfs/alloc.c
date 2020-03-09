@@ -1,8 +1,10 @@
+#include "dsk/node.h"
 #include "dsk/mdisk.h"
 #include "mkfs/metaBlocks.h"
 #include "mkfs/diskParams.h"
 #include "dsk/blkfetch.h"
 
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -11,11 +13,9 @@ static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
 size_t blockAlloc() {
     pthread_mutex_lock(&iNodeListMutex);
 
-    disk_block* freeListBlock = (disk_block*)malloc(sizeof(disk_block));
+	cacheNode *freeListBlockNode = getDiskBlockNode(FREE_LIST_BLOCK, 0);
     freeDiskListBlock* diskBlock = (freeDiskListBlock*)malloc(sizeof(freeDiskListBlock));
-
-    getDiskBlock(FREE_LIST_BLOCK, freeListBlock);
-    makeFreeDiskListBlock (freeListBlock, diskBlock);
+    makeFreeDiskListBlock(freeListBlockNode->dataBlock, diskBlock);
 
     printf("\nIN BLOCK ALLOC BEFORE ALLOC\n");
     int i = 0;
@@ -35,14 +35,16 @@ size_t blockAlloc() {
         }
     }
     if (counter == (BLOCK_ADDRESSES_PER_BLOCK - 1)) {
-		getDiskBlock(new_block, freeListBlock);
+		cacheNode *newBlockNode = getDiskBlockNode(new_block, 0);
+		memcpy(freeListBlockNode->dataBlock, newBlockNode->dataBlock, BLOCK_SIZE);
+		writeDiskBlockNode(newBlockNode);
     }
 	else {
-		writeFreeDiskListBlock(diskBlock, freeListBlock);
+		writeFreeDiskListBlock(diskBlock, freeListBlockNode->dataBlock);
 	}
-	writeDiskBlock(FREE_LIST_BLOCK, freeListBlock);
+	freeListBlockNode->header->delayedWrite = true;
+	writeDiskBlockNode(freeListBlockNode);
 
-	free(freeListBlock);
     free(diskBlock);
     pthread_mutex_unlock(&iNodeListMutex);
     return new_block;

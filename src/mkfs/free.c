@@ -3,6 +3,7 @@
 #include "mkfs/diskParams.h"
 #include "dsk/blkfetch.h"
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -10,10 +11,9 @@
 static pthread_mutex_t iNodeListMutex = PTHREAD_MUTEX_INITIALIZER;
 
 void _freeInto(size_t freeListBlockNumber, size_t blockNumber) {
-    disk_block* freeListBlock = (disk_block*)malloc(sizeof(disk_block));
-    getDiskBlock(freeListBlockNumber, freeListBlock);
+	cacheNode *freeListBlockNode = getDiskBlockNode(freeListBlockNumber, 0);
     freeDiskListBlock* diskBlock = (freeDiskListBlock*)malloc(sizeof(freeDiskListBlock));
-    diskBlock = makeFreeDiskListBlock (freeListBlock, diskBlock);
+    diskBlock = makeFreeDiskListBlock(freeListBlockNode->dataBlock, diskBlock);
 
     printf("\nIN BLOCK FREE BEFORE FREE\n");
     int i = 0;
@@ -23,10 +23,12 @@ void _freeInto(size_t freeListBlockNumber, size_t blockNumber) {
     }
     printf("\n");
 
-
     if (diskBlock -> blkNos[0]) {
-        // _freeInto(diskBlock -> blkNos[BLOCK_ADDRESSES_PER_BLOCK - 1], blockNumber);
-        writeDiskBlock(blockNumber, freeListBlock);
+		cacheNode *freeIntoBlockNode = getDiskBlockNode(blockNumber, 0);
+		memcpy(freeIntoBlockNode->dataBlock, freeListBlockNode->dataBlock, BLOCK_SIZE);
+		freeIntoBlockNode->header->delayedWrite = true;
+		writeDiskBlockNode(freeIntoBlockNode);
+
         diskBlock->blkNos[BLOCK_ADDRESSES_PER_BLOCK - 1] = blockNumber;
         int counter = 0;
         while (counter < (BLOCK_ADDRESSES_PER_BLOCK - 1)) {
@@ -52,24 +54,30 @@ void _freeInto(size_t freeListBlockNumber, size_t blockNumber) {
     }
     printf("\n");
 
-    writeFreeDiskListBlock(diskBlock, freeListBlock);
-    writeDiskBlock(freeListBlockNumber, freeListBlock);
+    writeFreeDiskListBlock(diskBlock, freeListBlockNode->dataBlock);
+	freeListBlockNode->header->delayedWrite = true;
+    writeDiskBlockNode(freeListBlockNode);
 
-    free(freeListBlock);
     free(diskBlock);
 }
 
+void blockFree(size_t blockNumber) {
+    pthread_mutex_lock(&iNodeListMutex);
+    _freeInto(FREE_LIST_BLOCK, blockNumber);
+    pthread_mutex_unlock(&iNodeListMutex);
+}
+
+
 void diskBlockFree(size_t diskBlockNumber, ssize_t* leftSize, int recursionLevel) {
     if (recursionLevel) {
-        disk_block *blockToBeFreed = (disk_block *) malloc(sizeof(disk_block));
-        getDiskBlock(diskBlockNumber, blockToBeFreed);
+		cacheNode *toBeFreedBlockNode = getDiskBlockNode(diskBlockNumber, 0);
         freeDiskListBlock* diskBlocks = (freeDiskListBlock*)malloc(sizeof(freeDiskListBlock));
-        diskBlocks = makeFreeDiskListBlock (blockToBeFreed, diskBlocks);
+        diskBlocks = makeFreeDiskListBlock(toBeFreedBlockNode->dataBlock, diskBlocks);
 
         int i;
         for (i = 0; i < BLOCK_ADDRESSES_PER_BLOCK && *leftSize > 0; ++i)
             diskBlockFree(diskBlocks -> blkNos[i], leftSize, recursionLevel - 1);
-        free(blockToBeFreed);
+		writeDiskBlockNode(toBeFreedBlockNode);
         free(diskBlocks);
     }
     else
@@ -99,8 +107,3 @@ void inodeBlocksFree(inCoreiNode *inode) {
     }
 }
 
-void blockFree(size_t blockNumber) {
-    pthread_mutex_lock(&iNodeListMutex);
-    _freeInto(FREE_LIST_BLOCK, blockNumber);
-    pthread_mutex_unlock(&iNodeListMutex);
-}

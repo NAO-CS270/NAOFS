@@ -1,3 +1,4 @@
+#include "dsk/node.h"
 #include "dsk/blkfetch.h"
 #include "incoreInodeOps/iNodeManager.h"
 #include "incoreInodeOps/bmap.h"
@@ -12,19 +13,19 @@ typedef freeDiskListBlock indirectBlock;
 
 size_t processAndGetDiskBlock(blkTreeOffset *indirectionOffsets, size_t startBlockNum) {
 	size_t indirectBlockIndex = startBlockNum;
-	disk_block* dataBlock = (disk_block*)malloc(BLOCK_SIZE);
+	cacheNode *dataBlockNode;
 	indirectBlock* workingData = (indirectBlock*)malloc(sizeof(indirectBlock));
 
 	size_t counter = 0;
 	while(counter < indirectionOffsets->offsetIndirection) {
-		getDiskBlock(indirectBlockIndex, dataBlock);
-		makeFreeDiskListBlock(dataBlock, workingData);
+		dataBlockNode = getDiskBlockNode(indirectBlockIndex, 0);
+		makeFreeDiskListBlock(dataBlockNode->dataBlock, workingData);
 
 		indirectBlockIndex = (workingData->blkNos)[indirectionOffsets->offsets[counter + 1]];
+		writeDiskBlockNode(dataBlockNode);
 		counter++;
 	}
 
-	free(dataBlock);
 	free(workingData);
 
 	return indirectBlockIndex;

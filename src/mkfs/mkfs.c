@@ -35,10 +35,12 @@ size_t writeINodeListToDisk(size_t freeBlockNum, size_t iNodeListSize) {
 		iNodeCounter++;
 	}
 
-	disk_block *metaBlock = (disk_block *)malloc(BLOCK_SIZE);
-	size_t rememberedINode = initINodeListBlock(metaBlock, iNodeList, iNodeListSize);
-	writeDiskBlock(freeBlockNum, metaBlock);
-	free(metaBlock);
+	cacheNode *diskBlockNode = getDiskBlockNode(freeBlockNum, 0);
+
+	size_t rememberedINode = initINodeListBlock(diskBlockNode->dataBlock, iNodeList, iNodeListSize);
+
+	diskBlockNode->header->delayedWrite = true;
+	writeDiskBlockNode(diskBlockNode);
 
 	free(iNodeList);
 	return rememberedINode;
@@ -54,20 +56,22 @@ size_t getINodeListSize() {
 
 /* Initializes `NUM_OF_INODES` empty iNodes and saves them to disk. */
 void createINodes(size_t startPos) {
-	disk_block *metaBlock = (disk_block *)malloc(BLOCK_SIZE);
-
+	cacheNode *diskBlockNode;
 	size_t iNodeCounter = 0;
 
 	size_t blockCounter = startPos;
 	size_t endOfINodeBlocks = blockCounter + NUM_OF_INODE_BLOCKS;
 
 	while (blockCounter < endOfINodeBlocks) {
-		iNodeCounter = populateINodesIn(metaBlock, iNodeCounter);
+		diskBlockNode = getDiskBlockNode(blockCounter, 0);
 
-		writeDiskBlock(blockCounter, metaBlock);
+		iNodeCounter = populateINodesIn(diskBlockNode->dataBlock, iNodeCounter);
+
+		diskBlockNode->header->delayedWrite = true;
+		writeDiskBlockNode(diskBlockNode);
+
 		blockCounter++;
 	}
-	free(metaBlock);
 }
 
 /* Initializes `NUM_OF_INODES` empty iNodes and saves them to disk. Then, it forms
@@ -91,20 +95,24 @@ size_t initializeINodeData(size_t freeBlockNum, size_t startPos) {
 void initializeDiskBlocks(size_t freeBlockNum, size_t startPos) {
 	size_t freeBlocksPerBlock = BLOCK_SIZE / BLOCK_ADDRESS_SIZE;
 
-	disk_block *metaBlock = (disk_block *)malloc(sizeof(disk_block));
+	cacheNode *diskBlockNode;
+
 	size_t pointerBlockNumber = freeBlockNum;
 	size_t nextFreeListNumber;
 	while (pointerBlockNumber < NUM_OF_BLOCKS) {
-		nextFreeListNumber = makeOneBlock(metaBlock, startPos);
-		
-		writeDiskBlock(pointerBlockNumber, metaBlock);
+		diskBlockNode = getDiskBlockNode(pointerBlockNumber, 0);
+
+		nextFreeListNumber = makeOneBlock(diskBlockNode->dataBlock, startPos);
+
+		diskBlockNode->header->delayedWrite = true;
+		writeDiskBlockNode(diskBlockNode);
+
 		if (nextFreeListNumber == 0) {
 			break;
 		}
 		pointerBlockNumber = nextFreeListNumber;
 		startPos += freeBlocksPerBlock;
 	}
-	free(metaBlock);
 }
 
 /* Only this method must be exposed to be called as MKFS API. */
@@ -115,14 +123,14 @@ void makeFileSystem() {
 	
 	initializeDiskBlocks(FREE_LIST_BLOCK, 4 + NUM_OF_INODE_BLOCKS);
 
-	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
+	cacheNode *diskBlockNode = getDiskBlockNode(SUPER_BLOCK, 0);
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
 
 	(theSuperBlock->rememberedINode) = iNodeToRemember;
-	writeSuperBlock(theSuperBlock, superBlockData);
-	writeDiskBlock(SUPER_BLOCK, superBlockData);
+	writeSuperBlock(theSuperBlock, diskBlockNode->dataBlock);
 
-	free(superBlockData);
+	writeDiskBlockNode(diskBlockNode);
+
 	free(theSuperBlock);
 }
 

@@ -2,12 +2,13 @@
 #define _BLOCK_FETCHER_H
 
 #include "dsk/mdisk.h"
+#include "dsk/node.h"
 
 extern int setupDisk(const char *inputDev);
 
-extern int getDiskBlock(size_t blockNumber, disk_block *blockData);
+extern cacheNode *getDiskBlockNode(size_t blockNumber, size_t deviceNumber);
 
-extern int writeDiskBlock(size_t blockNumber, disk_block* blockData);
+extern void writeDiskBlockNode(cacheNode *nodeToWrite);
 
 #endif
 

@@ -1,5 +1,6 @@
 #include "incoreInodeOps/iNodeManager.h"
 
+#include "dsk/node.h"
 #include "dsk/blkfetch.h"
 #include "mkfs/alloc.h"
 #include "mkfs/free.h"
@@ -79,7 +80,7 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 	size_t parentBlock;
 	size_t newAllocBlock;
 	
-	disk_block* dataBlock = (disk_block*)malloc(BLOCK_SIZE);
+	cacheNode *dataBlockNode;
 	indirectBlock* workingData = (indirectBlock*)malloc(sizeof(indirectBlock));
 
 	while (counter < offsetsSize) {
@@ -89,13 +90,16 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 			*curBlock = newAllocBlock;
 
 			if (counter != 0) {
-				writeFreeDiskListBlock(workingData, dataBlock);
-				writeDiskBlock(parentBlock, dataBlock);
+				writeFreeDiskListBlock(workingData, dataBlockNode->dataBlock);
+				dataBlockNode->header->delayedWrite = true;
 			}
 		}
+		if (counter != 0) {
+			writeDiskBlockNode(dataBlockNode);
+		}
 		size_t tmp = *curBlock;
-		getDiskBlock(*curBlock, dataBlock);
-		makeFreeDiskListBlock(dataBlock, workingData);
+		dataBlockNode = getDiskBlockNode(*curBlock, 0);
+		makeFreeDiskListBlock(dataBlockNode->dataBlock, workingData);
 
 		parentBlock = tmp;
 		curBlock = (workingData->blkNos) + indirOffsets[counter];
@@ -103,10 +107,10 @@ void allocateAllNeededBlocks(size_t *curBlock, size_t blockNumToAdd, int *indirO
 		counter ++;
 	}
 	*curBlock = blockNumToAdd;
-	writeFreeDiskListBlock(workingData, dataBlock);
-	writeDiskBlock(parentBlock, dataBlock);
+	writeFreeDiskListBlock(workingData, dataBlockNode->dataBlock);
+	dataBlockNode->header->delayedWrite = true;
+	writeDiskBlockNode(dataBlockNode);
 
-	free(dataBlock);
 	free(workingData);
 }
 
@@ -179,7 +183,7 @@ void freeNeededBlocks(inCoreiNode* iNode, size_t blockNumToRemove, blkTreeOffset
 	size_t *blockIndex = iNode->dataBlockNums + DIRECT_BLOCK_LIMIT + indirection;
 	size_t blocksToBeFreed[indirection];
 
-	disk_block *dataBlock = (disk_block*)malloc(BLOCK_SIZE);
+	cacheNode *dataBlockNode;
 	indirectBlock* workingData = (indirectBlock*)malloc(sizeof(indirectBlock));
 
 	int counter = 0;
@@ -189,9 +193,10 @@ void freeNeededBlocks(inCoreiNode* iNode, size_t blockNumToRemove, blkTreeOffset
 			blocksToBeFreed[blockFreeCounter] = *blockIndex;
 			blockFreeCounter++;
 		}
-		getDiskBlock(*blockIndex, dataBlock);
-		makeFreeDiskListBlock(dataBlock, workingData);
+		dataBlockNode = getDiskBlockNode(*blockIndex, 0);
+		makeFreeDiskListBlock(dataBlockNode->dataBlock, workingData);
 		blockIndex = workingData->blkNos + offsets[counter];
+		writeDiskBlockNode(dataBlockNode);
 		counter++;
 	}
 
@@ -201,7 +206,6 @@ void freeNeededBlocks(inCoreiNode* iNode, size_t blockNumToRemove, blkTreeOffset
 		counter++;
 	}
 
-	free(dataBlock);
 	free(workingData);
 }
 

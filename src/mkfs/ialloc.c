@@ -33,30 +33,29 @@ size_t checkAndGetFreeINode(iNodeListBlock *iNodeList) {
 }
 
 void fetchFreeINodes(iNodeListBlock *iNodeList) {
-	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
-	getDiskBlock(SUPER_BLOCK, superBlockData);
+	cacheNode *superBlockNode = getDiskBlockNode(SUPER_BLOCK, 0);
 
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
-	makeSuperBlock(superBlockData, theSuperBlock);
+	makeSuperBlock(superBlockNode->dataBlock, theSuperBlock);
 
 	size_t rememberedINode = theSuperBlock->rememberedINode;
 	(theSuperBlock->rememberedINode) = searchINodes(rememberedINode, iNodeList);
 
-	writeSuperBlock(theSuperBlock, superBlockData);
-	writeDiskBlock(SUPER_BLOCK, superBlockData);
+	writeSuperBlock(theSuperBlock, superBlockNode->dataBlock);
+	superBlockNode->header->delayedWrite = true;
 
-	free(superBlockData);
+	writeDiskBlockNode(superBlockNode);
+
 	free(theSuperBlock);
 }
 
 size_t getNewINode(iNodeType fileType, mode_t fileMode, uid_t uid, gid_t gid) {
 	pthread_mutex_lock(&iNodeListMutex);
 
-	disk_block *iNodeListData = (disk_block *)malloc(BLOCK_SIZE);
-	getDiskBlock(INODE_LIST_BLOCK, iNodeListData);
+	cacheNode *iNodeListBlockNode = getDiskBlockNode(INODE_LIST_BLOCK, 0);
 
 	iNodeListBlock *iNodeList = (iNodeListBlock *)malloc(sizeof(iNodeListBlock));
-	makeINodeListBlock(iNodeListData, iNodeList);
+	makeINodeListBlock(iNodeListBlockNode->dataBlock, iNodeList);
 
 	size_t freeINode = checkAndGetFreeINode(iNodeList);
 
@@ -66,9 +65,10 @@ size_t getNewINode(iNodeType fileType, mode_t fileMode, uid_t uid, gid_t gid) {
 	}
 
 	updateINodeData(freeINode, fileType, fileMode, uid, gid, 0, 0);
-	writeINodeListBlock(iNodeList, iNodeListData);
-	writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
-	free(iNodeListData);
+	writeINodeListBlock(iNodeList, iNodeListBlockNode->dataBlock);
+	iNodeListBlockNode->header->delayedWrite = true;
+
+	writeDiskBlockNode(iNodeListBlockNode);
 	free(iNodeList);
 	pthread_mutex_unlock(&iNodeListMutex);
 	return freeINode;

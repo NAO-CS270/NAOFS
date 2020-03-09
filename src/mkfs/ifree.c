@@ -42,16 +42,17 @@ void rememberIfNeeded(size_t iNodeNum, iNodeListBlock *iNodeList) {
 		return ;
 	}
 	
-	disk_block *superBlockData = (disk_block *)malloc(BLOCK_SIZE);
-	getDiskBlock(SUPER_BLOCK, superBlockData);
+	cacheNode *superBlockNode = getDiskBlockNode(SUPER_BLOCK, 0);
 
 	superBlock *theSuperBlock = (superBlock *)malloc(sizeof(superBlock));
-	makeSuperBlock(superBlockData, theSuperBlock);
+	makeSuperBlock(superBlockNode->dataBlock, theSuperBlock);
 
 	(theSuperBlock->rememberedINode) = iNodeNum;
 
-	writeSuperBlock(theSuperBlock, superBlockData);
-	writeDiskBlock(SUPER_BLOCK, superBlockData);
+	writeSuperBlock(theSuperBlock, superBlockNode->dataBlock);
+	superBlockNode->header->delayedWrite = true;
+
+	writeDiskBlockNode(superBlockNode);
 
 	free(theSuperBlock);
 }
@@ -61,22 +62,20 @@ void freeINode(size_t iNodeNum) {
 
 	updateINodeData(iNodeNum, 0, 0, 0, 0, 0, 0);
 
-	disk_block *iNodeListData = (disk_block *)malloc(BLOCK_SIZE);
-	getDiskBlock(INODE_LIST_BLOCK, iNodeListData);
+	cacheNode *iNodeListBlockNode = getDiskBlockNode(INODE_LIST_BLOCK, 0);
 
 	iNodeListBlock *iNodeList = (iNodeListBlock *)malloc(sizeof(iNodeListBlock));
-	makeINodeListBlock(iNodeListData, iNodeList);
+	makeINodeListBlock(iNodeListBlockNode->dataBlock, iNodeList);
 
 	bool isSavedInList = saveInListIfPossible(iNodeNum, iNodeList);
 	if (!isSavedInList) {
 		rememberIfNeeded(iNodeNum, iNodeList);
-		free(iNodeListData);
 	}
 	else {
-		writeINodeListBlock(iNodeList, iNodeListData);
-		writeDiskBlock(INODE_LIST_BLOCK, iNodeListData);
+		writeINodeListBlock(iNodeList, iNodeListBlockNode->dataBlock);
+		iNodeListBlockNode->header->delayedWrite = true;
+		writeDiskBlockNode(iNodeListBlockNode);
 	}
-	free(iNodeListData);
 	free(iNodeList);
 
 	pthread_mutex_unlock(&iNodeListMutex);

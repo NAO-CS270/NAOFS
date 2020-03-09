@@ -1,3 +1,4 @@
+#include "dsk/node.h"
 #include "trav/directory.h"
 #include "mandsk/params.h"
 #include "inode/iNode.h"
@@ -85,20 +86,19 @@ size_t searchBlockDirectoryEntries(disk_block *blockPtr, char *entryName, size_t
 }
 
 size_t checkInBlock(size_t tillEndOfFile, bmapResponse *bmapResp, char *entryName, directoryEntry *entryBuffer, directoryEntry* lastEntry) {
-	disk_block *blockPtr = (disk_block *)malloc(sizeof(disk_block));
-	getDiskBlock(bmapResp->blockNumber, blockPtr);
+	cacheNode *blockDataNode = getDiskBlockNode(bmapResp->blockNumber, 0);
 		
 	size_t entriesInBlock = (bmapResp->bytesLeftInBlock) / DIRECTORY_ENTRY_SIZE;
 	if (bmapResp->bytesLeftInBlock > tillEndOfFile) {
 		entriesInBlock = tillEndOfFile / DIRECTORY_ENTRY_SIZE;
 	}
 
-	size_t retValue = searchBlockDirectoryEntries(blockPtr, entryName, bmapResp->byteOffsetInBlock, entryBuffer, entriesInBlock, lastEntry);
+	size_t retValue = searchBlockDirectoryEntries(blockDataNode->dataBlock, entryName, bmapResp->byteOffsetInBlock, entryBuffer, entriesInBlock, lastEntry);
 
 	if (NULL != lastEntry && lastEntry->iNodeNum != -1 && retValue == 1) {
-		writeDiskBlock(bmapResp->blockNumber, blockPtr);
+		blockDataNode->header->delayedWrite = true;
 	}
-	free(blockPtr);
+	writeDiskBlockNode(blockDataNode);
 	return retValue;
 }
 
@@ -109,13 +109,16 @@ void getLastEntry(inCoreiNode *iNodePtr, directoryEntry* entry) {
 	}
 	bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
 	bmap(iNodePtr, iNodePtr->size - DIRECTORY_ENTRY_SIZE, bmapResp, READ_MODE);
-	disk_block *data_block = (disk_block*)malloc(sizeof(disk_block));
-	getDiskBlock(bmapResp->blockNumber, data_block);
-	unsigned char *ptrIntoBlock = data_block->data;
+
+	cacheNode *dataBlockNode = getDiskBlockNode(bmapResp->blockNumber, 0);
+
+	unsigned char *ptrIntoBlock = dataBlockNode->dataBlock->data;
 	ptrIntoBlock += bmapResp->byteOffsetInBlock;
 	memcpy(entry->name, ptrIntoBlock, FILENAME_SIZE);
 	memcpy(&(entry->iNodeNum), ptrIntoBlock + FILENAME_SIZE, INODE_ADDRESS_SIZE);
-	free(data_block);
+
+	writeDiskBlockNode(dataBlockNode);
+
 	free(bmapResp);
 }
 
@@ -170,17 +173,16 @@ int searchINodeDirectoryEntries(inCoreiNode *iNodePtr, char *entryName, size_t o
 }
 
 void addDirectoryEntry(size_t blockNum, size_t blockOffset, const char *filename, size_t iNodeNum) {
-	disk_block *blockPtr = (disk_block *) malloc(sizeof(disk_block));
-	getDiskBlock(blockNum, blockPtr);
+	cacheNode *dataBlockNode = getDiskBlockNode(blockNum, 0);
 
-	unsigned char *ptrIntoBlock = blockPtr->data;
+	unsigned char *ptrIntoBlock = dataBlockNode->dataBlock->data;
 	ptrIntoBlock += blockOffset;
 	memcpy(ptrIntoBlock, filename, FILENAME_SIZE);
 	ptrIntoBlock += FILENAME_SIZE;
 	memcpy(ptrIntoBlock, &(iNodeNum), INODE_ADDRESS_SIZE);
 
-	writeDiskBlock(blockNum, blockPtr);
-	free(blockPtr);
+	dataBlockNode->header->delayedWrite = true;
+	writeDiskBlockNode(dataBlockNode);
 }
 
 /* Fetches the directory disk block of `parentINode` and adds a new entry for `filename`

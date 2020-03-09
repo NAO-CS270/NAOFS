@@ -1,3 +1,4 @@
+#include "dsk/node.h"
 #include "inode/inCoreiNode.h"
 #include "mandsk/params.h"
 #include "trav/directory.h"
@@ -65,14 +66,12 @@ int validateFile(fileTableEntry *file, struct fuse_context *fuse_context) {
 }
 
 void readInBlock(bmapResponse *bmapResp, char *buf, size_t size) {
-	disk_block *blockPtr = (disk_block *)malloc(sizeof(disk_block));
-	getDiskBlock(bmapResp->blockNumber, blockPtr);
-	unsigned char *ptrIntoBlock = blockPtr->data;
+	cacheNode *dataBlockNode = getDiskBlockNode(bmapResp->blockNumber, 0);
+	unsigned char *ptrIntoBlock = dataBlockNode->dataBlock->data;
     printf("WE ARE IN READ!\n");
     printf("block_number: %ld\n", bmapResp->blockNumber);
 	memcpy(buf, ptrIntoBlock + bmapResp->byteOffsetInBlock, size);
-
-	free(blockPtr);
+	writeDiskBlockNode(dataBlockNode);
 }
 
 size_t readBytes(fileTableEntry *file, char *buf, size_t size, size_t offset) {

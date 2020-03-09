@@ -1,6 +1,12 @@
-#include "dsk/mdisk.h"
+#include "dsk/bufferAccess.h"
+#include "dsk/node.h"
+#include "dsk/hashQ.h"
+#include "dsk/freeList.h"
 #include "dsk/diskAccess.h"
+#include "dsk/mdisk.h"
 
+#include <string.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -15,23 +21,44 @@ int setupDisk(const char *inputDev) {
 	int retValue = initDeviceAccessor(inputDev);
 	if (retValue == 0) {
 		isDiskAvailable = true;
+
+		initBufferCacheFreeList();
+		initCacheHashQueues();
 	}
 	return retValue;
 }
 
-int getDiskBlock(size_t blockNumber, disk_block *blockData) {
-	if (isDiskAvailable) {
-		return fetchDeviceDiskBlock(blockNumber, blockData);
-	}
+cacheNode *makeNode(size_t blockNumber) {
+    cacheNode* node = (cacheNode *)malloc(sizeof(cacheNode));
+	memset(node, 0, sizeof(cacheNode));
 
-	return fetchMemoryDiskBlock(blockNumber, blockData);
+	node->header = (blockHeader *)malloc(sizeof(blockHeader));
+	memset(node->header, 0, sizeof(blockHeader));
+	node->header->blockNumber = blockNumber;
+
+    node->dataBlock = (disk_block *)malloc(sizeof(disk_block));
+	memset(node->dataBlock, 0, sizeof(disk_block));
+	disk_block *blockData = (disk_block *)malloc(sizeof(disk_block));
+
+	return node;
 }
 
-int writeDiskBlock(size_t blockNumber, disk_block* blockData) {
+cacheNode *getDiskBlockNode(size_t blockNumber, size_t deviceNumber) {
 	if (isDiskAvailable) {
-		return writeDeviceDiskBlock(blockNumber, blockData);
+		return getBlock(blockNumber, deviceNumber);
 	}
 
-	return writeMemoryDiskBlock(blockNumber, blockData);
+	cacheNode *hellyeah = makeNode(blockNumber);
+	fetchMemoryDiskBlock(blockNumber, hellyeah->dataBlock);
+	return hellyeah;
+}
+
+void writeDiskBlockNode(cacheNode *nodeToWrite) {
+	if (isDiskAvailable) {
+		blockRelease(nodeToWrite);
+		return ;
+	}
+
+	writeMemoryDiskBlock(nodeToWrite->header->blockNumber, nodeToWrite->dataBlock);
 }
 
