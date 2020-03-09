@@ -41,23 +41,26 @@ case "$1" in
         MKROOT=""
         NAOFS=""
         ;;
-	rebuild)
+	build)
 		MAKEGEN="cmake -Bbuild -H."
-		MKROOT=""
 		NAOFS=""
 		;;
-	nomake)
+	mkfs)
 		MAKE=""
-		NAOFS="./naofs -d -f -s -o blkdev -o fsname=$DEVICE_FILE -o allow_other,default_permissions ./fsRoot"
-		;;
-	ondisk)
-		NAOFS="./naofs -d -f -s -o blkdev -o fsname=$DEVICE_FILE -o allow_other,default_permissions ./fsRoot"
-		;;
-	diskinit)
 		GETTOMKFS="cd $BASEDIR/build/src/mkfs"
 		MKFS="./mkfs $DEVICE_FILE"
 		MKROOT=""
 		NAOFS=""
+		;;
+	nologs)
+		MAKE=""
+		MKROOT=""
+		NAOFS="./naofs -s -o blkdev -o fsname=$DEVICE_FILE -o allow_other,default_permissions ./fsRoot"
+		;;
+	debug)
+		MAKE=""
+		MKROOT=""
+		NAOFS="./naofs -d -f -s -o blkdev -o fsname=$DEVICE_FILE -o allow_other,default_permissions ./fsRoot"
 		;;
 	clean)
 		MAKE=""
@@ -76,8 +79,6 @@ $MAKE
 
 $GETTOMKFS
 $MKFS
-
-
 
 $GETIN
 $MKROOT
