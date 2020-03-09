@@ -70,11 +70,6 @@ void readInBlock(bmapResponse *bmapResp, char *buf, size_t size) {
 	unsigned char *ptrIntoBlock = blockPtr->data;
     printf("WE ARE IN READ!\n");
     printf("block_number: %ld\n", bmapResp->blockNumber);
-    int i = 0;
-    for(i=0; i < size; i++) {
-        printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
-    }
-    printf("\n");
 	memcpy(buf, ptrIntoBlock + bmapResp->byteOffsetInBlock, size);
 
 	free(blockPtr);
@@ -124,12 +119,6 @@ int readFile(char *buf, size_t size, off_t offset, struct fuse_file_info *fi, st
 	debug_print("Acquired lock for iNode %ld\n", fileINode->inode_number);
 
 	retVal = validateFile(file, fuse_context);
-	// if (retVal != 0) {
-	// 	debug_print("Some error for fd: %d\n", fi->fh);
-	// 	pthread_mutex_unlock(&(fileINode->iNodeMutex));
-	// 	debug_print("Released lock for inode %ld\n", fileINode->inode_number);
-	// 	return retVal;
-	// }
 
 	size_t bytesRead = readBytes(file, buf, size, offset);
 

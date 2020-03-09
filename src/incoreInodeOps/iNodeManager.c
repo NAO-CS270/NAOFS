@@ -212,13 +212,6 @@ void freeDataBlockInINode(inCoreiNode* iNode, size_t blockNumToRemove) {
 
 	blkTreeOffset * blkOffset = (blkTreeOffset *)malloc(sizeof(blkTreeOffset));
 	calculateOffset(size, blkOffset);
-//	printf("\n");
-//    int i = 0;
-//    while(i<4) {
-//        printf("%ld ", blkOffset->offsets[i]);
-//        i++;
-//    }
-//    printf("\n");
 	freeNeededBlocks(iNode, blockNumToRemove, blkOffset);
 	free(blkOffset);
 }

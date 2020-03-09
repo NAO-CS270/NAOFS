@@ -14,28 +14,27 @@ void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
 
     printf("WE ARE IN WRITE!\n");
     printf("block_number: %ld\n", bmapResp->blockNumber);
-    int i = 0;
-    for(i=0; i < size; i++) {
-        printf("%c", buf[i]);
-    }
-    printf("\n");
-    printf("block data: \n");
-    for(i=0; i < BLOCK_SIZE; ++i) {
-        printf("%c", ptrIntoBlock[i]);
-    }
-    printf("\n");
+//    int i = 0;
+//    for(i=0; i < size; i++) {
+//        printf("%c", buf[i]);
+//    }
+//    printf("\n");
+//    printf("block data: \n");
+//    for(i=0; i < BLOCK_SIZE; ++i) {
+//        printf("%c", ptrIntoBlock[i]);
+//    }
+//    printf("\n");
     memcpy(ptrIntoBlock + bmapResp->byteOffsetInBlock, buf, size);
     
-    for(i=0; i < size; i++) {
-        printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
-    }
-    printf("\n");
+//    for(i=0; i < size; i++) {
+//        printf("%c", (ptrIntoBlock + bmapResp->byteOffsetInBlock)[i]);
+//    }
+//    printf("\n");
     writeDiskBlock(bmapResp->blockNumber, blockPtr);
     free(blockPtr);
 }
 
 int writeToFile(const char* path, const char* buf, size_t size, off_t offset, struct fuse_file_info *fi, struct fuse_context *fuse_context) {
-    printf("filehandler: %ld", fi->fh);
     printf("\nBEGINNING OF WRITE_TO_FILE\n");
     printf("Size: %ld, offset: %ld\n", size, offset);
     if(fi->fh < 0) { // TODO: Do we really need this check?
