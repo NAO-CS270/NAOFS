@@ -16,8 +16,8 @@ cd build
 make
 
 # start the FUSE file system daemon
-mkdir mount_dir
-./naofs ./mount_dir
+mkdir fsRoot
+./naofs -f -s -d -o allow_other,default_permissions fsRoot
 
 # enter the file system and now execute the file system calls
 # TODO: Mention the system calls which are working at present
