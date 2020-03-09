@@ -45,7 +45,7 @@ int attrPopulate(const char *path, struct stat *stbuf) {
 
 int changeMode(const char* path, mode_t mode) {
     inCoreiNode* inode = getFileINode(path, strlen(path));
-    if (inode == NULL) {
+    if (NULL == inode) {
         printf("[changeMode] File not found !!\n");
         return -ENOENT;
     }
@@ -59,5 +59,29 @@ int changeMode(const char* path, mode_t mode) {
     pthread_mutex_unlock(&(inode->iNodeMutex));
     iput(inode);
 
+    return 0;
+}
+
+int changeOwner(const char* path, uid_t uid, gid_t gid) {
+    inCoreiNode* inode = getFileINode(path, strlen(path));
+    if (NULL == inode) {
+        printf("[changeOwner] File not found !!\n");
+        return -ENOENT;
+    }
+    printf("[changeOwner]: uid: %d, gid: %d\n");
+    pthread_mutex_lock(&(inode->iNodeMutex));
+    if (uid != -1) {
+        inode -> owner_uid = uid;
+        if(gid != -1) {
+            inode -> group_uid = gid;
+        }
+        inode -> inode_changed = true;
+    } else if (gid != -1) {
+        inode -> group_uid = gid;
+        inode -> inode_changed = true;
+    }
+
+    pthread_mutex_unlock(&(inode->iNodeMutex));
+    iput(inode);
     return 0;
 }
