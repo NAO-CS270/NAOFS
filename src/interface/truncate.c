@@ -84,12 +84,6 @@ int truncateFile (const char *path, size_t size, struct fuse_context *fuse_conte
 	if (fileINode->type == T_DIRECTORY) {
 		return -EISDIR;
 	}
-//    int counter = 0;
-//    printf("\n");
-//    while (counter < BLOCKS_IN_INODE) {
-//        printf("%ld ", fileINode -> dataBlockNums[counter++]);
-//    }
-//    printf("\n");
 	truncateINode (fileINode, size);
 	pthread_mutex_unlock(&(fileINode->iNodeMutex));
 
