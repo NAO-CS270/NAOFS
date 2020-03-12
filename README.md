@@ -20,23 +20,33 @@ read
 ```
 
 ### Running
-Compile the project - `make nao`
-Mount in random local directory - `./nao tempdir`
-Go into the directory and test commands.
-
-### Test
+Compile the project -
 ```
-mkdir CI-build
-cd CI-build
-cmake ..
-cmake --build .
-ctest  // or ./bin/unit_tests
+cmake -Bbuild -H.
+cd build/
+make
 ```
+* The file system can be run in-memory or be backed by a disk.
+* Size of the file system can be set in `include/mandsk/params.h`.
+* Make a directory to mount the file system in - `mkdir -p ${FILESYSTEM_ROOT}`.
+* Run the filesystem - `./naofs -s ${FILESYSTEM_ROOT}`.
+* The following options can be given -
+	* `-f` to run the filesystem in foreground (prints a lot of logs).
+	* `-d` to enable debug logs (TODO - move the logs printed by above option into this).
+	* `-o blkdev -o fsname=${DEVICE_FILENAME}` to run the file system on the physical disk `DEVICE_NAME`.
 
-### Clean
-`make clean`
+To run the file system on a physical disk, `mkfs` needs to be done on the disk before running our file system -
+```
+cd ${PROJECT_ROOT}/build/src/mkfs
+./mkfs #{DEVICE_FILENAME}
+```
+This would take some time depending on the size of the disk configuired in the project.
 
-
-
-./naofs -f -s -d -o allow_other,default_permissions fsRoot
+To automate all of these steps, we have also provided a script -
+* To setup dependencies, do `./run.sh setup ${DEVICE_FILENAME}`
+* To build, do `./run.sh build`.
+* For mkfs, do `./run.sh mkfs ${DEVICE_FILENAME}`.
+* To run the filesystem, do `./run.sh nologs`.
+* To clean the project, do `./run.sh clean`.
+* To do all these steps in one go, do `./run.sh present ${DEVICE_FILENAME}`
 

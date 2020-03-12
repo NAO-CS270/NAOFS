@@ -52,6 +52,7 @@ int writeToFile(const char* path, const char* buf, size_t size, off_t offset, st
     pthread_mutex_lock(&(_fileTableEntry->inode->iNodeMutex));
     if (offset > _fileTableEntry->inode->size) {
         printf ("Offset past end of file.\n");
+		pthread_mutex_unlock(&(_fileTableEntry->inode->iNodeMutex));
         return -1;
     }
     bmapResponse *bmapResp = (bmapResponse *)malloc(sizeof(bmapResponse));
