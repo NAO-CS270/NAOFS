@@ -1,4 +1,4 @@
-add_library(interface STATIC "close.c" "create.c" "getAttr.c" "link.c" "open.c" "read.c" "truncate.c" "unlink.c" "write.c" "rename.c")
+add_library(interface STATIC close.c create.c getAttr.c link.c open.c read.c truncate.c unlink.c write.c rename.c)
 
 target_include_directories(interface PUBLIC ${PROJECT_INCLUDE_DIRECTORY})
 target_link_libraries(interface PUBLIC fdTable)
