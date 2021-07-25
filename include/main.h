@@ -12,8 +12,8 @@
 #include "mkfs/ialloc.h"
 #include "trav/directory.h"
 
-#define FUSE_USE_VERSION 29
-#include <fuse/fuse.h>
+#define FUSE_USE_VERSION 30
+#include <fuse3/fuse.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>

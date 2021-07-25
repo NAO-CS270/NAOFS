@@ -68,7 +68,7 @@ int changeOwner(const char* path, uid_t uid, gid_t gid) {
         printf("[changeOwner] File not found !!\n");
         return -ENOENT;
     }
-    printf("[changeOwner]: uid: %d, gid: %d\n");
+    printf("[changeOwner]: uid: %d, gid: %d\n", uid, gid);
     pthread_mutex_lock(&(inode->iNodeMutex));
     if (uid != -1) {
         inode -> owner_uid = uid;

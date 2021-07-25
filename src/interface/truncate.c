@@ -9,7 +9,6 @@
 #include "utils/utils.h"
 
 #include <errno.h>
-#include <fuse.h>
 #include <stdlib.h>
 #include <string.h>
 

@@ -1,3 +1,4 @@
+#include "interface/read.h"
 #include "inode/inCoreiNode.h"
 #include "mandsk/params.h"
 #include "trav/directory.h"
@@ -11,7 +12,6 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <fuse.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -31,7 +31,7 @@ void fillDirectoryEntries(fuse_fill_dir_t filler, void *buffer, inCoreiNode *iNo
 
 		counter = 0;
 		while (counter < entriesRead) {
-			filler(buffer, (entryBuffer + counter)->name, NULL, 0);
+			filler(buffer, (entryBuffer + counter)->name, NULL, 0, FUSE_FILL_DIR_PLUS);
 			counter++;
 		}
 		entriesOffset += entriesRead;

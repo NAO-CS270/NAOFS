@@ -4,7 +4,6 @@
 #include "incoreInodeOps/iput.h"
 #include "utils/utils.h"
 
-#include <fuse.h>
 #include <stdbool.h>
 
 int closeFile(struct fuse_file_info *fi, struct fuse_context *fuse_context) {

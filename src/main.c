@@ -38,7 +38,7 @@ static int access_callback(const char* path, int mode) {
     return 0;
 }
 
-static int getattr_callback(const char *path, struct stat *stbuf) {
+static int getattr_callback(const char *path, struct stat *stbuf, struct fuse_file_info *fi) {
 	memset(stbuf, 0, sizeof(struct stat));
 
 	return attrPopulate(path, stbuf);
@@ -49,7 +49,7 @@ static int mkdir_callback(const char* path, mode_t mode) {
 	return createFile(path, T_DIRECTORY, mode, fuse_context);
 }
 
-static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) {
+static int readdir_callback(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi, enum fuse_readdir_flags flags) {
 	return readDirectory(path, buf, filler, offset, fi);
 }
 
@@ -74,24 +74,25 @@ static int read_callback(const char *path, char *buf, size_t size, off_t offset,
 static int release_callback(const char* path, struct fuse_file_info* fi) {
     struct fuse_context *fuse_context = fuse_get_context();
     closeFile(fi, fuse_context);
+	return 0;
 }
 
 /** Change the size of a file */
-static int truncate_callback(const char *path, off_t size) {
+static int truncate_callback(const char *path, off_t size, struct fuse_file_info *fi) {
     struct fuse_context *fuse_context = fuse_get_context();
     return truncateFile (path, size, fuse_context);
 }
 
-static int utimens_callback(const char *path, const struct timespec tv[2]) {
+static int utimens_callback(const char *path, const struct timespec tv[2], struct fuse_file_info *fi) {
     return 0;
 }
 
-static int chown_callback(const char *path, uid_t uid, gid_t gid) {
+static int chown_callback(const char *path, uid_t uid, gid_t gid, struct fuse_file_info *fi) {
     changeOwner(path, uid, gid);
     return 0;
 }
 
-static int chmod_callback(const char *path, mode_t mode) {
+static int chmod_callback(const char *path, mode_t mode, struct fuse_file_info *fi) {
     changeMode(path, mode);
     return 0;
 }
@@ -111,7 +112,7 @@ static int unlink_dir_callback(const char* file) {
     return unlinkDir(file, fuseContext, false);
 }
 
-static int rename_callback (const char* from, const char* to) {
+static int rename_callback (const char* from, const char* to, unsigned int flags) {
     struct fuse_context* fuseContext = fuse_get_context();
     return renameFile(from, to, fuseContext);
 }

@@ -1,3 +1,5 @@
+#include "interface/write.h"
+
 #include "incoreInodeOps/bmap.h"
 #include "fdTable/globalFileTable.h"
 #include "incoreInodeOps/iNodeManager.h"
@@ -5,7 +7,6 @@
 #include "dsk/blkfetch.h"
 #include "utils/utils.h"
 #include <string.h>
-#include <fuse.h>
 
 void writeToBlock(bmapResponse *bmapResp, const char *buf, size_t size) {
     disk_block *blockPtr = (disk_block *)malloc(sizeof(disk_block));

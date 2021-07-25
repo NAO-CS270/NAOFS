@@ -3,7 +3,10 @@
 
 #include "inode/inCoreiNode.h"
 
-#include <fuse.h>
+#ifndef FUSE_USE_VERSION
+#define FUSE_USE_VERSION 30
+#endif
+#include <fuse3/fuse.h>
 #include <stdbool.h>
 
 extern int unlinkFile(const char* file, struct fuse_context* fuseContext);
